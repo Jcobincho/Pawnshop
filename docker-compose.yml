@@ -1,0 +1,57 @@
+﻿version: '3.9'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=Pawnshop
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    restart: always
+    command: postgres -c 'listen_addresses=*'
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - "5050:80"
+
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:3.8-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  api:
+    image: ${DOCKER_REGISTRY-}pawnshop
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+      - 5001:5001
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:5001;http://+:5000
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=pawnshop;Username=postgres;Password=postgres
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    user: root
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+    external: false

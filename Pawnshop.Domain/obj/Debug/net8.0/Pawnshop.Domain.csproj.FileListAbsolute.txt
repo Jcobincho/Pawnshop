@@ -1,0 +1,5 @@
+C:\Users\Jcob\Desktop\Pawnshop\Pawnshop.Domain\obj\Debug\net8.0\Pawnshop.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Jcob\Desktop\Pawnshop\Pawnshop.Domain\obj\Debug\net8.0\Pawnshop.Domain.AssemblyInfoInputs.cache
+C:\Users\Jcob\Desktop\Pawnshop\Pawnshop.Domain\obj\Debug\net8.0\Pawnshop.Domain.AssemblyInfo.cs
+C:\Users\Jcob\Desktop\Pawnshop\Pawnshop.Domain\obj\Debug\net8.0\Pawnshop.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Jcob\Desktop\Pawnshop\Pawnshop.Domain\obj\Debug\net8.0\Pawnshop.Domain.sourcelink.json
