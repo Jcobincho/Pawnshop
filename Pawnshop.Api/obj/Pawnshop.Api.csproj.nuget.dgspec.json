@@ -1,23 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Api\\Pawnshop.Api.csproj": {}
+    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Api\\Pawnshop.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Api\\Pawnshop.Api.csproj": {
+    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Api\\Pawnshop.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Api\\Pawnshop.Api.csproj",
+        "projectUniqueName": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Api\\Pawnshop.Api.csproj",
         "projectName": "Pawnshop.Api",
-        "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Api\\Pawnshop.Api.csproj",
-        "packagesPath": "C:\\Users\\Jcob\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Api\\obj\\",
+        "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Api\\Pawnshop.Api.csproj",
+        "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Api\\obj\\",
         "projectStyle": "PackageReference",
+        "UsingMicrosoftNETSdk": false,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Jcob\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\jakub\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -33,14 +34,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
-                "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj"
+              "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
+                "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj"
               },
-              "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
-                "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj"
+              "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
+                "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj"
               },
-              "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj"
+              "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj"
               }
             }
           }
@@ -80,24 +81,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -106,24 +89,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-preview.1.24101.2/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
+    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj",
+        "projectUniqueName": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj",
         "projectName": "Pawnshop.Application",
-        "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj",
-        "packagesPath": "C:\\Users\\Jcob\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\obj\\",
+        "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj",
+        "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\obj\\",
         "projectStyle": "PackageReference",
+        "UsingMicrosoftNETSdk": false,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Jcob\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\jakub\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -184,43 +168,30 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-preview.1.24101.2/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
+    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
         "projectName": "Pawnshop.Domain",
-        "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
-        "packagesPath": "C:\\Users\\Jcob\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\obj\\",
+        "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
+        "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\obj\\",
         "projectStyle": "PackageReference",
+        "UsingMicrosoftNETSdk": false,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Jcob\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\jakub\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -273,43 +244,30 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-preview.1.24101.2/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj": {
+    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj",
         "projectName": "Pawnshop.Infrastructure",
-        "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\Jcob\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
+        "UsingMicrosoftNETSdk": false,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Jcob\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\jakub\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -325,8 +283,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
-                "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj"
+              "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
+                "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj"
+              },
+              "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
+                "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj"
               }
             }
           }
@@ -380,26 +341,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.1, 8.0.1]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-preview.1.24101.2/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
