@@ -4,9 +4,9 @@ namespace Pawnshop.Domain.Roles;
 
 public static class UserRoles
 {
-    public const string Szef = nameof(Szef);
-    public const string Kierownik = nameof(Kierownik);
-    public const string Pracownik = nameof(Pracownik);
+    public const string Boss = nameof(Boss);
+    public const string Manager = nameof(Manager);
+    public const string Worker = nameof(Worker);
 
     private static List<IdentityRole<Guid>> Roles;
 
@@ -14,9 +14,9 @@ public static class UserRoles
     {
         Roles = new List<IdentityRole<Guid>>()
         {
-            new(Szef),
-            new(Kierownik),
-            new(Pracownik)
+            new(Boss),
+            new(Manager),
+            new(Worker)
         };
     }
     
