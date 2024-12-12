@@ -13,7 +13,6 @@
         "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Api\\obj\\",
         "projectStyle": "PackageReference",
-        "UsingMicrosoftNETSdk": false,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
@@ -65,6 +64,12 @@
               "target": "Package",
               "version": "[8.0.10, )"
             },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
@@ -102,7 +107,6 @@
         "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\obj\\",
         "projectStyle": "PackageReference",
-        "UsingMicrosoftNETSdk": false,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
@@ -186,7 +190,6 @@
         "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\obj\\",
         "projectStyle": "PackageReference",
-        "UsingMicrosoftNETSdk": false,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
@@ -262,7 +265,6 @@
         "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
-        "UsingMicrosoftNETSdk": false,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],

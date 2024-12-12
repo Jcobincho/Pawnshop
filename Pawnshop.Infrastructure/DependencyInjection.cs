@@ -13,7 +13,7 @@ public static class DependencyInjection
     {
         services.DatabaseConfiguration(configuration);
         
-        services.AddSingleton<SignInManager<Users>>();
+        services.AddScoped<SignInManager<Users>>();
         services.AddScoped<UserManager<Users>>();
 
         services.Configure<IdentityOptions>(options =>
