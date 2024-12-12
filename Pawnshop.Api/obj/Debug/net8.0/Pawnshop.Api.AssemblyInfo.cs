@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pawnshop.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e54bf95e8efa8a30acf0b666ecfefd83346ff18")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+34e2253c07f68e3ef3c515002435a5705510e292")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pawnshop.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pawnshop.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

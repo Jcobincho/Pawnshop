@@ -15,6 +15,25 @@ public static class DependencyInjection
         
         services.AddSingleton<SignInManager<Users>>();
         services.AddScoped<UserManager<Users>>();
+
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 8;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequiredUniqueChars = 6;
+            
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMilliseconds(5);
+            
+            options.User.RequireUniqueEmail = true;
+            options.SignIn.RequireConfirmedEmail = false;
+        });
+        
+        services.AddHttpContextAccessor();
+        
+        
         
         return services;
     }
