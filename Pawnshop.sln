@@ -1,38 +1,37 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{075573F7-5228-481E-A871-E34B07403A85}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{0758596B-159E-4E3B-AAF2-8E10095B9A73}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mobile", "Mobile", "{5EE2678D-FF7C-4391-A600-8D702A20A771}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7FF8DF40-5C76-49E6-A605-285506EA3829}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pawnshop.Api", "Pawnshop.Api\Pawnshop.Api.csproj", "{C5408375-B7FF-4584-912C-26AD65DE60A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pawnshop.Api", "Pawnshop.Api\Pawnshop.Api.csproj", "{C5408375-B7FF-4584-912C-26AD65DE60A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pawnshop.Infrastructure", "Pawnshop.Infrastructure\Pawnshop.Infrastructure.csproj", "{695C1BDB-85D9-4FBA-B77E-B073EA418E77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pawnshop.Infrastructure", "Pawnshop.Infrastructure\Pawnshop.Infrastructure.csproj", "{695C1BDB-85D9-4FBA-B77E-B073EA418E77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pawnshop.Application", "Pawnshop.Application\Pawnshop.Application.csproj", "{080098EA-D6D2-48D5-810D-0B29B33784EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pawnshop.Application", "Pawnshop.Application\Pawnshop.Application.csproj", "{080098EA-D6D2-48D5-810D-0B29B33784EE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02524DD1-993C-4B3F-BEDC-2E8F101C3D2F}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		docker-compose.yml = docker-compose.yml
 		Dockerfile = Dockerfile
-		.dockerignore = .dockerignore
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pawnshop.Domain", "Pawnshop.Domain\Pawnshop.Domain.csproj", "{03CA8E85-C6B5-4BE6-BED7-28DDCD126091}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pawnshop.Domain", "Pawnshop.Domain\Pawnshop.Domain.csproj", "{03CA8E85-C6B5-4BE6-BED7-28DDCD126091}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{07D4C765-01AE-4FAE-86BF-2FA946893FBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pawnshop.Web", "Pawnshop.Web\Pawnshop.Web.csproj", "{98AB90D2-061B-4A4F-8ADC-5B108E8E51C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{C5408375-B7FF-4584-912C-26AD65DE60A3} = {075573F7-5228-481E-A871-E34B07403A85}
-		{695C1BDB-85D9-4FBA-B77E-B073EA418E77} = {075573F7-5228-481E-A871-E34B07403A85}
-		{080098EA-D6D2-48D5-810D-0B29B33784EE} = {075573F7-5228-481E-A871-E34B07403A85}
-		{03CA8E85-C6B5-4BE6-BED7-28DDCD126091} = {075573F7-5228-481E-A871-E34B07403A85}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C5408375-B7FF-4584-912C-26AD65DE60A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -51,5 +50,22 @@ Global
 		{03CA8E85-C6B5-4BE6-BED7-28DDCD126091}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03CA8E85-C6B5-4BE6-BED7-28DDCD126091}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03CA8E85-C6B5-4BE6-BED7-28DDCD126091}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98AB90D2-061B-4A4F-8ADC-5B108E8E51C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98AB90D2-061B-4A4F-8ADC-5B108E8E51C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98AB90D2-061B-4A4F-8ADC-5B108E8E51C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98AB90D2-061B-4A4F-8ADC-5B108E8E51C1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C5408375-B7FF-4584-912C-26AD65DE60A3} = {075573F7-5228-481E-A871-E34B07403A85}
+		{695C1BDB-85D9-4FBA-B77E-B073EA418E77} = {075573F7-5228-481E-A871-E34B07403A85}
+		{080098EA-D6D2-48D5-810D-0B29B33784EE} = {075573F7-5228-481E-A871-E34B07403A85}
+		{03CA8E85-C6B5-4BE6-BED7-28DDCD126091} = {075573F7-5228-481E-A871-E34B07403A85}
+		{98AB90D2-061B-4A4F-8ADC-5B108E8E51C1} = {07D4C765-01AE-4FAE-86BF-2FA946893FBF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C27419D0-5075-4469-BE6E-8CEC1C4D1905}
 	EndGlobalSection
 EndGlobal
