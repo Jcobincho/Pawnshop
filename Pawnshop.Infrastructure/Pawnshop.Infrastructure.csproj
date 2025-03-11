@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Pawnshop.Application\Pawnshop.Application.csproj" />
+      <ProjectReference Include="..\Pawnshop.Domain\Pawnshop.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>

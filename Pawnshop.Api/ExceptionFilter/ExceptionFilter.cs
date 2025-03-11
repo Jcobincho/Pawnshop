@@ -51,7 +51,7 @@ public class ExceptionFilter : IExceptionFilter
                 result = JsonSerializer.Serialize(new 
                 { 
                     error = "Something went wrong!", 
-                    details = context.Exception.ToString() // Add error details for internal errors
+                    details = context.Exception.ToString()
                 });
                 break;
         }
