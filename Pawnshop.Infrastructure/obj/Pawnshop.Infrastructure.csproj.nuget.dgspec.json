@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj": {}
+    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
+    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj",
+        "projectUniqueName": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj",
         "projectName": "Pawnshop.Application",
-        "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj",
-        "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\obj\\",
+        "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj",
+        "packagesPath": "C:\\Users\\Jcob\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\jakub\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Jcob\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -87,20 +87,20 @@
         }
       }
     },
-    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
+    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
         "projectName": "Pawnshop.Domain",
-        "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
-        "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\obj\\",
+        "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
+        "packagesPath": "C:\\Users\\Jcob\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\jakub\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Jcob\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -162,20 +162,20 @@
         }
       }
     },
-    "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj": {
+    "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj",
         "projectName": "Pawnshop.Infrastructure",
-        "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Pawnshop.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\Jcob\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\jakub\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Jcob\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -191,11 +191,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
-                "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj"
+              "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj": {
+                "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Application\\Pawnshop.Application.csproj"
               },
-              "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
-                "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj"
+              "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj": {
+                "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj"
               }
             }
           }

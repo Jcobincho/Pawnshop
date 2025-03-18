@@ -816,24 +816,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\jakub\\.nuget\\packages\\": {},
+    "C:\\Users\\Jcob\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
+      "projectUniqueName": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
       "projectName": "Pawnshop.Domain",
-      "projectPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
-      "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Domain\\obj\\",
+      "projectPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\Pawnshop.Domain.csproj",
+      "packagesPath": "C:\\Users\\Jcob\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Domain\\obj\\",
       "projectStyle": "PackageReference",
-      "UsingMicrosoftNETSdk": false,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\jakub\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Jcob\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
