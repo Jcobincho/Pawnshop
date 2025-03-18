@@ -7,7 +7,11 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Application.Base
 {
-    public abstract class BaseCommand<TResponse> : BaseCommand, IRequest<TResponse> { }
+    public abstract class BaseCommand<TResponse> : BaseCommand, IRequest<TResponse>
+        where TResponse : class
+    { 
+    
+    }
 
     public abstract class BaseCommand
     {
