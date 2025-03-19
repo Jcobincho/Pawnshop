@@ -9,6 +9,7 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
 {
     public DbContext(DbContextOptions<DbContext> options) : base(options){}
     
+    public DbSet<Employees> Employee { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

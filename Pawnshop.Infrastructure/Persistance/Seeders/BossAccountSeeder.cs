@@ -26,21 +26,13 @@ public class BossAccountSeeder
         {
             Email = Email,
             UserName = Email,
-            Name = Name,
-            Surname = Surname,
         };
         
         var createUser = await userManager.CreateAsync(bossUser, Password);
         if (!createUser.Succeeded) throw new CreateUserException(createUser.Errors);
 
-        var addBossRole = await userManager.AddToRoleAsync(bossUser, UserRoles.Boss);
+        var addBossRole = await userManager.AddToRoleAsync(bossUser, UserRoles.HeadAdmin);
         if (!addBossRole.Succeeded) throw new BadRequestException("You cannot add boss role");
-        
-        var addManagerRole = await userManager.AddToRoleAsync(bossUser, UserRoles.Manager);
-        if (!addManagerRole.Succeeded) throw new BadRequestException("You cannot add manager role");
-        
-        var addWorkerRole = await userManager.AddToRoleAsync(bossUser, UserRoles.Worker);
-        if (!addWorkerRole.Succeeded) throw new BadRequestException("You cannot add worker role");
         
         var addEmail = await userManager.AddClaimAsync(bossUser, new Claim(ClaimTypes.Email, Email));
         if (!addEmail.Succeeded) throw new BadRequestException("You cannot add email claim");

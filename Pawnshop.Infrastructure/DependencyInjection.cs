@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pawnshop.Application.Users.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Infrastructure.Persistance.Extensions;
+using Pawnshop.Infrastructure.Services.Users.Services;
 
 namespace Pawnshop.Infrastructure;
 
@@ -32,9 +34,13 @@ public static class DependencyInjection
         });
         
         services.AddHttpContextAccessor();
-        
-        
-        
+
+        // Interfaces Dependency Injection
+
+        // Users services
+        services.AddScoped<IUsersCommandService, UsersService>();
+        services.AddScoped<IUsersQueryService, UsersService>();
+
         return services;
     }
 }

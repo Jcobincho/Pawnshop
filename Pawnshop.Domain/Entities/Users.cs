@@ -6,8 +6,7 @@ namespace Pawnshop.Domain.Entities;
 
 public class Users : IdentityUser<Guid>
 {
-    public string Name { get; set; }
-    public string Surname { get; set; }
+    public Guid? EmployeesId { get; set; } = new Guid();
 }
 
 public class UserConfiguration : IEntityTypeConfiguration<Users>

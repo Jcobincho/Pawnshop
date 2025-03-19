@@ -16,11 +16,12 @@ public static class AddDatabase
             optionsBuilder => optionsBuilder.MigrationsAssembly(typeof(AddDatabase).Assembly.FullName)));
 
         services.AddHostedService<InitialDatabaseSeeder>();
-        
+
         services.AddIdentity<Users, IdentityRole<Guid>>()
             .AddEntityFrameworkStores<DbContext>()
             .AddDefaultTokenProviders();
-        
+
+
         return services;
     }
 }

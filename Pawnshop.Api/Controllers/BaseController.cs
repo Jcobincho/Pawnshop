@@ -22,7 +22,7 @@ namespace Pawnshop.Api.Controllers
             _sender = sender;
         }
 
-        [HttpPost]
+        [HttpPost()]
         public virtual async Task<IActionResult> AddAsync([FromBody] TAddData data, CancellationToken cancellation)
         {
             if (data == null)
@@ -33,7 +33,7 @@ namespace Pawnshop.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPut]
+        [HttpPut()]
         public virtual async Task<IActionResult> PutAsync([FromBody] TPutData data, CancellationToken cancellation)
         {
             if (data == null)
@@ -44,7 +44,7 @@ namespace Pawnshop.Api.Controllers
             return Ok(response);
         }
 
-        [HttpDelete]
+        [HttpDelete()]
         public virtual async Task<IActionResult> DeteleAsync([FromBody] TDeleteData data, CancellationToken cancellation)
         {
             if (data == null)
@@ -55,7 +55,7 @@ namespace Pawnshop.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet]
+        [HttpGet()]
         public virtual async Task<IActionResult> GetAsync([FromQuery] TGetData data, CancellationToken cancellation)
         {
             var response = await _sender.Send(data, cancellation);
