@@ -1,0 +1,72 @@
+﻿@page "/"
+
+<PageTitle> Login page </PageTitle>
+
+<div class="card cw-480">
+    <EditForm Model="@DataToLogin"
+              OnValidSubmit="@HandleValidSubmit"
+              OnInvalidSubmit="@HandleInvalidSubmit"
+              Context="EditFormContext">
+        <DataAnnotationsValidator />
+        <div class="card-header text-center py-3">
+            <h4>Welcome to DevExpress</h4>
+            <p class="tm-8 mb-0 fw-normal fs-825">
+                Log in to see it in action
+            </p>
+        </div>
+        <div class="card-body">
+            <DxFormLayout>
+                <DxFormLayoutItem ColSpanMd="12">
+                    <label for="tbUsername" class="d-none">Username</label>
+                    <DxTextBox @bind-Text="@DataToLogin.Login"
+                               NullText="Username"
+                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                               InputId="tbUsername" />
+                    <div class="text-danger">
+                        <ValidationMessage For="@(() => DataToLogin.Login)" />
+                    </div>
+                </DxFormLayoutItem>
+                <DxFormLayoutItem ColSpanMd="12">
+                    <label for="tbPassword" class="d-none">Password</label>
+                    <DxTextBox @bind-Text="@DataToLogin.Password"
+                               NullText="Password"
+                               Password="true"
+                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                               InputId="tbPassword" />
+                    <div class="text-danger">
+                        <ValidationMessage For="@(() => DataToLogin.Password)" />
+                    </div>
+                </DxFormLayoutItem>
+                <DxFormLayoutItem ColSpanMd="12">
+                    <DxButton CssClass="w-100"
+                              Text="Login"
+                              RenderStyle="ButtonRenderStyle.Primary"
+                              SubmitFormOnClick="true" />
+                </DxFormLayoutItem>
+            </DxFormLayout>
+        </div>
+    </EditForm>
+</div>
+
+
+@code {
+    private string FormSubmitResult { get; set; } = string.Empty;
+
+    private LoginData DataToLogin = new LoginData();
+
+    void HandleValidSubmit()
+    {
+        FormSubmitResult = "You have been logged in successully.";
+    }
+
+    void HandleInvalidSubmit()
+    {
+        FormSubmitResult = "";
+    }
+
+    public class LoginData
+    {
+        public string Login { get; set; }
+        public string Password { get; set; }
+    }
+}

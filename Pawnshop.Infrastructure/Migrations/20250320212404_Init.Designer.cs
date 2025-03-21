@@ -12,8 +12,8 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20241212095129_Initial")]
-    partial class Initial
+    [Migration("20250320212404_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -155,6 +155,32 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Employees", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SecondName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Employee");
+                });
+
             modelBuilder.Entity("Pawnshop.Domain.Entities.Users", b =>
                 {
                     b.Property<Guid>("Id")
@@ -175,15 +201,14 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("EmployeesId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -203,10 +228,6 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")

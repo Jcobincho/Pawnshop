@@ -3117,7 +3117,6 @@
       "packagesPath": "C:\\Users\\jakub\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\jakub\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
-      "UsingMicrosoftNETSdk": false,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],

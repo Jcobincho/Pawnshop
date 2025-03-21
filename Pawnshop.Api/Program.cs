@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Pawnshop.Api.ExceptionFilter;
 using Pawnshop.Api.Extensions;
 using Pawnshop.Application;
+using Pawnshop.Domain.Entities;
 using Pawnshop.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,8 @@ builder.Services
     .CorsExtension()
     .SwaggerExtension();
 
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +31,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();

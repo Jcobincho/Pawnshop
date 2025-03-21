@@ -29,15 +29,15 @@ public class ExceptionFilter : IExceptionFilter
                     error = badRequestException.ErrorMessage
                 });
                 break;
-            
-            // case CreateUserException createUserException:
-            //     statusCode = HttpStatusCode.BadRequest;
-            //     result = JsonSerializer.Serialize(new
-            //     {
-            //         error = createUserException.Errors
-            //     });
-            //     break;
-            
+
+            case CreateUserException createUserException:
+                statusCode = HttpStatusCode.BadRequest;
+                result = JsonSerializer.Serialize(new
+                {
+                    error = createUserException.Errors
+                });
+                break;
+
             case NotFoundException notFoundException:
                 statusCode = HttpStatusCode.NotFound;
                 result = JsonSerializer.Serialize(new
