@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pawnshop.Application.Users.Responses
+namespace Pawnshop.Application.Users.Commands.CreateUser
 {
-    internal class dummy
+    public sealed class CreateUserValidator
     {
+
     }
 }
