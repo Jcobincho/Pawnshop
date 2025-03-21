@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Pawnshop.Application.Users.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Infrastructure.Persistance.Extensions;
-using Pawnshop.Infrastructure.Services.Users.Services;
+using Pawnshop.Infrastructure.Services.UsersInfrastructure.Services;
 
 namespace Pawnshop.Infrastructure;
 

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pawnshop.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8356a48af4cb6422435f028d4f7769664b86ed5b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+10ec855af950278ac2f39d1fea447d16a7a50f71")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pawnshop.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pawnshop.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
