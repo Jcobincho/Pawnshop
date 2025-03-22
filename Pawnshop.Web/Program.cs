@@ -1,3 +1,4 @@
+using MudBlazor.Services;
 using Pawnshop.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddDevExpressBlazor();
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 

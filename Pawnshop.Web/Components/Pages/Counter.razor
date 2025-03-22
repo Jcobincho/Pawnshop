@@ -1,4 +1,5 @@
 ﻿@page "/counter"
+@using MudBlazor
 @rendermode InteractiveServer
 
 <PageTitle>Counter</PageTitle>
@@ -9,19 +10,21 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
-<button class="btn btn-primary" @onclick="Decrement"> Decrement </button>
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+    <MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Servers</MudNavLink>
+    <MudNavGroup Title="Settings" Expanded="true">
+        <MudNavLink Href="/users"  Match="NavLinkMatch.Prefix">Users</MudNavLink>
+        <MudNavLink Href="/security"  Match="NavLinkMatch.Prefix">Security</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Href="/about"  Match="NavLinkMatch.Prefix">About</MudNavLink>
+</MudNavMenu>
 
 @code {
-
     private int currentCount = 0;
 
     private void IncrementCount()
     {
         currentCount++;
-    }
-
-    private void Decrement()
-    {
-        currentCount--;
     }
 }
