@@ -6,6 +6,8 @@
 [Oo]utput/
 [Ll]og/
 [Ll]ogs/
+[Bb]in/
+[Oo]bj/
 
 # User-specific files
 *.user
