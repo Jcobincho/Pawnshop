@@ -1,0 +1,32 @@
+﻿@page "/"
+
+<PageTitle> Login page </PageTitle>
+
+<div class="min-vh-100 d-flex align-items-center">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-sm-7 col-md-5"> <!-- Dostosuj szerokość np. col-md-5 -->
+                <MudPaper Class="pa-4">
+                    <MudForm @bind-IsValid="@success" @bind-Errors="errors">
+                        <MudTextField T="string" 
+                                    Label="Username"
+                                    Required="true"
+                                    RequiredError="User name is required."
+                                    InputType="InputType.Text" />
+
+                        <MudTextField T="string"
+                                    Label="Password"
+                                    Required="true"
+                                    RequiredError="Password is required."
+                                    InputType="InputType.Password" />
+                    </MudForm>
+                </MudPaper>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    bool success;
+    string[] errors = { };
+}
