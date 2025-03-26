@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.Entities;
+using Pawnshop.Infrastructure.Behaviors;
 using Pawnshop.Infrastructure.Persistance.Extensions;
 using Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.Services;
@@ -50,6 +52,9 @@ public static class DependencyInjection
 
         // User claims data provicer service
         services.AddScoped<IUserClaimsDataProviderService, UserClaimsDataProviderService>();
+
+        // Register pipeline behavior for getting user id from claims
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UserIdPipelineBehavior<,>));
 
         return services;
     }

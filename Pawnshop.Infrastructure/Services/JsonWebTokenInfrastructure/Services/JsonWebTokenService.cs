@@ -78,7 +78,7 @@ namespace Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services
             return new RefreshToken
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expires = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpire)
+                Expires = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpire)
             };
         }
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pawnshop.Application.Base;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
+using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
 
 namespace Pawnshop.Api.Controllers
@@ -54,6 +55,25 @@ namespace Pawnshop.Api.Controllers
             Response.Cookies.Append("refresh-token", response.RefreshToken.Token, cookie);
 
             return Ok(response);
+        }
+
+        [HttpPost("logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+        {
+            var refreshToken = Request.Cookies["refresh-token"];
+
+            var command = new LogoutCommand()
+            {
+                RefreshToken = refreshToken
+            };
+
+            var resposne = await Sender.Send(command, cancellationToken);
+
+            Response.Cookies.Delete("refresh-token");
+
+            return Ok(resposne);
         }
 
         [NonAction]

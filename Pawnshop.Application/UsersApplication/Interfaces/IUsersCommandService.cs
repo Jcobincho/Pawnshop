@@ -11,6 +11,6 @@ namespace Pawnshop.Application.UsersApplication.Interfaces
         Task<Guid> CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken);
         Task<JsonWebToken> LoginUserAsync(LoginUserCommand command, CancellationToken cancellationToken);
         Task<JsonWebToken> RefreshTokenAsync(RefreshTokenCommand command, CancellationToken cancellationToken);
-        Task SignOut(LogoutCommand? command, CancellationToken cancellationToken);
+        Task LogoutAsync(LogoutCommand? command, CancellationToken cancellationToken);
     }
 }

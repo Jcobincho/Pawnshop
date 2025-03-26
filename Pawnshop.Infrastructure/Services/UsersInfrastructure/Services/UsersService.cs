@@ -151,7 +151,7 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
 
         }
 
-        public async Task SignOut(LogoutCommand? command, CancellationToken cancellationToken)
+        public async Task LogoutAsync(LogoutCommand? command, CancellationToken cancellationToken)
         {
             var user = await _userManager.Users.Include(x => x.RefreshToken)
                                                   .SingleOrDefaultAsync(x => x.Id == command.UserIdFromClaims, cancellationToken)

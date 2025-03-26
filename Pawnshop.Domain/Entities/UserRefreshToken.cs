@@ -10,20 +10,20 @@ namespace Pawnshop.Domain.Entities
     {
         public Guid Id { get; set; }
         public string Token { get; set; }
-        public DateTime Expires { get; set; }
-        public bool IsExpired => DateTime.Now >= Expires;
+        public DateTimeOffset Expires { get; set; }
+        public bool IsExpired => DateTimeOffset.UtcNow >= Expires;
 
         public UserRefreshToken()
         {
             
         }
 
-        private UserRefreshToken(string token, DateTime expires)
+        private UserRefreshToken(string token, DateTimeOffset expires)
         {
             Token = token;
             Expires = expires;
         }
 
-        public static UserRefreshToken Create(string token, DateTime expires) => new(token, expires);
+        public static UserRefreshToken Create(string token, DateTimeOffset expires) => new(token, expires);
     }
 }
