@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Application.UsersApplication.Responses
 {
-    
     public sealed class CreateUserResponse
     {
         public Guid UserId { get; set; }

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Application.UsersApplication.Responses
 {
-    internal class LogoutResponse
+    public sealed class LogoutResponse
     {
+        public string Response { get; set; }
     }
 }

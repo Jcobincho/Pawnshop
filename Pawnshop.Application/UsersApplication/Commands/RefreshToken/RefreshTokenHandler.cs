@@ -21,7 +21,7 @@ namespace Pawnshop.Application.UsersApplication.Commands.RefreshToken
 
         public async Task<JsonWebToken> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            return await _usersCommandService.RefreshToken(request, cancellationToken);
+            return await _usersCommandService.RefreshTokenAsync(request, cancellationToken);
         }
     }
 }

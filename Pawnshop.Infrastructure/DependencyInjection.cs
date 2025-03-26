@@ -2,10 +2,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
+using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Infrastructure.Persistance.Extensions;
 using Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UsersInfrastructure.Services;
 
 namespace Pawnshop.Infrastructure;
@@ -45,6 +47,9 @@ public static class DependencyInjection
 
         // JsonWebToken service
         services.AddScoped<IJsonWebTokenService, JsonWebTokenService>();
+
+        // User claims data provicer service
+        services.AddScoped<IUserClaimsDataProviderService, UserClaimsDataProviderService>();
 
         return services;
     }

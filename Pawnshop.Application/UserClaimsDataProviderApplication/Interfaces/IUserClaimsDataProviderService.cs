@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces
+﻿namespace Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces
 {
-    internal interface IUserClaimsDataProviderService
+    public interface IUserClaimsDataProviderService
     {
+        Guid GetUserIdFromClaims();
     }
 }

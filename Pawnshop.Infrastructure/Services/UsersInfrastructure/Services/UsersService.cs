@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
+using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.AuthTokens;
@@ -121,7 +122,7 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             return jwtToken;
         }
 
-        public async Task<JsonWebToken> RefreshToken(RefreshTokenCommand command, CancellationToken cancellationToken)
+        public async Task<JsonWebToken> RefreshTokenAsync(RefreshTokenCommand command, CancellationToken cancellationToken)
         {
             var user = await _userManager.Users.Include(x => x.RefreshToken)
                                                .SingleOrDefaultAsync(x => x.RefreshToken.Any(token => token.Token == command.RefreshToken), cancellationToken)
@@ -148,6 +149,24 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
 
             return jwtToken;
 
+        }
+
+        public async Task SignOut(LogoutCommand? command, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.Users.Include(x => x.RefreshToken)
+                                                  .SingleOrDefaultAsync(x => x.Id == command.UserIdFromClaims, cancellationToken)
+                                                ?? throw new NotFoundException("Invalid refresh token.");
+
+            var token = user.RefreshToken.FirstOrDefault(x => x.Token == command.RefreshToken);
+
+            if (token is null) throw new NotFoundException("Invalid refresh token.");
+            
+
+            user.DeleteRefreshToken(token);
+            _dbContext.Update(user);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            await _signInManager.SignOutAsync();
         }
     }
 }

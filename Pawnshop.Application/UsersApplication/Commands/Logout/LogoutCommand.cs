@@ -10,6 +10,6 @@ namespace Pawnshop.Application.UsersApplication.Commands.Logout
 {
     public class LogoutCommand : BaseCommand<LogoutResponse>
     {
-        public string RefreshToken { get; set; }
+        public string? RefreshToken { get; set; }
     }
 }
