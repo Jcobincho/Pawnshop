@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using System.Text.Json.Serialization;
 
 namespace Pawnshop.Application.Base
 {
@@ -9,6 +10,7 @@ namespace Pawnshop.Application.Base
 
     public abstract class BaseCommand
     {
-        public Guid UserIdFromClaims { get; set; }
+        [JsonIgnore]
+        public Guid UserIdFromClaims { get; internal set; }
     }
 }
