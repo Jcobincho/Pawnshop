@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
+using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.AuthTokens;
 using Pawnshop.Domain.Entities;
@@ -118,6 +119,35 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return jwtToken;
+        }
+
+        public async Task<JsonWebToken> RefreshToken(RefreshTokenCommand command, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.Users.Include(x => x.RefreshToken)
+                                               .SingleOrDefaultAsync(x => x.RefreshToken.Any(token => token.Token == command.RefreshToken), cancellationToken)
+                                               ?? throw new BadRequestException("Invalid refresh token.");
+
+            var currentToken = user.RefreshToken.Single(x => x.Token == command.RefreshToken);
+
+            if (currentToken.IsExpired) throw new BadRequestException("Invalid refresh token.");
+
+            user.DeleteRefreshToken(currentToken);
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var userClaims = await _userManager.GetClaimsAsync(user);
+
+            var jwtToken = _jsonWebTokenService.GenerateJsonWebToken(user, userRoles, userClaims);
+            var newRefreshToken = _jsonWebTokenService.GenerateRefreshToken();
+
+            jwtToken.RefreshToken = newRefreshToken;
+            _jsonWebTokenService.DeleteExpiresRefreshToken(user);
+            user.AddRefreshToken(newRefreshToken);
+
+            _dbContext.Update(user);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return jwtToken;
+
         }
     }
 }

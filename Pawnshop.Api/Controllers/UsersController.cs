@@ -22,6 +22,26 @@ namespace Pawnshop.Api.Controllers
             return Ok(response);
         }
 
+        [HttpPost("refresh-token")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> RefreshToken(CancellationToken cancellationToken)
+        {
+            var refreshToken = Request.Cookies["refresh-token"];
+            var response = await Sender.Send(new RefreshTokenCommand(refreshToken), cancellationToken);
+
+            var cookie = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = response.RefreshToken.Expires
+            };
+
+            Response.Cookies.Append("refresh-token", response.RefreshToken.Token, cookie);
+
+            return Ok(response);
+        }
+
+
         [NonAction]
         public override Task<IActionResult> GetAsync([FromQuery] BaseQuery data, CancellationToken cancellation)
         {
