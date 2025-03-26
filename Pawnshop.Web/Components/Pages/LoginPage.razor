@@ -1,30 +1,77 @@
 ﻿@page "/"
+@using Pawnshop.Application.UsersApplication.Commands.CreateUser
 
-<PageTitle> Login page </PageTitle>
+<PageTitle>Login page</PageTitle>
 
-<div class="min-vh-100 d-flex align-items-center">
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-sm-7 col-md-5"> <!-- Dostosuj szerokość np. col-md-5 -->
-                <MudPaper Class="pa-4">
-                    <MudForm @bind-IsValid="@success" @bind-Errors="errors">
-                        <MudTextField T="string" 
-                                    Label="Username"
-                                    Required="true"
-                                    RequiredError="User name is required."
-                                    InputType="InputType.Text" />
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-                        <MudTextField T="string"
-                                    Label="Password"
-                                    Required="true"
-                                    RequiredError="Password is required."
-                                    InputType="InputType.Password" />
-                    </MudForm>
-                </MudPaper>
-            </div>
+<MudContainer Class="min-vh-100 d-flex align-items-center" MaxWidth="MaxWidth.Medium">
+    <MudCard Class="d-flex w-100" Elevation="25">
+        <div class="row g-0 w-100" style="height: 60vh;">
+            <!-- Nadajemy stałą wysokość -->
+            @* Lewa karta *@
+            <MudCard Class="col-md-6 h-100 d-flex flex-column"
+                     Style="background: linear-gradient(to bottom, #1976d2 30%, #2196f3 70%)">
+                <MudCardContent Class="flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="text-center">
+                        <MudIcon Icon="@Icons.Custom.Brands.MudBlazor"
+                                 Size="Size.Large"
+                                 Color="Color.Inherit"
+                                 Style="font-size: 8rem; color: white;"
+                                 Class="mb-4" />
+
+                        <MudText Typo="Typo.h3" Class="white--text mb-2">Welcome to</MudText>
+                        <MudText Typo="Typo.h2" Class="white--text font-weight-bold">Pawnshop System</MudText>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+
+            @* Prawa karta *@
+            <MudCard Class="col-md-6 h-100 d-flex flex-column">
+                <MudCardContent Class="flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="w-100 px-6">
+                        <div class="text-center mb-6">
+                            <MudText Typo="Typo.h4" Class="font-weight-bold">Formularz logowania</MudText>
+                        </div>
+
+                        <MudForm @bind-IsValid="@success" @bind-Errors="errors">
+                            <MudTextField T="string"
+                                          Label="Username"
+                                          Required="true"
+                                          RequiredError="User name is required."
+                                          Variant="Variant.Outlined"
+                                          FullWidth="true"
+                                          Margin="Margin.Dense"
+                                          Class="mb-6" />
+
+                            <MudTextField T="string"
+                                          Label="Password"
+                                          Required="true"
+                                          RequiredError="Password is required."
+                                          Variant="Variant.Outlined"
+                                          InputType="InputType.Password"
+                                          FullWidth="true"
+                                          Margin="Margin.Dense"
+                                          Class="mb-8" />
+
+                            <div class="d-flex justify-content-end">
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Large"
+                                           ButtonType="ButtonType.Submit"
+                                           Class="px-8 py-3">
+                                    Sign In
+                                </MudButton>
+                            </div>
+                        </MudForm>
+                    </div>
+                </MudCardContent>
+            </MudCard>
         </div>
-    </div>
-</div>
+    </MudCard>
+</MudContainer>
 
 @code {
     bool success;

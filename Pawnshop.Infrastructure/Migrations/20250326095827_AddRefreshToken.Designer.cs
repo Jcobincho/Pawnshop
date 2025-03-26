@@ -12,8 +12,8 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250320212404_Init")]
-    partial class Init
+    [Migration("20250326095827_AddRefreshToken")]
+    partial class AddRefreshToken
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -181,6 +181,29 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.ToTable("Employee");
                 });
 
+            modelBuilder.Entity("Pawnshop.Domain.Entities.UserRefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("UsersId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("UserRefreshToken");
+                });
+
             modelBuilder.Entity("Pawnshop.Domain.Entities.Users", b =>
                 {
                     b.Property<Guid>("Id")
@@ -298,6 +321,18 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.UserRefreshToken", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Users", null)
+                        .WithMany("RefreshToken")
+                        .HasForeignKey("UsersId");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Users", b =>
+                {
+                    b.Navigation("RefreshToken");
                 });
 #pragma warning restore 612, 618
         }

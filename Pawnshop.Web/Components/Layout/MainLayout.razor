@@ -7,6 +7,7 @@
 <MudSnackbarProvider />
 
 <MudLayout>
+
     <AuthorizeView>
         <Authorized>
             <MudAppBar Elevation="1" Dense="false">
@@ -20,15 +21,13 @@
                 </MudDrawerHeader>
                 <NavMenu />
             </MudDrawer>
-            <div class="p-2">
+            <div>
                 <MudMainContent>
                     @Body
                 </MudMainContent>
             </div>
         </Authorized>
-    </AuthorizeView>
-    
-    <AuthorizeView>
+
         <NotAuthorized>
             <MudMainContent>
                 @Body
