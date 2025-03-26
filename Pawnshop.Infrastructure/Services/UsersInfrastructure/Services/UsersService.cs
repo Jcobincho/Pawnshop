@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Pawnshop.Application.Users.Interfaces;
+using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
+using Pawnshop.Application.UsersApplication.Commands.LoginUser;
+using Pawnshop.Application.UsersApplication.Interfaces;
+using Pawnshop.Domain.AuthTokens;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
 using Pawnshop.Domain.Roles;
@@ -15,12 +18,14 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
         private readonly DbContext _dbContext;
         private readonly SignInManager<Users> _signInManager;
         private readonly UserManager<Users> _userManager;
+        private readonly IJsonWebTokenService _jsonWebTokenService;
 
-        public UsersService(DbContext dbContext, SignInManager<Users> signInManager, UserManager<Users> userManager)
+        public UsersService(DbContext dbContext, SignInManager<Users> signInManager, UserManager<Users> userManager, IJsonWebTokenService jsonWebTokenService)
         {
             _dbContext = dbContext;
             _signInManager = signInManager;
             _userManager = userManager;
+            _jsonWebTokenService = jsonWebTokenService;
         }
 
         public async Task<Guid> CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken)
@@ -82,6 +87,37 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return newUser.Id;
+        }
+
+        public async Task<JsonWebToken> LoginUserAsync(LoginUserCommand command, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByNameAsync(command.Username);
+
+            if(user == null) 
+                throw new NotFoundException("Login or password incorrect.");
+
+            var passwordVerification = await _signInManager.CheckPasswordSignInAsync(user, command.Password, true);
+
+            if(!passwordVerification.Succeeded)
+                throw new NotFoundException("Login or password incorrect.");
+            
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var userClaims = await _userManager.GetClaimsAsync(user);
+
+            var jwtToken = _jsonWebTokenService.GenerateJsonWebToken(user, userRoles, userClaims);
+            var refreshToken = _jsonWebTokenService.GenerateRefreshToken();
+
+            jwtToken.RefreshToken = refreshToken;
+
+            _jsonWebTokenService.DeleteExpiresRefreshToken(user);
+
+            user.AddRefreshToken(refreshToken);
+
+            _dbContext.Update(user);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return jwtToken;
         }
     }
 }

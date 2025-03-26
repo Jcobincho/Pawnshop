@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pawnshop.Application.Users.Responses
+namespace Pawnshop.Application.UsersApplication.Responses
 {
     
     public sealed class CreateUserResponse

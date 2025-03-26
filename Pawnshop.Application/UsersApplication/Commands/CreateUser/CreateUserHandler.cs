@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Pawnshop.Application.Users.Interfaces;
-using Pawnshop.Application.Users.Responses;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
+using Pawnshop.Application.UsersApplication.Interfaces;
+using Pawnshop.Application.UsersApplication.Responses;
 
 namespace Pawnshop.Application.UsersApplicaiton.Commands.CreateUser
 {

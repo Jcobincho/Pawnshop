@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Pawnshop.Application.Base;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
+using Pawnshop.Application.UsersApplication.Commands.LoginUser;
 
 namespace Pawnshop.Api.Controllers
 {
@@ -11,6 +12,16 @@ namespace Pawnshop.Api.Controllers
                                                   BaseCommand,
                                                   BaseQuery>
     {
+        [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> LoginUser([FromBody] LoginUserCommand command, CancellationToken cancellation)
+        {
+            var response = await Sender.Send(command, cancellation);
+
+            return Ok(response);
+        }
+
         [NonAction]
         public override Task<IActionResult> GetAsync([FromQuery] BaseQuery data, CancellationToken cancellation)
         {

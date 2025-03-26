@@ -1,6 +1,5 @@
-﻿
-using Pawnshop.Application.Base;
-using Pawnshop.Application.Users.Responses;
+﻿using Pawnshop.Application.Base;
+using Pawnshop.Application.UsersApplication.Responses;
 using System.ComponentModel.DataAnnotations;
 
 namespace Pawnshop.Application.UsersApplication.Commands.CreateUser
