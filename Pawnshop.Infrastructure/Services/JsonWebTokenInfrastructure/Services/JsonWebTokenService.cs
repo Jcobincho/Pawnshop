@@ -44,7 +44,7 @@ namespace Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services
             {
                 var customClaims = new List<Claim>();
 
-                foreach(var claim in customClaims)
+                foreach(var claim in claims)
                 {
                     customClaims.Add(new Claim(claim.Type, claim.Value));
                 }
@@ -55,10 +55,13 @@ namespace Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = dtNow.AddMinutes(_jwtSettings.ExpiryMinutes);
 
+            var now = DateTime.UtcNow;
+
             var jwt = new JwtSecurityToken(
             _jwtSettings.Issuer,
             _jwtSettings.Audience,
             jwtClaims,
+            now,
             expires: expires,
             signingCredentials: cred
             );
@@ -70,6 +73,8 @@ namespace Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services
                 AccessToken = token,
                 Expires = new DateTimeOffset(expires).ToUnixTimeSeconds(),
                 UserId = user.Id,
+                Roles = roles,
+                Claims = claims?.ToDictionary(x => x.Type, x => x.Value)
             };
         }
 

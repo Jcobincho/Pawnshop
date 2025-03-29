@@ -1,5 +1,6 @@
 using MudBlazor.Services;
 using Pawnshop.Web.Components;
+using Pawnshop.Web.Services.ApiService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,15 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped(sp =>
+    new HttpClient
+    {
+        BaseAddress = new Uri(builder.Configuration["FrontendUrl"] ?? "https://localhost:7287")
+    });
+
+builder.Services.AddScoped<ApiService>();
 
 var app = builder.Build();
 

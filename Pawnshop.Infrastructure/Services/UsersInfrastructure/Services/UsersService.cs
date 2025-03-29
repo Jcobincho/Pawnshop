@@ -82,9 +82,9 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
                 if (!addUserRoles.Succeeded) throw new BadRequestException("Add roles failed.");
             }
 
-            IdentityResult addClaims = await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()));
+            IdentityResult addNameIdentifierClaims = await _userManager.AddClaimAsync(newUser, new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()));
 
-            if (!addClaims.Succeeded) throw new BadRequestException("Add roles failed.");
+            if (!addNameIdentifierClaims.Succeeded) throw new BadRequestException("Add claims failed.");
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 

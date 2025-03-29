@@ -22,6 +22,8 @@ namespace Pawnshop.Application.UsersApplication.Commands.Logout
         {
             await _usersCommandService.LogoutAsync(request, cancellationToken);
 
+            var x = request.UserIdFromClaims;
+
             return new LogoutResponse() { Response = "You have been successfully logged out." };
         }
     }
