@@ -5,9 +5,12 @@
 @using Pawnshop.Domain.AuthTokens
 @using Pawnshop.Web.Exceptions
 @using Pawnshop.Web.Services.ApiService
+@using Pawnshop.Web.Services.AuthenticationService
 
 @inject HttpClient httpClient
 @inject ApiService apiService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
 
 <PageTitle>Login page</PageTitle>
 
@@ -98,11 +101,17 @@
     LoginUserCommand loginData = new LoginUserCommand();
     List<string> apiExceptions = null;
 
+
     private async Task LoginHandle()
     {
         try
         {
             var result = await apiService.PostAsync<LoginUserCommand, JsonWebToken>("/Users/login", loginData, requireAuth: false);
+            if (result != null && result.AccessToken != null)
+            {
+                await ((AuthStateProviderService)AuthStateProvider).MarkUserAsAuthenticated(result);
+                NavigationManager.NavigateTo("/Home");
+            }
             apiExceptions = null;
         }
         catch(ApiException ex)

@@ -35,24 +35,24 @@ namespace Pawnshop.Api.Controllers
         [HttpPost("refresh-token")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> RefreshToken(CancellationToken cancellationToken)
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command,CancellationToken cancellationToken)
         {
-            var refreshToken = Request.Cookies["refresh-token"];
+            //var refreshToken = Request.Cookies["refresh-token"];
 
-            var command = new RefreshTokenCommand()
-            {
-                RefreshToken = refreshToken
-            };
+            //var command = new RefreshTokenCommand()
+            //{
+            //    RefreshToken = refreshToken
+            //};
 
             var response = await Sender.Send(command, cancellationToken);
 
-            var cookie = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = response.RefreshToken.Expires
-            };
+            //var cookie = new CookieOptions
+            //{
+            //    HttpOnly = true,
+            //    Expires = response.RefreshToken.Expires
+            //};
 
-            Response.Cookies.Append("refresh-token", response.RefreshToken.Token, cookie);
+            //Response.Cookies.Append("refresh-token", response.RefreshToken.Token, cookie);
 
             return Ok(response);
         }
@@ -60,18 +60,18 @@ namespace Pawnshop.Api.Controllers
         [HttpPost("logout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+        public async Task<IActionResult> Logout([FromBody] LogoutCommand command, CancellationToken cancellationToken)
         {
-            var refreshToken = Request.Cookies["refresh-token"];
+            //var refreshToken = Request.Cookies["refresh-token"];
 
-            var command = new LogoutCommand()
-            {
-                RefreshToken = refreshToken
-            };
+            //var command = new LogoutCommand()
+            //{
+            //    RefreshToken = refreshToken
+            //};
 
             var resposne = await Sender.Send(command, cancellationToken);
 
-            Response.Cookies.Delete("refresh-token");
+            //Response.Cookies.Delete("refresh-token");
 
             return Ok(resposne);
         }

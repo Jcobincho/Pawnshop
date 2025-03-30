@@ -1,4 +1,9 @@
-﻿@inherits LayoutComponentBase
+﻿@using Pawnshop.Web.Services.AuthenticationService
+
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
 @rendermode InteractiveServer
 
 <MudThemeProvider />
@@ -52,4 +57,31 @@
     {
         open = !open;
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await ((AuthStateProviderService)AuthStateProvider).InitializeAuthenticationState();
+                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+
+                if (!user.Identity.IsAuthenticated)
+                {
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/Home");
+                }
+            }
+            catch (Exception ex)
+            {
+                NavigationManager.NavigateTo("/", true);
+            }
+        }
+    }
+
 }
