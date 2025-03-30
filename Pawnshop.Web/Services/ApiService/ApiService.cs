@@ -2,6 +2,7 @@
 using System.Text;
 using Pawnshop.Web.Exceptions;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace Pawnshop.Web.Services.ApiService
 {
@@ -80,11 +81,28 @@ namespace Pawnshop.Web.Services.ApiService
         {
             var errorMessages = new List<string>();
 
+            AddErrorToList(errorContent, errorMessages, "errors");
+
+            if (!errorMessages.Any())
+            {
+                AddErrorToList(errorContent, errorMessages, "error");
+            }
+
+            if (!errorMessages.Any())
+            {
+                errorMessages.Add("Unknown error occurred.");
+            }
+
+            return errorMessages;
+        }
+
+        private void AddErrorToList(string errorContent, List<string> errorMessages, string tryGetProperty)
+        {
             try
             {
                 using var doc = JsonDocument.Parse(errorContent);
 
-                if (doc.RootElement.TryGetProperty("error", out var errorElement))
+                if (doc.RootElement.TryGetProperty(tryGetProperty, out var errorElement))
                 {
                     if (errorElement.ValueKind == JsonValueKind.String)
                     {
@@ -104,17 +122,10 @@ namespace Pawnshop.Web.Services.ApiService
                     }
                 }
             }
-            catch (JsonException)
+            catch(JsonException)
             {
                 errorMessages.Add("Invalid error response format.");
             }
-
-            if (!errorMessages.Any())
-            {
-                errorMessages.Add("Unknown error occurred.");
-            }
-
-            return errorMessages;
         }
     }
 }

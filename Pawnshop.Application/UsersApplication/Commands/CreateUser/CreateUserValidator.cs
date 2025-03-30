@@ -2,7 +2,7 @@
 
 namespace Pawnshop.Application.UsersApplication.Commands.CreateUser
 {
-    public class CreateUserValidator : AbstractValidator<CreateUserCommand>
+    public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
     {
         public CreateUserValidator()
         {

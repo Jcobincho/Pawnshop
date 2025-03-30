@@ -38,11 +38,12 @@
                 <MudCardContent Class="flex-grow-1 d-flex flex-column justify-content-center">
                     <div class="w-100 px-6">
                         <div class="text-center mb-6">
-                            <MudText Typo="Typo.h4" Class="font-weight-bold">Formularz logowania</MudText>
+                            <MudText Typo="Typo.h4" Class="font-weight-bold">Login form</MudText>
                         </div>
 
                         <MudForm @bind-IsValid="@success" @bind-Errors="errors">
-                            <MudTextField T="string"
+                            <MudTextField @bind-Value="@loginData.Username"
+                                          T="string"
                                           Label="Username"
                                           Required="true"
                                           RequiredError="User name is required."
@@ -51,7 +52,8 @@
                                           Margin="Margin.Dense"
                                           Class="mb-6" />
 
-                            <MudTextField T="string"
+                            <MudTextField @bind-Value="@loginData.Password"
+                                          T="string"
                                           Label="Password"
                                           Required="true"
                                           RequiredError="Password is required."
@@ -61,11 +63,19 @@
                                           Margin="Margin.Dense"
                                           Class="mb-8" />
 
+                            @if (apiExceptions != null)
+                            {
+                                foreach (var exception in apiExceptions)
+                                {
+                                    <MudAlert Class="mb-1" Severity="Severity.Error" Variant="Variant.Filled">@exception</MudAlert>
+                                }
+                            }
+
                             <div class="d-flex justify-content-end">
                                 <MudButton Variant="Variant.Filled"
                                            Color="Color.Primary"
                                            Size="Size.Large"
-                                           ButtonType="ButtonType.Submit"
+                                           ButtonType="ButtonType.Button"
                                            Class="px-8 py-3" OnClick="@LoginHandle">
                                     Sign In
                                 </MudButton>
@@ -75,6 +85,8 @@
                     </div>
                 </MudCardContent>
             </MudCard>
+
+           
         </div>
     </MudCard>
 </MudContainer>
@@ -83,27 +95,23 @@
     bool success;
     string[] errors = { };
 
+    LoginUserCommand loginData = new LoginUserCommand();
+    List<string> apiExceptions = null;
+
     private async Task LoginHandle()
     {
         try
         {
-            var param = new LoginUserCommand()
-            {
-                Username = "test",
-                Password = "ZAQ!2wx"
-            };
-
-            var result = await apiService.PostAsync<LoginUserCommand, JsonWebToken>("/Users/login", param, requireAuth: false);
+            var result = await apiService.PostAsync<LoginUserCommand, JsonWebToken>("/Users/login", loginData, requireAuth: false);
+            apiExceptions = null;
         }
         catch(ApiException ex)
         {
-            
+            apiExceptions = ex.ErrorMessages;
         }
         catch(Exception ex)
         {
 
         }
-
-        InvokeAsync(StateHasChanged);
     }
 }
