@@ -18,7 +18,7 @@ namespace Pawnshop.Api.Controllers
         protected IMediator Sender => _sender ??= HttpContext.RequestServices.GetRequiredService<IMediator>();
 
 
-        [HttpPost()]
+        [HttpPost("add")]
         public virtual async Task<IActionResult> AddAsync([FromBody] TAddData data, CancellationToken cancellation)
         {
             if (data == null)
@@ -29,7 +29,7 @@ namespace Pawnshop.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPut()]
+        [HttpPut("update")]
         public virtual async Task<IActionResult> PutAsync([FromBody] TPutData data, CancellationToken cancellation)
         {
             if (data == null)
@@ -40,7 +40,7 @@ namespace Pawnshop.Api.Controllers
             return Ok(response);
         }
 
-        [HttpDelete()]
+        [HttpDelete("delete")]
         public virtual async Task<IActionResult> DeteleAsync([FromBody] TDeleteData data, CancellationToken cancellation)
         {
             if (data == null)
@@ -51,7 +51,7 @@ namespace Pawnshop.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet()]
+        [HttpGet("get")]
         public virtual async Task<IActionResult> GetAsync([FromQuery] TGetData data, CancellationToken cancellation)
         {
             var response = await Sender.Send(data, cancellation);

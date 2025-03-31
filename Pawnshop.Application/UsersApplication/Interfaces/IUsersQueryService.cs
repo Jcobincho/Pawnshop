@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pawnshop.Application.Users.Interfaces
+namespace Pawnshop.Application.UsersApplication.Interfaces
 {
     public interface IUsersQueryService
     {

@@ -1,0 +1,127 @@
+﻿@page "/"
+
+@using Pawnshop.Application.UsersApplication.Commands.CreateUser
+@using Pawnshop.Application.UsersApplication.Commands.LoginUser
+@using Pawnshop.Domain.AuthTokens
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+@using Pawnshop.Web.Services.AuthenticationService
+
+@inject HttpClient httpClient
+@inject ApiService ApiService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Login page</PageTitle>
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudContainer Class="min-vh-100 d-flex align-items-center" MaxWidth="MaxWidth.Medium">
+    <MudCard Class="d-flex w-100" Elevation="25">
+        <div class="row g-0 w-100" style="height: 60vh;">
+            <MudCard Class="col-md-6 h-100 d-flex flex-column"
+                     Style="background: linear-gradient(to bottom, #1976d2 30%, #2196f3 70%)">
+                <MudCardContent Class="flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="text-center">
+                        <MudIcon Icon="@Icons.Custom.Brands.MudBlazor"
+                                 Size="Size.Large"
+                                 Color="Color.Inherit"
+                                 Style="font-size: 8rem; color: white;"
+                                 Class="mb-4" />
+
+                        <MudText Typo="Typo.h3" Class="white--text mb-2">Welcome to</MudText>
+                        <MudText Typo="Typo.h2" Class="white--text font-weight-bold">Pawnshop System</MudText>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+
+            <MudCard Class="col-md-6 h-100 d-flex flex-column">
+                <MudCardContent Class="flex-grow-1 d-flex flex-column justify-content-center">
+                    <div class="w-100 px-6">
+                        <div class="text-center mb-6">
+                            <MudText Typo="Typo.h4" Class="font-weight-bold">Login form</MudText>
+                        </div>
+
+                        <MudForm @bind-IsValid="@success" @bind-Errors="errors">
+                            <MudTextField @bind-Value="@loginData.Username"
+                                          T="string"
+                                          Label="Username"
+                                          Required="true"
+                                          RequiredError="User name is required."
+                                          Variant="Variant.Outlined"
+                                          FullWidth="true"
+                                          Margin="Margin.Dense"
+                                          Class="mb-6" />
+
+                            <MudTextField @bind-Value="@loginData.Password"
+                                          T="string"
+                                          Label="Password"
+                                          Required="true"
+                                          RequiredError="Password is required."
+                                          Variant="Variant.Outlined"
+                                          InputType="InputType.Password"
+                                          FullWidth="true"
+                                          Margin="Margin.Dense"
+                                          Class="mb-8" />
+
+                            @if (apiExceptions != null)
+                            {
+                                foreach (var exception in apiExceptions)
+                                {
+                                    <MudAlert Class="mb-1" Severity="Severity.Error" Variant="Variant.Filled">@exception</MudAlert>
+                                }
+                            }
+
+                            <div class="d-flex justify-content-end">
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Large"
+                                           ButtonType="ButtonType.Button"
+                                           Class="px-8 py-3" 
+                                           OnClick="@LoginHandle">
+                                    Sign In
+                                </MudButton>
+                            </div>
+
+                        </MudForm>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+
+           
+        </div>
+    </MudCard>
+</MudContainer>
+
+@code {
+    bool success;
+    string[] errors = { };
+
+    LoginUserCommand loginData = new LoginUserCommand();
+    List<string> apiExceptions = null;
+
+
+    private async Task LoginHandle()
+    {
+        try
+        {
+            var result = await ApiService.PostAsync<LoginUserCommand, JsonWebToken>("/Users/login", loginData, requireAuth: false);
+            if (result != null && result.AccessToken != null)
+            {
+                await ((AuthStateProviderService)AuthStateProvider).MarkUserAsAuthenticated(result);
+                NavigationManager.NavigateTo("/Home");
+            }
+            apiExceptions = null;
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+        catch(Exception ex)
+        {
+
+        }
+    }
+}

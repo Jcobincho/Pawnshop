@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Pawnshop.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class ChangeUtcDateTimeInRefrestToken : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -173,6 +173,25 @@ namespace Pawnshop.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserRefreshToken",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    Expires = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UsersId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRefreshToken", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserRefreshToken_AspNetUsers_UsersId",
+                        column: x => x.UsersId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -209,6 +228,11 @@ namespace Pawnshop.Infrastructure.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRefreshToken_UsersId",
+                table: "UserRefreshToken",
+                column: "UsersId");
         }
 
         /// <inheritdoc />
@@ -231,6 +255,9 @@ namespace Pawnshop.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Employee");
+
+            migrationBuilder.DropTable(
+                name: "UserRefreshToken");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

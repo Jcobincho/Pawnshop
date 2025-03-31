@@ -1,7 +1,25 @@
-﻿@page "/"
+﻿@page "/Home"
+@using Pawnshop.Application.Base
+@using Pawnshop.Application.UsersApplication.Commands.Logout
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
 
-<PageTitle>Home</PageTitle>
+@inject ApiService apiService
 
-<h1>Hello, world!</h1>
+<h3>Home</h3>
 
-Welcome to your new app.
+<MudButton ButtonType="ButtonType.Button" OnClick="@ClickHandle">CLICK</MudButton>
+
+@code {
+    private async void ClickHandle()
+    {
+        try
+        {
+            await apiService.PostAsync<TestClassPublic, TestClassRTesponse>("/Users/test", new TestClassPublic() { TestToken = "asd" });
+        }
+        catch(ApiException ex)
+        {
+            
+        }
+    }
+}

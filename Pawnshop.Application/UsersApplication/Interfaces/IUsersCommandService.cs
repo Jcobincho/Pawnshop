@@ -1,9 +1,16 @@
 ﻿using Pawnshop.Application.UsersApplication.Commands.CreateUser;
+using Pawnshop.Application.UsersApplication.Commands.LoginUser;
+using Pawnshop.Application.UsersApplication.Commands.Logout;
+using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
+using Pawnshop.Domain.AuthTokens;
 
-namespace Pawnshop.Application.Users.Interfaces
+namespace Pawnshop.Application.UsersApplication.Interfaces
 {
     public interface IUsersCommandService
     {
-        public Task<Guid> CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken);
+        Task<Guid> CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken);
+        Task<JsonWebToken> LoginUserAsync(LoginUserCommand command, CancellationToken cancellationToken);
+        Task<JsonWebToken> RefreshTokenAsync(RefreshTokenCommand command, CancellationToken cancellationToken);
+        Task LogoutAsync(LogoutCommand? command, CancellationToken cancellationToken);
     }
 }

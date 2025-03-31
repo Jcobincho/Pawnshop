@@ -1,23 +1,95 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.IdentityModel.JsonWebTokens
+@using Pawnshop.Application.UsersApplication.Commands.Logout
+@using Pawnshop.Application.UsersApplication.Responses
+@using Pawnshop.Web.Services.ApiService
+@using Pawnshop.Web.Services.AuthenticationService
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject AuthStateProviderService AuthStateProviderService
+@inject ApiService ApiService
+@inject ProtectedLocalStorage localStorage
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+@rendermode InteractiveServer
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+
+    <AuthorizeView>
+        <Authorized>
+            <MudAppBar Elevation="1" Dense="false">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+                <MudSpacer />
+                <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="@ApiService.LogoutHandler" />
+            </MudAppBar>
+            <MudDrawer @bind-Open="@open" ClipMode="DrawerClipMode.Never" Elevation="1" Variant="@DrawerVariant.Responsive">
+                <MudDrawerHeader>
+                    <MudText Typo="Typo.h6">Pawnshop</MudText>
+                </MudDrawerHeader>
+                <NavMenu />
+            </MudDrawer>
+            <div class="p-2">
+                <MudMainContent>
+                    @Body
+                </MudMainContent>
+            </div>
+        </Authorized>
+
+        <NotAuthorized>
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+        </NotAuthorized>
+    </AuthorizeView>
+    
+</MudLayout>
+
+
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code {
+    private bool open = true;
+
+    private void ToggleDrawer()
+    {
+        open = !open;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await ((AuthStateProviderService)AuthStateProvider).InitializeAuthenticationState();
+                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+
+                if (!user.Identity.IsAuthenticated)
+                {
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/Home");
+                }
+            }
+            catch (Exception ex)
+            {
+                NavigationManager.NavigateTo("/", true);
+            }
+        }
+    }
+
+}
