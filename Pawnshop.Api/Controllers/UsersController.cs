@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawnshop.Application.Base;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
@@ -75,6 +77,14 @@ namespace Pawnshop.Api.Controllers
 
             return Ok(resposne);
         }
+
+        [HttpPost("test")]
+        [Authorize]
+        public async Task<IActionResult> Test([FromBody] TestClassPublic test)
+        { 
+            return Ok(new TestClassRTesponse() { REsponseTEst = "OK"});
+        }
+
 
         [NonAction]
         public override Task<IActionResult> GetAsync([FromQuery] BaseQuery data, CancellationToken cancellation)

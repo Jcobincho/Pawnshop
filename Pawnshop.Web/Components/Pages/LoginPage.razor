@@ -8,7 +8,7 @@
 @using Pawnshop.Web.Services.AuthenticationService
 
 @inject HttpClient httpClient
-@inject ApiService apiService
+@inject ApiService ApiService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
@@ -79,7 +79,8 @@
                                            Color="Color.Primary"
                                            Size="Size.Large"
                                            ButtonType="ButtonType.Button"
-                                           Class="px-8 py-3" OnClick="@LoginHandle">
+                                           Class="px-8 py-3" 
+                                           OnClick="@LoginHandle">
                                     Sign In
                                 </MudButton>
                             </div>
@@ -106,7 +107,7 @@
     {
         try
         {
-            var result = await apiService.PostAsync<LoginUserCommand, JsonWebToken>("/Users/login", loginData, requireAuth: false);
+            var result = await ApiService.PostAsync<LoginUserCommand, JsonWebToken>("/Users/login", loginData, requireAuth: false);
             if (result != null && result.AccessToken != null)
             {
                 await ((AuthStateProviderService)AuthStateProvider).MarkUserAsAuthenticated(result);

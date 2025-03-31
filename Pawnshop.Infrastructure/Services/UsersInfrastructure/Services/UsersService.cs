@@ -154,8 +154,13 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
         public async Task LogoutAsync(LogoutCommand? command, CancellationToken cancellationToken)
         {
             var user = await _userManager.Users.Include(x => x.RefreshToken)
-                                                  .SingleOrDefaultAsync(x => x.Id == command.UserIdFromClaims, cancellationToken)
-                                                ?? throw new NotFoundException("Invalid refresh token.");
+                                                  .SingleOrDefaultAsync(x => x.Id == command.UserIdFromClaims, cancellationToken);
+                                                
+
+            if (user == null)
+            {
+                throw new NotFoundException("Invalid refresh token.");
+            }
 
             var token = user.RefreshToken.FirstOrDefault(x => x.Token == command.RefreshToken);
 

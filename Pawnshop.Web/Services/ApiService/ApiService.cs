@@ -13,6 +13,9 @@ using Microsoft.IdentityModel.Tokens;
 using Pawnshop.Domain.AuthTokens;
 using Pawnshop.Web.Services.AuthenticationService;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
+using Pawnshop.Application.UsersApplication.Commands.Logout;
+using Pawnshop.Application.UsersApplication.Responses;
+using MediatR;
 
 namespace Pawnshop.Web.Services.ApiService
 {
@@ -51,6 +54,25 @@ namespace Pawnshop.Web.Services.ApiService
             return await SendAsync<TResponse>(HttpMethod.Delete, uri, requireAuth, null, body);
         }
 
+        public async Task LogoutHandler()
+        {
+            var sessionState = (await _localStorage.GetAsync<JsonWebToken>("sessionState")).Value;
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "/Users/logout");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.AccessToken);
+                var jsonContent = JsonSerializer.Serialize(new LogoutCommand() { RefreshToken = sessionState.RefreshToken.Token });
+                request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                await _httpClient.SendAsync(request);
+            }
+            catch (Exception ex) { }
+            finally
+            {
+                await ((AuthStateProviderService)_authStateProvider).MarkUserAsLoggedOut();
+                _navigationManager.NavigateTo("/");
+            }
+        }
+
         private async Task SetAuthorizeHeader(HttpRequestMessage request)
         {
             try
@@ -60,28 +82,31 @@ namespace Pawnshop.Web.Services.ApiService
                 {
                     if (sessionState.Expires < DateTimeOffset.UtcNow.ToUnixTimeSeconds() && sessionState.RefreshToken.Expires < DateTime.UtcNow)
                     {
-                        await ((AuthStateProviderService)_authStateProvider).MarkUserAsLoggedOut();
-                        _navigationManager.NavigateTo("/");
+                        await LogoutHandler();
                     }
-                    else if (sessionState.Expires < DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds())
+                    else if(sessionState.Expires > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                    {
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.AccessToken);
+                    }
+                    else if (sessionState.Expires < DateTimeOffset.UtcNow.ToUnixTimeSeconds() && sessionState.RefreshToken.Expires > DateTime.UtcNow)
                     {
                         try
                         {
-                            var res = await PostAsync<RefreshTokenCommand,JsonWebToken>("/Users/refresh-token", new RefreshTokenCommand() { RefreshToken = sessionState.RefreshToken.Token }, requireAuth: false);
+                            var res = await PostAsync<RefreshTokenCommand,JsonWebToken>("/Users/refresh-token", new RefreshTokenCommand() { RefreshToken = sessionState.RefreshToken.Token });
 
                             await ((AuthStateProviderService)_authStateProvider).MarkUserAsAuthenticated(res);
                             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", res.AccessToken);
                         }
                         catch(ApiException)
                         {
-                            await ((AuthStateProviderService)_authStateProvider).MarkUserAsLoggedOut();
-                            _navigationManager.NavigateTo("/");
+                            await LogoutHandler();
                         }
                     }
-                    else
-                    {
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.AccessToken);
-                    }
+                    
+                }
+                else
+                {
+                    _navigationManager.NavigateTo("/");
                 }
             }
             catch (Exception ex)

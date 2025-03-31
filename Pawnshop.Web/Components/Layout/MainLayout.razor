@@ -1,8 +1,16 @@
-﻿@using Pawnshop.Web.Services.AuthenticationService
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.IdentityModel.JsonWebTokens
+@using Pawnshop.Application.UsersApplication.Commands.Logout
+@using Pawnshop.Application.UsersApplication.Responses
+@using Pawnshop.Web.Services.ApiService
+@using Pawnshop.Web.Services.AuthenticationService
 
 @inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
+@inject AuthStateProviderService AuthStateProviderService
+@inject ApiService ApiService
+@inject ProtectedLocalStorage localStorage
 
 @rendermode InteractiveServer
 
@@ -18,7 +26,7 @@
             <MudAppBar Elevation="1" Dense="false">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
                 <MudSpacer />
-                <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor" Target="_blank" />
+                <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="@ApiService.LogoutHandler" />
             </MudAppBar>
             <MudDrawer @bind-Open="@open" ClipMode="DrawerClipMode.Never" Elevation="1" Variant="@DrawerVariant.Responsive">
                 <MudDrawerHeader>

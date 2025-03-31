@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Pawnshop.Application.UsersApplication.Commands.Logout;
+using Pawnshop.Application.UsersApplication.Responses;
 using Pawnshop.Domain.AuthTokens;
+using Pawnshop.Web.Services.ApiService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 

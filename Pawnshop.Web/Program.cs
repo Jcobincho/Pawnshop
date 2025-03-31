@@ -25,6 +25,7 @@ builder.Services.AddScoped(sp =>
 
 
 builder.Services.AddScoped<ApiService>();
+builder.Services.AddScoped<AuthStateProviderService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProviderService>();
 
 
