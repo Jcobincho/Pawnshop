@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Infrastructure.Behaviors;
 using Pawnshop.Infrastructure.Persistance.Extensions;
+using Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UsersInfrastructure.Services;
@@ -46,6 +48,10 @@ public static class DependencyInjection
         // Users services
         services.AddScoped<IUsersCommandService, UsersService>();
         services.AddScoped<IUsersQueryService, UsersService>();
+
+        // Employees services
+        services.AddScoped<IEmployeesCommandService, EmployeesService>();
+        services.AddScoped<IEmployeesQueryService, EmployeesService>();
 
         // JsonWebToken service
         services.AddScoped<IJsonWebTokenService, JsonWebTokenService>();

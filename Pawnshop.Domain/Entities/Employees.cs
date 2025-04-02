@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Domain.Entities
 {
-    public class Employees
+    public class Employees : BaseEntity
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
