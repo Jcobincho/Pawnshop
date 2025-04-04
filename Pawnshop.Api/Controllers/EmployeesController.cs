@@ -3,16 +3,13 @@ using Pawnshop.Application.Base;
 using Pawnshop.Application.EmployeesApplication.Commands.AddEmployee;
 using Pawnshop.Application.EmployeesApplication.Commands.DeleteEmployee;
 using Pawnshop.Application.EmployeesApplication.Commands.EditEmployee;
+using Pawnshop.Application.EmployeesApplication.Queries.GetAllEmployees;
 
 namespace Pawnshop.Api.Controllers
 {
     [Route("[controller]")]
-    public class EmployeesController : BaseController<AddEmployeeCommand, EditEmployeeCommand, DeleteEmployeeCommand, BaseQuery>
+    public class EmployeesController : BaseController<AddEmployeeCommand, EditEmployeeCommand, DeleteEmployeeCommand, GetAllEmployeesQuery>
     {
-        [NonAction]
-        public override Task<IActionResult> GetAsync([FromQuery] BaseQuery data, CancellationToken cancellation)
-        {
-            return base.GetAsync(data, cancellation);
-        }
+
     }
 }

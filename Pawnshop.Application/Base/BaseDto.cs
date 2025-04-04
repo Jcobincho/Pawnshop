@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Application.Base
 {
-    internal class BaseDto
+    public class BaseDto
     {
+        public DateTime CreatedAt { get; set; }
+        public Guid CreatedBy { get; set; }
+        public DateTime EditedAt { get; set; }
+        public Guid EditedBy { get; set; }
     }
 }

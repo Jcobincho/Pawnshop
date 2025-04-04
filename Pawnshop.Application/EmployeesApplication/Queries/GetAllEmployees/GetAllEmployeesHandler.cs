@@ -24,8 +24,8 @@ namespace Pawnshop.Application.EmployeesApplication.Queries.GetAllEmployees
 
             return new GetAllEmployeesResponse()
             {
-                AllEmployeesList = await
-            
+                AllEmployeesList = allEmployees
+            };
         }
     }
 }

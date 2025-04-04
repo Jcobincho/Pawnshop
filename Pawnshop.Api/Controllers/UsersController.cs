@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Pawnshop.Application.Base;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
 using Pawnshop.Application.UsersApplication.Commands.EditUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
+using Pawnshop.Domain.Roles;
 
 namespace Pawnshop.Api.Controllers
 {

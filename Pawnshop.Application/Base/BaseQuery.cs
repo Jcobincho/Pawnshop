@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using System.Text.Json.Serialization;
 
 namespace Pawnshop.Application.Base
 {
@@ -10,8 +11,7 @@ namespace Pawnshop.Application.Base
 
     public abstract class BaseQuery
     {
-        // Add user id from http context accessor
-
-        // dodać sprawdzanie uprawnien
+        [JsonIgnore]
+        public Guid UserIdFromClaims { get; internal set; }
     }
 }
