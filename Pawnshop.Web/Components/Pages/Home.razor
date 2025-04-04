@@ -13,13 +13,6 @@
 @code {
     private async void ClickHandle()
     {
-        try
-        {
-            await apiService.PostAsync<TestClassPublic, TestClassRTesponse>("/Users/test", new TestClassPublic() { TestToken = "asd" });
-        }
-        catch(ApiException ex)
-        {
-            
-        }
+
     }
 }

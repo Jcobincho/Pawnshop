@@ -9,7 +9,6 @@ namespace Pawnshop.Domain.Entities
 {
     public class Employees : BaseEntity
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string SecondName { get; set; } = string.Empty;
         public string Surname { get; set; }

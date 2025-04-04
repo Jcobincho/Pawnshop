@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Domain.Entities;
+using Pawnshop.Domain.Exceptions;
 
 namespace Pawnshop.Infrastructure;
 
@@ -21,13 +23,41 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new UserConfiguration());
+
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>()
+            .HaveConversion<DateTimeToUtcConverter>();
+
+        //base.ConfigureConventions(configurationBuilder);
+    }
+
+    private class DateTimeToUtcConverter : ValueConverter<DateTime, DateTime>
+    {
+        public DateTimeToUtcConverter() : base
+            (
+                v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            ) 
+        {  
+        
+        }
     }
 
     public override async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
-        UpdateBaseEntity();
-        return await base.SaveChangesAsync(cancellationToken);
+        try
+        {
+            UpdateBaseEntity();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new BadRequestException("You are trying to edit a mismatched record.");
+        }
     }
 
     private void UpdateBaseEntity()

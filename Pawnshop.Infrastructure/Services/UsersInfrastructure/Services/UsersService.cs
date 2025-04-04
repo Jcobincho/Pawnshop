@@ -7,6 +7,8 @@ using Pawnshop.Application.UsersApplication.Commands.EditUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
+using Pawnshop.Application.UsersApplication.Dto;
+using Pawnshop.Application.UsersApplication.Dto.DtoExtension;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.AuthTokens;
 using Pawnshop.Domain.Entities;
@@ -242,6 +244,13 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
                 throw new BadRequestException($"Failed to update user: {string.Join(", ", updateResult.Errors)}");
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<List<GetAllUsersDto>> GetAllUsersAsync(CancellationToken cancellationToken)
+        {
+            var users = await _userManager.Users.Include(u => u.Employee).Select(x => x.UserPraseToDto()).ToListAsync(cancellationToken);
+
+            return users;
         }
     }
 }

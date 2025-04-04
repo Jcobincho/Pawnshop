@@ -6,6 +6,7 @@ using Pawnshop.Application.UsersApplication.Commands.EditUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
+using Pawnshop.Application.UsersApplication.Queries.GetAllUsers;
 using Pawnshop.Domain.Roles;
 
 namespace Pawnshop.Api.Controllers
@@ -14,7 +15,7 @@ namespace Pawnshop.Api.Controllers
     public class UsersController : BaseController<CreateUserCommand,
                                                   EditUserCommand,
                                                   BaseCommand,
-                                                  BaseQuery>
+                                                  GetAllUsersQuery>
     {
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -78,11 +79,6 @@ namespace Pawnshop.Api.Controllers
             return Ok(resposne);
         }
 
-        [NonAction]
-        public override Task<IActionResult> GetAsync([FromQuery] BaseQuery data, CancellationToken cancellation)
-        {
-            return base.GetAsync(data, cancellation);
-        }
 
         [NonAction]
         public override Task<IActionResult> DeteleAsync([FromBody] BaseCommand data, CancellationToken cancellation)

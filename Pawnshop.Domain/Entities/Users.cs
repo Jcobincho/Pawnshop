@@ -7,7 +7,8 @@ namespace Pawnshop.Domain.Entities;
 
 public class Users : IdentityUser<Guid>
 {
-    public Guid? EmployeesId { get; set; } = new Guid();
+    public Guid? EmployeesId { get; set; }
+    public Employees? Employee { get; set; }
 
     public IReadOnlyCollection<UserRefreshToken> RefreshToken => _refreshToken;
 
@@ -29,6 +30,9 @@ public class UserConfiguration : IEntityTypeConfiguration<Users>
 {
     public void Configure(EntityTypeBuilder<Users> builder)
     {
-        
+        builder.HasOne(u => u.Employee)
+               .WithMany()
+               .HasForeignKey(u => u.EmployeesId)
+               .IsRequired(false);
     }
 }

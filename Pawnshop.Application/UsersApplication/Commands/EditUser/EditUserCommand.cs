@@ -21,9 +21,9 @@ namespace Pawnshop.Application.UsersApplication.Commands.EditUser
         [EmailAddress]
         public string Email { get; set; }
 
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
-        public string RepeatedPassword { get; set; }
+        public string RepeatedPassword { get; set; } = string.Empty;
 
         public Guid EmployeeId { get; set; } = new Guid();
 

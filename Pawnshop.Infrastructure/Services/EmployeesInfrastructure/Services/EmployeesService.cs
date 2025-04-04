@@ -3,6 +3,7 @@ using Pawnshop.Application.EmployeesApplication.Commands.AddEmployee;
 using Pawnshop.Application.EmployeesApplication.Commands.DeleteEmployee;
 using Pawnshop.Application.EmployeesApplication.Commands.EditEmployee;
 using Pawnshop.Application.EmployeesApplication.Dto;
+using Pawnshop.Application.EmployeesApplication.Dto.DtoExtension;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
@@ -77,18 +78,7 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
 
         public async Task<List<EmployeeDto>> GetAllEmployeesAsDtoAsync(CancellationToken cancellationToken)
         {
-            var employees = await _dbContext.Employee.Select(x => new EmployeeDto
-            {
-                Name = x.Name,
-                SecondName = x.SecondName,
-                Surname = x.Surname,
-                BirthDate = x.BirthDate,
-                CreatedAt = x.CreatedAt,
-                CreatedBy = x.CreatedBy,
-                EditedAt = x.EditedAt,
-                EditedBy = x.EditedBy
-
-            }).ToListAsync(cancellationToken);
+            var employees = await _dbContext.Employee.Select(x => x.EmployeePraseToDto()).ToListAsync(cancellationToken);
 
             return employees;
         }

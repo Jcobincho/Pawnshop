@@ -12,8 +12,8 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250326191111_ChangeUtcDateTimeInRefrestToken")]
-    partial class ChangeUtcDateTimeInRefrestToken
+    [Migration("20250404223158_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,9 +164,27 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.Property<string>("SecondName")
                         .IsRequired()
@@ -262,6 +280,8 @@ namespace Pawnshop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeesId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -328,6 +348,15 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.HasOne("Pawnshop.Domain.Entities.Users", null)
                         .WithMany("RefreshToken")
                         .HasForeignKey("UsersId");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Users", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Employees", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeesId");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.Users", b =>
