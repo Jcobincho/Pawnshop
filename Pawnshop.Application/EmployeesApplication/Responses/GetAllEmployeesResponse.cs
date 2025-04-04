@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pawnshop.Application.EmployeesApplication.Dto;
 
 namespace Pawnshop.Application.EmployeesApplication.Responses
 {
-    internal class GetAllEmployeesResponse
+    public sealed class GetAllEmployeesResponse
     {
+        public List<EmployeeDto> AllEmployeesList { get; set; }
     }
 }

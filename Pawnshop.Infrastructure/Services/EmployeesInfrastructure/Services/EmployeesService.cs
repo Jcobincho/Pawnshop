@@ -1,14 +1,18 @@
-﻿using Pawnshop.Application.EmployeesApplication.Commands.AddEmployee;
+﻿using Microsoft.EntityFrameworkCore;
+using Pawnshop.Application.EmployeesApplication.Commands.AddEmployee;
 using Pawnshop.Application.EmployeesApplication.Commands.DeleteEmployee;
 using Pawnshop.Application.EmployeesApplication.Commands.EditEmployee;
+using Pawnshop.Application.EmployeesApplication.Dto;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
 {
@@ -69,6 +73,24 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
             }
 
             return employee;
+        }
+
+        public async Task<List<EmployeeDto>> GetAllEmployeesAsDtoAsync(CancellationToken cancellationToken)
+        {
+            var employees = await _dbContext.Employee.Select(x => new EmployeeDto
+            {
+                Name = x.Name,
+                SecondName = x.SecondName,
+                Surname = x.Surname,
+                BirthDate = x.BirthDate,
+                CreatedAt = x.CreatedAt,
+                CreatedBy = x.CreatedBy,
+                EditedAt = x.EditedAt,
+                EditedBy = x.EditedBy
+
+            }).ToListAsync(cancellationToken);
+
+            return employees;
         }
     }
 }
