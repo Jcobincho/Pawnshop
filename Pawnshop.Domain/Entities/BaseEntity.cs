@@ -17,7 +17,7 @@ namespace Pawnshop.Domain.Entities
         public DateTime EditedAt { get; set; }
         public Guid EditedBy { get; set; }
 
-        [Timestamp]
+        [Timestamp] 
         public uint RowVersion { get; set; }
 
         public void SetBaseEntity(Guid userId)

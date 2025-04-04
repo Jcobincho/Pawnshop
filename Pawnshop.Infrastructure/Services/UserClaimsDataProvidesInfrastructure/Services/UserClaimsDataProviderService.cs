@@ -25,5 +25,14 @@ namespace Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.
 
             return userId;
         }
+
+        public string GetUserNameFromClaims()
+        {
+            var claims = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
+
+            if (string.IsNullOrWhiteSpace(claims)) return string.Empty;
+
+            return claims.ToString();
+        }
     }
 }

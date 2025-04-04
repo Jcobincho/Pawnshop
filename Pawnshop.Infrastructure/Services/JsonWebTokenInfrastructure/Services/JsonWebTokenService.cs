@@ -27,7 +27,7 @@ namespace Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services
             var jwtClaims = new List<Claim>()
             {
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new(JwtRegisteredClaimNames.UniqueName, user.Id.ToString()),
+                new(JwtRegisteredClaimNames.UniqueName, user.UserName),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(JwtRegisteredClaimNames.Iat, new DateTimeOffset(dtNow).ToUnixTimeSeconds().ToString())
             };

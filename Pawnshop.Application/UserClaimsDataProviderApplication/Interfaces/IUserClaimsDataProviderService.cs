@@ -3,5 +3,6 @@
     public interface IUserClaimsDataProviderService
     {
         Guid GetUserIdFromClaims();
+        string GetUserNameFromClaims();
     }
 }
