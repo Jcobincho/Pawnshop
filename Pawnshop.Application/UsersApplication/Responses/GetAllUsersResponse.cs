@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Application.UsersApplication.Responses
 {
-    public sealed class EditUserResponse
+    public sealed class GetAllUsersResponse
     {
-        public string Message { get; set; } = "Success.";
     }
 }

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation.Internal;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
+using Pawnshop.Application.UsersApplication.Commands.EditUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
@@ -172,6 +174,74 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             await _signInManager.SignOutAsync();
+        }
+
+        public async Task EditUserAsync(EditUserCommand command, CancellationToken cancellationToken)
+        {
+            var userToEdit = await _userManager.FindByIdAsync(command.UserId.ToString());
+
+            if (userToEdit == null) throw new NotFoundException("User identifier is incorrect.");
+
+            if (userToEdit.UserName != command.UserName)
+            {
+                bool isUserNameTaken = await _userManager.Users.AnyAsync(u => u.UserName == command.UserName, cancellationToken);
+                if (isUserNameTaken)
+                    throw new BadRequestException("Username already exists.");
+                userToEdit.UserName = command.UserName;
+            }
+
+            if (userToEdit.Email != command.Email)
+            {
+                bool isEmailTaken = await _userManager.Users.AnyAsync(u => u.Email == command.Email, cancellationToken);
+                if (isEmailTaken)
+                    throw new BadRequestException("Email already exists.");
+                userToEdit.Email = command.Email;
+            }
+
+            if (command.EmployeeId != Guid.Empty)
+            {
+                bool employeeExists = await _dbContext.Employee.AnyAsync(e => e.Id == command.EmployeeId, cancellationToken);
+                if (!employeeExists)
+                    throw new BadRequestException("Employee not found.");
+                userToEdit.EmployeesId = command.EmployeeId;
+            }
+            else
+            {
+                userToEdit.EmployeesId = Guid.Empty;
+            }
+
+            if (!string.IsNullOrEmpty(command.Password))
+            {
+                var removeResult = await _userManager.RemovePasswordAsync(userToEdit);
+                if (!removeResult.Succeeded)
+                    throw new BadRequestException($"Failed to remove old password: {string.Join(", ", removeResult.Errors)}");
+
+                var addResult = await _userManager.AddPasswordAsync(userToEdit, command.Password);
+                if (!addResult.Succeeded)
+                    throw new CreateUserException(addResult.Errors);
+            }
+
+            var currentRoles = await _userManager.GetRolesAsync(userToEdit);
+            if (currentRoles.Any())
+            {
+                var removeResult = await _userManager.RemoveFromRolesAsync(userToEdit, currentRoles);
+                if (!removeResult.Succeeded)
+                    throw new BadRequestException($"Failed to remove roles: {string.Join(", ", removeResult.Errors)}");
+            }
+
+            var validRoles = command.UserRoles.Where(role => UserRoles.GetRoles().Any(r => r.Name == role)).ToList();
+            if (validRoles.Any())
+            {
+                var addResult = await _userManager.AddToRolesAsync(userToEdit, validRoles);
+                if (!addResult.Succeeded)
+                    throw new BadRequestException($"Failed to add roles: {string.Join(", ", addResult.Errors)}");
+            }
+
+            var updateResult = await _userManager.UpdateAsync(userToEdit);
+            if (!updateResult.Succeeded)
+                throw new BadRequestException($"Failed to update user: {string.Join(", ", updateResult.Errors)}");
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

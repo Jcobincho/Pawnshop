@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pawnshop.Application.Base;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
+using Pawnshop.Application.UsersApplication.Commands.EditUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
@@ -9,7 +10,7 @@ namespace Pawnshop.Api.Controllers
 {
     [Route("[controller]")]
     public class UsersController : BaseController<CreateUserCommand,
-                                                  BaseCommand,
+                                                  EditUserCommand,
                                                   BaseCommand,
                                                   BaseQuery>
     {
@@ -85,12 +86,6 @@ namespace Pawnshop.Api.Controllers
         public override Task<IActionResult> DeteleAsync([FromBody] BaseCommand data, CancellationToken cancellation)
         {
             return base.DeteleAsync(data, cancellation);
-        }
-
-        [NonAction]
-        public override Task<IActionResult> PutAsync([FromBody] BaseCommand data, CancellationToken cancellation)
-        {
-            return base.PutAsync(data, cancellation);
         }
     }
 }
