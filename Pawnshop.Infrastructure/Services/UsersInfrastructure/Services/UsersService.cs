@@ -248,9 +248,32 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
 
         public async Task<List<GetAllUsersDto>> GetAllUsersAsync(CancellationToken cancellationToken)
         {
-            var users = await _userManager.Users.Include(u => u.Employee).Select(x => x.UserPraseToDto()).ToListAsync(cancellationToken);
+            var users = await _userManager.Users
+                .Include(u => u.Employee)
+                .ToListAsync(cancellationToken);
 
-            return users;
+            var userRoles = await _dbContext.UserRoles
+                .Join(
+                    _dbContext.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => new { ur.UserId, RoleName = r.Name }
+                )
+                .GroupBy(ur => ur.UserId)
+                .ToDictionaryAsync(
+                    g => g.Key,
+                    g => g.Select(ur => ur.RoleName).ToList(),
+                    cancellationToken
+                );
+
+            var result = users.Select(user =>
+            {
+                var dto = user.UserPraseToDto();
+                dto.Roles = userRoles.GetValueOrDefault(user.Id) ?? new List<string>();
+                return dto;
+            }).ToList();
+
+            return result;
         }
     }
 }
