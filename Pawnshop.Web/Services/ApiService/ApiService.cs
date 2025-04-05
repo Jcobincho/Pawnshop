@@ -34,9 +34,9 @@ namespace Pawnshop.Web.Services.ApiService
             _authStateProvider = authStateProvider;
         }
 
-        public async Task<T> GetAsync<T>(string uri, Dictionary<string, string> queryParams = null, bool requireAuth = true)
+        public async Task<TResponse> GetAsync<TResponse>(string uri, Dictionary<string, string> queryParams = null, bool requireAuth = true)
         {
-            return await SendAsync<T>(HttpMethod.Get, uri, requireAuth, queryParams);
+            return await SendAsync<TResponse>(HttpMethod.Get, uri, requireAuth, queryParams);
         }
 
         public async Task<TResponse> PostAsync<TRequest, TResponse>(string uri, TRequest body, bool requireAuth = true)

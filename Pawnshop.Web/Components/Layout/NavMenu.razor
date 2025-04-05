@@ -4,13 +4,21 @@
 <MudNavMenu>
     <AuthorizeView>
         <Authorized>
-            <MudNavLink Href="/Home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="/Home" 
+                        Match="NavLinkMatch.All" 
+                        Icon="@Icons.Material.Filled.Home">
+                Home
+            </MudNavLink>
         </Authorized>
     </AuthorizeView>
 
     <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.UsersDisplayAndModify}, {UserRoles.UsersDisplay}")">
         <Authorized>
-            <MudNavLink Href="/User-management-page"></MudNavLink>
+            <MudNavLink Href="/User-management-page"
+                        Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.ManageAccounts">
+                User management
+            </MudNavLink>
         </Authorized>
     </AuthorizeView>
     
