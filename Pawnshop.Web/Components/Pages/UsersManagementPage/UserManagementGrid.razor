@@ -1,14 +1,60 @@
-﻿@using Pawnshop.Application.UsersApplication.Responses
+﻿@using Pawnshop.Application.UsersApplication.Dto
+@using Pawnshop.Application.UsersApplication.Responses
 @using Pawnshop.Web.Exceptions
 @using Pawnshop.Web.Services.ApiService
 
 @inject ApiService ApiService
 
-<h3>UserManagementGrid</h3>
+<MudDataGrid T="GetAllUsersDto"
+             @ref="grid" 
+             Items="@usersFromApi.Users" 
+             DragDropColumnReordering="true" 
+             ColumnsPanelReordering="true"
+             ColumnResizeMode="ResizeMode.Container"
+             Hideable="true" 
+             Filterable="true" 
+             Groupable="true" 
+             FilterMode="DataGridFilterMode.Simple" 
+             ShowMenuIcon="true"
+             RowContextMenuClick="@OpenMenuContext">
+    <Columns>
+        <SelectColumn T="GetAllUsersDto"/>
+        <PropertyColumn Property="x => x.UserId" Title="User id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true"/>
+        <PropertyColumn Property="x => x.UserName" Title="User name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Email" Title="Email" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Roles" Title="Roles" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true">
+            <CellTemplate>
+                @string.Join(", ", context.Item.Roles)
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Employee.EmployeeId" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Employee.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Employee.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Employee.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Employee.BirthDate" Title="BirthDate" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+    </Columns>
+</MudDataGrid>
+
+<MudMenu @ref="contextMenu"
+         Style="@($"position: fixed; left: {xPos}px; top: {yPos}px;")"
+         Visible="@(selectedUser != null)">
+    <MudMenuItem Icon="@Icons.Material.Filled.Block" OnClick="@(() => HandleMenuClick("Add"))">
+        Add
+    </MudMenuItem>
+    <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => HandleMenuClick("Detail"))">
+        Detail
+    </MudMenuItem>
+</MudMenu>
 
 @code {
     List<string> apiExceptions = null;
     GetAllUsersResponse usersFromApi = new GetAllUsersResponse();
+    MudDataGrid<GetAllUsersDto> grid = null;
+    MudMenu contextMenu = null!;
+
+    private GetAllUsersDto selectedUser;
+    private double xPos;
+    private double yPos;
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,4 +72,25 @@
             apiExceptions = ex.ErrorMessages;
         }
     }
+
+    private async Task OpenMenuContext(DataGridRowClickEventArgs<GetAllUsersDto> args)
+    {
+        selectedUser = args.Item;
+        xPos = args.MouseEventArgs.ClientX;
+        yPos = args.MouseEventArgs.ClientY;
+        await contextMenu.OpenMenuAsync(args.MouseEventArgs);
+        StateHasChanged();
+    }
+
+    // Obsługa kliknięć w menu
+    private void HandleMenuClick(string action)
+    {
+        if (selectedUser != null)
+        {
+            Console.WriteLine($"{action} clicked for: {selectedUser.UserName}");
+            // Tutaj dodaj logikę dla akcji
+        }
+        selectedUser = null;
+    }
 }
+
