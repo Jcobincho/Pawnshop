@@ -6,15 +6,16 @@
 @inject ApiService ApiService
 
 <MudDataGrid T="EmployeeDto" 
-             Items="@employeesFromApi.AllEmployeesList" 
+             Items="@(employeesFromApi?.AllEmployeesList ?? new List<EmployeeDto>())"
              DragDropColumnReordering="true" 
              ColumnsPanelReordering="true" 
-             ColumnResizeMode="ResizeMode.Container"
+             ColumnResizeMode="ResizeMode.Column"
              Hideable="true"
              Filterable="true"
              Groupable="true"
              FilterMode="DataGridFilterMode.Simple"
-             ShowMenuIcon="true">
+             ShowMenuIcon="true"
+             MultiSelection="false">
     <Columns>
         <PropertyColumn Property="x => x.EmployeeId" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
