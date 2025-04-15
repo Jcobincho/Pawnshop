@@ -17,9 +17,10 @@
              Groupable="true" 
              FilterMode="DataGridFilterMode.Simple" 
              ShowMenuIcon="true"
+             Dense
              RowContextMenuClick="@OpenMenuContext">
     <Columns>
-        <SelectColumn T="GetAllUsersDto"/>
+        <SelectColumn T="GetAllUsersDto" />
         <PropertyColumn Property="x => x.UserId" Title="User id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true"/>
         <PropertyColumn Property="x => x.UserName" Title="User name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.Email" Title="Email" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
