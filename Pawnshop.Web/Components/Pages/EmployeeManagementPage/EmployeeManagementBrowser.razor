@@ -11,6 +11,12 @@
 
 <EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" />
 
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style="backdrop-filter: blur(3px); z-index: 1050;">
+    @* <div class="m-5" style="max-width: 90%; max-height: 90vh; overflow: auto;"> *@
+        <EmployeeManagementDetail />
+    @* </div> *@
+</div>
+
 
 @code {
     private EmployeeDto currentEmployee = null;

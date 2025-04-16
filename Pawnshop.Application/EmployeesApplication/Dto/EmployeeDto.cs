@@ -8,6 +8,6 @@ namespace Pawnshop.Application.EmployeesApplication.Dto
         public string Name { get; set; }
         public string SecondName { get; set; }
         public string Surname { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime BirthDate { get; set; } = DateTime.Today;
     }
 }
