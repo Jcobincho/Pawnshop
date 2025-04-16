@@ -24,6 +24,7 @@
         <PropertyColumn Property="x => x.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="@(x => x.BirthDate.ToString("dd.MM.yyyy"))" Title="Birth date" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
     </Columns>
 </MudDataGrid>
 
@@ -40,6 +41,12 @@
     protected override async Task OnInitializedAsync()
     {
         await GetEmployeeFromApiAsync();
+    }
+
+    public async Task ReloadDataAsync()
+    {
+        await GetEmployeeFromApiAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task GetEmployeeFromApiAsync()
@@ -60,16 +67,3 @@
         await OnEmployeeSelected.InvokeAsync(row.Item);
     }
 }
-
-@* {
-  "employeeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "name": "string",
-  "secondName": "string",
-  "surname": "string",
-  "birthDate": "2025-04-15T10:47:24.516Z"
-} *@
-
-@* public sealed class GetAllEmployeesResponse
-    {
-        public List<EmployeeDto> AllEmployeesList { get; set; }
-    } *@

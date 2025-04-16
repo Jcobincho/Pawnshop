@@ -1,28 +1,41 @@
 ﻿@page "/Employee-management-page"
 @using Pawnshop.Application.EmployeesApplication.Dto
+@using Pawnshop.Web.Components.Common
 
-<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
-    <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye">Details</MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.Add">Add</MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.ContentCopy">Add copy</MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.Update">Update</MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.Delete">Delete</MudButton>
-</MudButtonGroup>
+<UniversalCrudMenu IsItemSelected="@(currentEmployee != null)" OnActionSelected="HandleCrudAction" />
 
-<EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" />
+<EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" @ref="employeeGrid" />
 
-<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style="backdrop-filter: blur(3px); z-index: 1050;">
-    @* <div class="m-5" style="max-width: 90%; max-height: 90vh; overflow: auto;"> *@
-        <EmployeeManagementDetail />
-    @* </div> *@
-</div>
+@if(showDetail)
+{
+    <EmployeeManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentEmployee="currentEmployee" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
+}
 
 
 @code {
     private EmployeeDto currentEmployee = null;
+    private bool showDetail = false;
+    private UniversalCrudMenu.CrudAction selectedAction;
+    private EmployeeManagementGrid employeeGrid;
 
     private void HandleEmployeeSelected(EmployeeDto selectedEmployee)
     {
         currentEmployee = selectedEmployee;
+    }
+
+    private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
+    {
+        selectedAction = action;
+        showDetail = true;
+    }
+
+    private void HandleDetailCanceled(bool canceled)
+    {
+        showDetail = canceled;
+    }
+
+    private async Task HandleCrudCompleted()
+    {
+        await employeeGrid.ReloadDataAsync();
     }
 }
