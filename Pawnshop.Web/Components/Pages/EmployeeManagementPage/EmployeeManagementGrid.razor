@@ -26,6 +26,9 @@
         <PropertyColumn Property="x => x.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="@(x => x.BirthDate.ToString("dd.MM.yyyy"))" Title="Birth date" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
     </Columns>
+    <PagerContent>
+        <MudDataGridPager T="EmployeeDto" />
+    </PagerContent>
 </MudDataGrid>
 
 @code {
