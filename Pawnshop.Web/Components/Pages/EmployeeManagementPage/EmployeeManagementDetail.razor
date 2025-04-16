@@ -1,0 +1,179 @@
+﻿@using Pawnshop.Application.EmployeesApplication.Commands.AddEmployee
+@using Pawnshop.Application.EmployeesApplication.Commands.DeleteEmployee
+@using Pawnshop.Application.EmployeesApplication.Commands.EditEmployee
+@using Pawnshop.Application.EmployeesApplication.Dto
+@using Pawnshop.Application.EmployeesApplication.Responses
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService
+
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style="backdrop-filter: blur(3px); z-index: 1050;">
+    <MudCard Class="w-50">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Employee detail</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="@(CurrentEmployee.Name)" 
+                          Label="Name" 
+                          Variant="Variant.Outlined" 
+                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+
+            <MudTextField @bind-Value="CurrentEmployee.SecondName" 
+                          Label="Secondname" 
+                          Variant="Variant.Outlined" 
+                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+
+            <MudTextField @bind-Value="CurrentEmployee.Surname" 
+                          Label="Surname" 
+                          Variant="Variant.Outlined" 
+                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+
+            <MudDatePicker Label="Birth date"
+                           Editable="true"
+                           Date="@CurrentEmployee.BirthDate"
+                           DateChanged="@HandleBirthDateChanged"
+                           Mask="@(new DateMask("00.00.0000"))"
+                           DateFormat="dd.MM.yyyy"
+                           Placeholder="Birth date"
+                           Variant="Variant.Outlined" 
+                           ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+        </MudCardContent>
+        <MudCardActions Class="gap-2 justify-content-end">
+
+            @if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudAddHandler">Add</MudButton>
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudUpdateHandler">Update</MudButton>
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudDeleteHandler">Delete</MudButton>
+            }
+
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="HandleDetailCancel">Cancel</MudButton>
+
+        </MudCardActions>
+    </MudCard>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnDetailCancel { get; set; }
+
+    [Parameter]
+    public EmployeeDto CurrentEmployee { get; set; }
+
+    [Parameter]
+    public UniversalCrudMenu.CrudAction SelectedAction { get; set; }
+
+    [Parameter]
+    public EventCallback OnCrudCompleted { get; set; }
+
+    List<string> apiExceptions = null;
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentEmployee == null || SelectedAction == UniversalCrudMenu.CrudAction.Add)
+        {
+            CurrentEmployee = new EmployeeDto
+            {
+                Name = string.Empty,
+                SecondName = string.Empty,
+                Surname = string.Empty,
+                BirthDate = DateTime.Today 
+            };
+        }
+    }
+
+    private void HandleBirthDateChanged(DateTime? date)
+    {
+        CurrentEmployee.BirthDate = date ?? DateTime.Today;
+    }
+
+    private async Task HandleDetailCancel()
+    {
+        await OnDetailCancel.InvokeAsync(false);
+    }
+
+    private async Task CrudAddHandler()
+    {
+        try
+        {
+            AddEmployeeCommand newEmployee = new AddEmployeeCommand();
+
+            newEmployee.Name = CurrentEmployee.Name;
+            newEmployee.SecondName = CurrentEmployee.SecondName;
+            newEmployee.Surname = CurrentEmployee.Surname;
+            newEmployee.BirthDate = CurrentEmployee.BirthDate;
+
+            AddEmployeeResponse addEmployeeResponse = new AddEmployeeResponse();
+
+            addEmployeeResponse = await ApiService.PostAsync<AddEmployeeCommand, AddEmployeeResponse>("/Employees/add", newEmployee);
+
+            await CrudCompleted();
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudUpdateHandler()
+    {
+        try
+        {
+            EditEmployeeCommand updateEmployee = new EditEmployeeCommand();
+
+            updateEmployee.EmployeeId = CurrentEmployee.EmployeeId;
+            updateEmployee.Name = CurrentEmployee.Name;
+            updateEmployee.SecondName = CurrentEmployee.SecondName;
+            updateEmployee.Surname = CurrentEmployee.Surname;
+            updateEmployee.BirthDate = CurrentEmployee.BirthDate;
+
+            EditEmployeeResponse updateEmployeeResponse = new EditEmployeeResponse();
+
+            updateEmployeeResponse = await ApiService.PutAsync<EditEmployeeCommand, EditEmployeeResponse>("/Employees/update", updateEmployee);
+
+            await CrudCompleted();
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudDeleteHandler()
+    {
+        try
+        {
+            DeleteEmployeeCommand deleteEmployee = new DeleteEmployeeCommand();
+
+            deleteEmployee.EmployeeId = CurrentEmployee.EmployeeId;
+
+            DeleteEmployeeResponse deleteEmployeeResponse = new DeleteEmployeeResponse();
+
+            deleteEmployeeResponse = await ApiService.DeleteAsync<DeleteEmployeeCommand, DeleteEmployeeResponse>("/Employees/delete", deleteEmployee);
+
+            await CrudCompleted();
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudCompleted()
+    {
+        await HandleDetailCancel();
+        await OnCrudCompleted.InvokeAsync();
+    }
+}

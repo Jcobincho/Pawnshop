@@ -1,0 +1,41 @@
+﻿@page "/Employee-management-page"
+@using Pawnshop.Application.EmployeesApplication.Dto
+@using Pawnshop.Web.Components.Common
+
+<UniversalCrudMenu IsItemSelected="@(currentEmployee != null)" OnActionSelected="HandleCrudAction" />
+
+<EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" @ref="employeeGrid" />
+
+@if(showDetail)
+{
+    <EmployeeManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentEmployee="currentEmployee" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
+}
+
+
+@code {
+    private EmployeeDto currentEmployee = null;
+    private bool showDetail = false;
+    private UniversalCrudMenu.CrudAction selectedAction;
+    private EmployeeManagementGrid employeeGrid;
+
+    private void HandleEmployeeSelected(EmployeeDto selectedEmployee)
+    {
+        currentEmployee = selectedEmployee;
+    }
+
+    private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
+    {
+        selectedAction = action;
+        showDetail = true;
+    }
+
+    private void HandleDetailCanceled(bool canceled)
+    {
+        showDetail = canceled;
+    }
+
+    private async Task HandleCrudCompleted()
+    {
+        await employeeGrid.ReloadDataAsync();
+    }
+}

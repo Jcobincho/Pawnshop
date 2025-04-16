@@ -1,0 +1,72 @@
+﻿@using Pawnshop.Application.EmployeesApplication.Dto
+@using Pawnshop.Application.EmployeesApplication.Responses
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService
+
+<MudDataGrid T="EmployeeDto"
+             Items="@(employeesFromApi?.AllEmployeesList ?? new List<EmployeeDto>())"
+             RowClick="OnRowClicked"
+             DragDropColumnReordering="true" 
+             ColumnsPanelReordering="true" 
+             ColumnResizeMode="ResizeMode.Column"
+             RowClassFunc="@( (employee, index) => employee == selectedEmployee ? "selected-row" : string.Empty )"
+             Hideable="true"
+             Filterable="true"
+             Groupable="true"
+             FilterMode="DataGridFilterMode.Simple" 
+             Striped="true"
+             ShowMenuIcon="true">
+
+    <Columns>
+        <PropertyColumn Property="x => x.EmployeeId" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="@(x => x.BirthDate.ToString("dd.MM.yyyy"))" Title="Birth date" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="EmployeeDto" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public EventCallback<EmployeeDto> OnEmployeeSelected { get; set; }
+
+    private EmployeeDto selectedEmployee;
+    public GetAllEmployeesResponse employeesFromApi = null;
+    List<string> apiExceptions = null;
+
+    MudDataGrid<EmployeeDto> grid = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEmployeeFromApiAsync();
+    }
+
+    public async Task ReloadDataAsync()
+    {
+        await GetEmployeeFromApiAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task GetEmployeeFromApiAsync()
+    {
+        try
+        {
+            employeesFromApi = await ApiService.GetAsync<GetAllEmployeesResponse>("/Employees/get");
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task OnRowClicked(DataGridRowClickEventArgs<EmployeeDto> row)
+    {
+        selectedEmployee = row.Item;
+        await OnEmployeeSelected.InvokeAsync(row.Item);
+    }
+}

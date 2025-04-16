@@ -21,6 +21,16 @@
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
+
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.EmployeesDisplay}, {UserRoles.EmployeesDisplayAndModify}")">
+        <Authorized>
+            <MudNavLink Href="/Employee-management-page"
+                        Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.Work">
+                Employee management
+            </MudNavLink>
+        </Authorized>
+    </AuthorizeView>
     
     @* <MudNavLink Href="/Cos" Match="NavLinkMatch.Prefix">Gdzies</MudNavLink> *@
 </MudNavMenu>

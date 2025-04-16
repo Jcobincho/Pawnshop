@@ -1,0 +1,49 @@
+﻿@using MudBlazor
+
+<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
+    <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Disabled="@(!IsItemSelected)"
+               OnClick="@(() => OnAction(CrudAction.View))">
+        Details
+    </MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Add"
+               OnClick="@(() => OnAction(CrudAction.Add))">
+        Add
+    </MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Disabled="@(!IsItemSelected)"
+               OnClick="@(() => OnAction(CrudAction.AddCopy))">
+        Add copy
+    </MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Update" Disabled="@(!IsItemSelected)"
+               OnClick="@(() => OnAction(CrudAction.Update))">
+        Update
+    </MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Delete" Disabled="@(!IsItemSelected)"
+               OnClick="@(() => OnAction(CrudAction.Delete))">
+        Delete
+    </MudButton>
+</MudButtonGroup>
+
+@code {
+    [Parameter]
+    public bool IsItemSelected { get; set; }
+
+    [Parameter]
+    public EventCallback<CrudAction> OnActionSelected { get; set; }
+
+    private async Task OnAction(CrudAction action)
+    {
+        if (OnActionSelected.HasDelegate)
+        {
+            await OnActionSelected.InvokeAsync(action);
+        }
+    }
+
+    public enum CrudAction
+    {
+        View,
+        Add,
+        AddCopy,
+        Update,
+        Delete
+    }
+}
