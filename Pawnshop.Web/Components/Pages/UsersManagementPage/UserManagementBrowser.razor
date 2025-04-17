@@ -1,0 +1,34 @@
+﻿@page "/User-management-page"
+
+@using Pawnshop.Application.UsersApplication.Dto
+@using Pawnshop.Web.Components.Common
+
+<UniversalCrudMenu IsItemSelected="@(currenUser != null)" OnActionSelected="HandleCrudAction" />
+
+<UserManagementGrid OnUserSelected="HandleUserSelected" @ref="userGrid" />
+
+@if(showDetail)
+{
+    <UserManagementDetail CurrentUser="currenUser" SelectedAction="selectedAction" OnDetailCanceled="HandleDetailCanceled" OnCrudCompleted="HandlerCrudCompleted" />
+}
+
+@* Add detail here *@
+
+@code {
+    private GetAllUsersDto currenUser = null;
+    private bool showDetail = false;
+    private UniversalCrudMenu.CrudAction selectedAction;
+    private UserManagementGrid userGrid;
+
+    private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
+    {
+        selectedAction = action;
+        showDetail = true;
+    }
+
+    private void HandleUserSelected(GetAllUsersDto selectedUser) => currenUser = selectedUser;
+
+    private void HandleDetailCanceled() => showDetail = false;
+
+    private async Task HandlerCrudCompleted() => await userGrid.ReloadDataAsync();
+}

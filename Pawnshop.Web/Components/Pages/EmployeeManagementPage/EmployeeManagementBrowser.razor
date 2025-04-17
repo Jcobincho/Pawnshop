@@ -18,24 +18,15 @@
     private UniversalCrudMenu.CrudAction selectedAction;
     private EmployeeManagementGrid employeeGrid;
 
-    private void HandleEmployeeSelected(EmployeeDto selectedEmployee)
-    {
-        currentEmployee = selectedEmployee;
-    }
-
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
         selectedAction = action;
         showDetail = true;
     }
 
-    private void HandleDetailCanceled(bool canceled)
-    {
-        showDetail = canceled;
-    }
+    private void HandleEmployeeSelected(EmployeeDto selectedEmployee) => currentEmployee = selectedEmployee;
 
-    private async Task HandleCrudCompleted()
-    {
-        await employeeGrid.ReloadDataAsync();
-    }
+    private void HandleDetailCanceled() => showDetail = false;
+
+    private async Task HandleCrudCompleted() => await employeeGrid.ReloadDataAsync();
 }

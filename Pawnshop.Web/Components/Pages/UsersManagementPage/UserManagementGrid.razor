@@ -6,8 +6,9 @@
 @inject ApiService ApiService
 
 <MudDataGrid T="GetAllUsersDto"
-             @ref="grid" 
-             Items="@usersFromApi.Users" 
+             Items="@(usersFromApi?.Users ?? new List<GetAllUsersDto>())" 
+             RowClassFunc="@( (user, index) => user == selectedUser ? "selected-row" : string.Empty)" 
+             RowClick="OnRowClicked"
              DragDropColumnReordering="true" 
              ColumnsPanelReordering="true"
              ColumnResizeMode="ResizeMode.Column" 
@@ -17,11 +18,8 @@
              Groupable="true" 
              FilterMode="DataGridFilterMode.Simple" 
              ShowMenuIcon="true"
-             Dense
-             Striped
-             RowContextMenuClick="@OpenMenuContext">
+             Striped="true">
     <Columns>
-        <SelectColumn T="GetAllUsersDto" />
         <PropertyColumn Property="x => x.UserId" Title="User id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true"/>
         <PropertyColumn Property="x => x.UserName" Title="User name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.Email" Title="Email" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
@@ -30,36 +28,30 @@
                 @string.Join(", ", context.Item.Roles)
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.Employee.EmployeeId" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="@(x => x.Employee.EmployeeId)" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.Employee.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.Employee.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.Employee.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Employee.BirthDate" Title="BirthDate" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="@(x => x.Employee.BirthDate.ToString("dd.MM.yyyy"))" Title="BirthDate" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
     </Columns>
 </MudDataGrid>
 
-<MudMenu @ref="contextMenu"
-         Style="@($"position: fixed; left: {xPos}px; top: {yPos}px;")"
-         Visible="@(selectedUser != null)">
-    <MudMenuItem Icon="@Icons.Material.Filled.Block" OnClick="@(() => HandleMenuClick("Add"))">
-        Add
-    </MudMenuItem>
-    <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => HandleMenuClick("Detail"))">
-        Detail
-    </MudMenuItem>
-</MudMenu>
-
 @code {
-    List<string> apiExceptions = null;
-    GetAllUsersResponse usersFromApi = new GetAllUsersResponse();
-    MudDataGrid<GetAllUsersDto> grid = null;
-    MudMenu contextMenu = null!;
+    [Parameter]
+    public EventCallback<GetAllUsersDto> OnUserSelected { get; set; }
 
+    List<string> apiExceptions = null;
+    public GetAllUsersResponse usersFromApi = new GetAllUsersResponse();
     private GetAllUsersDto selectedUser;
-    private double xPos;
-    private double yPos;
+
 
     protected override async Task OnInitializedAsync()
+    {
+        await GetUsersFromApiAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task ReloadDataAsync()
     {
         await GetUsersFromApiAsync();
     }
@@ -76,24 +68,10 @@
         }
     }
 
-    private async Task OpenMenuContext(DataGridRowClickEventArgs<GetAllUsersDto> args)
+    private async Task OnRowClicked(DataGridRowClickEventArgs<GetAllUsersDto> row)
     {
-        selectedUser = args.Item;
-        xPos = args.MouseEventArgs.ClientX;
-        yPos = args.MouseEventArgs.ClientY;
-        await contextMenu.OpenMenuAsync(args.MouseEventArgs);
-        StateHasChanged();
-    }
-
-    // Obsługa kliknięć w menu
-    private void HandleMenuClick(string action)
-    {
-        if (selectedUser != null)
-        {
-            Console.WriteLine($"{action} clicked for: {selectedUser.UserName}");
-            // Tutaj dodaj logikę dla akcji
-        }
-        selectedUser = null;
+        selectedUser = row.Item;
+        await OnUserSelected.InvokeAsync(selectedUser);
     }
 }
 

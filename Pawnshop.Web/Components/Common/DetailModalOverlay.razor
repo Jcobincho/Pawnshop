@@ -1,0 +1,16 @@
+﻿<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style="backdrop-filter: blur(3px); z-index: 1050;" @onclick="HandleBackdropClick">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback OnClickOutside { get; set; }
+
+    private async Task HandleBackdropClick()
+    {
+        await OnClickOutside.InvokeAsync();
+    }
+}
