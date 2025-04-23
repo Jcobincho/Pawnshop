@@ -11,7 +11,7 @@ namespace Pawnshop.Api.Controllers
 {
     [Route("[controller]")]
     [Authorize]
-    public class EmployeesController : BaseController<AddEmployeeCommand, EditEmployeeCommand, DeleteEmployeeCommand, GetAllEmployeesQuery>
+    public class EmployeesController : BaseController<AddEmployeeCommand, UpdateEmployeeCommand, DeleteEmployeeCommand, GetAllEmployeesQuery>
     {
 
     }

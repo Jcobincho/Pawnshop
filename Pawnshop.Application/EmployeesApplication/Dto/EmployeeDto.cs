@@ -4,10 +4,10 @@ namespace Pawnshop.Application.EmployeesApplication.Dto
 {
     public class EmployeeDto : BaseDto
     {
-        public Guid EmployeeId { get; set; }
-        public string Name { get; set; }
-        public string SecondName { get; set; }
-        public string Surname { get; set; }
+        public Guid EmployeeId { get; set; } = Guid.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string SecondName { get; set; } = string.Empty;
+        public string Surname { get; set; } = string.Empty;
         public DateTime BirthDate { get; set; } = DateTime.Today;
     }
 }

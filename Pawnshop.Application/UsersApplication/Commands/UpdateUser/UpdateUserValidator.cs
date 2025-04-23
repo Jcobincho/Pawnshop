@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Application.UsersApplication.Commands.EditUser
 {
-    public sealed class EditUserValidator : AbstractValidator<EditUserCommand>
+    public sealed class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
     {
-        public EditUserValidator()
+        public UpdateUserValidator()
         {
             RuleFor(x => x.RepeatedPassword)
                 .Equal(x => x.Password)

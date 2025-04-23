@@ -4,7 +4,7 @@ namespace Pawnshop.Application.EmployeesApplication.Dto.DtoExtension
 {
     public static class EmployeeDtoExtension
     {
-        public static EmployeeDto EmployeePraseToDto(this Employees employees)
+        public static EmployeeDto EmployeePraseToDto(this Employee employees)
         {
 
             return new EmployeeDto

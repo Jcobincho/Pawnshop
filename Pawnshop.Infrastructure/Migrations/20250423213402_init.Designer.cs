@@ -12,7 +12,7 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250404225909_init")]
+    [Migration("20250423213402_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -155,7 +155,7 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Pawnshop.Domain.Entities.Employees", b =>
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Employee", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -196,7 +196,7 @@ namespace Pawnshop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.UserRefreshToken", b =>
@@ -352,7 +352,7 @@ namespace Pawnshop.Infrastructure.Migrations
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.Users", b =>
                 {
-                    b.HasOne("Pawnshop.Domain.Entities.Employees", "Employee")
+                    b.HasOne("Pawnshop.Domain.Entities.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeesId");
 

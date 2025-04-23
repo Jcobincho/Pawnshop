@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Application.EmployeesApplication.Commands.EditEmployee
 {
-    public sealed class EditEmployeeCommand : BaseCommand<EditEmployeeResponse>
+    public sealed class UpdateEmployeeCommand : BaseCommand<UpdateEmployeeResponse>
     {
         [Required(ErrorMessage = "User identifier is required.")]
         public Guid EmployeeId { get; set; }

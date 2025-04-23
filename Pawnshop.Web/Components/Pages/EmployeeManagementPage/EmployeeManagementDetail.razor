@@ -9,11 +9,20 @@
 
 @inject ApiService ApiService
 
-<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style="backdrop-filter: blur(3px); z-index: 1050;">
+<DetailModalOverlay>
     <MudCard Class="w-50">
         <MudCardHeader>
             <CardHeaderContent>
                 <MudText Typo="Typo.h6">Employee detail</MudText>
+
+                @if (apiExceptions != null)
+                {
+                    foreach (var error in apiExceptions)
+                    {
+                        <MudAlert Severity="Severity.Error" Class="mt-2">@error</MudAlert>
+                    }
+                }
+
             </CardHeaderContent>
         </MudCardHeader>
         <MudCardContent>
@@ -61,14 +70,11 @@
 
         </MudCardActions>
     </MudCard>
-</div>
+</DetailModalOverlay>
 
 
 
 @code {
-    [Parameter]
-    public EventCallback<bool> OnDetailCancel { get; set; }
-
     [Parameter]
     public EmployeeDto CurrentEmployee { get; set; }
 
@@ -78,7 +84,10 @@
     [Parameter]
     public EventCallback OnCrudCompleted { get; set; }
 
-    List<string> apiExceptions = null;
+    [Parameter]
+    public EventCallback OnDetailCancel { get; set; }
+
+    private List<string> apiExceptions = null;
 
     protected override void OnParametersSet()
     {
@@ -101,7 +110,7 @@
 
     private async Task HandleDetailCancel()
     {
-        await OnDetailCancel.InvokeAsync(false);
+        await OnDetailCancel.InvokeAsync();
     }
 
     private async Task CrudAddHandler()
@@ -131,17 +140,17 @@
     {
         try
         {
-            EditEmployeeCommand updateEmployee = new EditEmployeeCommand();
+            UpdateEmployeeCommand updatedEmployee = new UpdateEmployeeCommand();
 
-            updateEmployee.EmployeeId = CurrentEmployee.EmployeeId;
-            updateEmployee.Name = CurrentEmployee.Name;
-            updateEmployee.SecondName = CurrentEmployee.SecondName;
-            updateEmployee.Surname = CurrentEmployee.Surname;
-            updateEmployee.BirthDate = CurrentEmployee.BirthDate;
+            updatedEmployee.EmployeeId = CurrentEmployee.EmployeeId;
+            updatedEmployee.Name = CurrentEmployee.Name;
+            updatedEmployee.SecondName = CurrentEmployee.SecondName;
+            updatedEmployee.Surname = CurrentEmployee.Surname;
+            updatedEmployee.BirthDate = CurrentEmployee.BirthDate;
 
-            EditEmployeeResponse updateEmployeeResponse = new EditEmployeeResponse();
+            UpdateEmployeeResponse updatedEmployeeResponse = new UpdateEmployeeResponse();
 
-            updateEmployeeResponse = await ApiService.PutAsync<EditEmployeeCommand, EditEmployeeResponse>("/Employees/update", updateEmployee);
+            updatedEmployeeResponse = await ApiService.PutAsync<UpdateEmployeeCommand, UpdateEmployeeResponse>("/Employees/update", updatedEmployee);
 
             await CrudCompleted();
         }

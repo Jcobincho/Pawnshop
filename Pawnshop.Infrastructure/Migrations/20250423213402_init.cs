@@ -27,7 +27,7 @@ namespace Pawnshop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employee",
+                name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -43,7 +43,7 @@ namespace Pawnshop.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employee", x => x.Id);
+                    table.PrimaryKey("PK_Employees", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -92,9 +92,9 @@ namespace Pawnshop.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Employee_EmployeesId",
+                        name: "FK_AspNetUsers_Employees_EmployeesId",
                         column: x => x.EmployeesId,
-                        principalTable: "Employee",
+                        principalTable: "Employees",
                         principalColumn: "Id");
                 });
 
@@ -278,7 +278,7 @@ namespace Pawnshop.Infrastructure.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Employee");
+                name: "Employees");
         }
     }
 }

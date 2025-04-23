@@ -50,7 +50,7 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
 
             if(command.EmployeeId != Guid.Empty)
             {
-                bool isEmployeeExists = await _dbContext.Employee.AnyAsync(x => x.Id == command.EmployeeId, cancellationToken);
+                bool isEmployeeExists = await _dbContext.Employees.AnyAsync(x => x.Id == command.EmployeeId, cancellationToken);
 
                 if(isEmployeeExists)
                 {
@@ -178,7 +178,7 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             await _signInManager.SignOutAsync();
         }
 
-        public async Task EditUserAsync(EditUserCommand command, CancellationToken cancellationToken)
+        public async Task UpdateUserAsync(UpdateUserCommand command, CancellationToken cancellationToken)
         {
             var userToEdit = await _userManager.FindByIdAsync(command.UserId.ToString());
 
@@ -202,7 +202,7 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
 
             if (command.EmployeeId != Guid.Empty)
             {
-                bool employeeExists = await _dbContext.Employee.AnyAsync(e => e.Id == command.EmployeeId, cancellationToken);
+                bool employeeExists = await _dbContext.Employees.AnyAsync(e => e.Id == command.EmployeeId, cancellationToken);
                 if (!employeeExists)
                     throw new BadRequestException("Employee not found.");
                 userToEdit.EmployeesId = command.EmployeeId;
@@ -274,6 +274,30 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             }).ToList();
 
             return result;
+        }
+
+        public async Task UpdateEmployeeIdentifierAsync(Guid employeeId, CancellationToken cancellationToken)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.EmployeesId == employeeId, cancellationToken);
+
+            if(user != null)
+            {
+                user.EmployeesId = employeeId;
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+        }
+
+        public async Task DeleteUserAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            var user = await _dbContext.Users.FindAsync(userId, cancellationToken);
+
+            if (user == null)
+                throw new NotFoundException("User does not exist.");
+
+            _dbContext.Remove(user);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }
