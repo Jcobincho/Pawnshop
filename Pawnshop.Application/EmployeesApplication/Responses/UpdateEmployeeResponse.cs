@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pawnshop.Application.UsersApplication.Responses
+namespace Pawnshop.Application.EmployeesApplication.Responses
 {
-    public sealed class EditUserResponse
+    public sealed class UpdateEmployeeResponse
     {
         public string Message { get; set; } = "Success.";
     }

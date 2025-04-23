@@ -9,20 +9,20 @@ using System.Threading.Tasks;
 
 namespace Pawnshop.Application.EmployeesApplication.Commands.EditEmployee
 {
-    public sealed class EditEmployeeHandler : IRequestHandler<EditEmployeeCommand, EditEmployeeResponse>
+    public sealed class UpdateEmployeeHandler : IRequestHandler<UpdateEmployeeCommand, UpdateEmployeeResponse>
     {
         private readonly IEmployeesCommandService _employeesCommandService;
 
-        public EditEmployeeHandler(IEmployeesCommandService employeesCommandService)
+        public UpdateEmployeeHandler(IEmployeesCommandService employeesCommandService)
         {
             _employeesCommandService = employeesCommandService;
         }
 
-        public async Task<EditEmployeeResponse> Handle(EditEmployeeCommand request, CancellationToken cancellationToken)
+        public async Task<UpdateEmployeeResponse> Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
         {
             await _employeesCommandService.EditEmployeeAsync(request, cancellationToken);
 
-            return new EditEmployeeResponse();
+            return new UpdateEmployeeResponse();
         }
     }
 }

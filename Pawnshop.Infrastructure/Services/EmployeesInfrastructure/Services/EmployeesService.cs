@@ -5,30 +5,26 @@ using Pawnshop.Application.EmployeesApplication.Commands.EditEmployee;
 using Pawnshop.Application.EmployeesApplication.Dto;
 using Pawnshop.Application.EmployeesApplication.Dto.DtoExtension;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
+using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
 {
     internal sealed class EmployeesService : IEmployeesCommandService, IEmployeesQueryService
     {
         private readonly DbContext _dbContext;
+        private readonly IUsersCommandService _usersCommandService;
 
-        public EmployeesService(DbContext dbContext)
+        public EmployeesService(DbContext dbContext, IUsersCommandService usersCommandService)
         {
             _dbContext = dbContext;
+            _usersCommandService = usersCommandService;
         }
 
         public async Task<Guid> AddEmployeeAsync(AddEmployeeCommand command, CancellationToken cancellationToken)
         {
-            var newEmployee = new Employees()
+            var newEmployee = new Employee()
             {
                 Name = command.Name,
                 SecondName = command.SecondName,
@@ -36,13 +32,13 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
                 BirthDate = command.BirthDate
             };
 
-            await _dbContext.Employee.AddAsync(newEmployee, cancellationToken);
+            await _dbContext.Employees.AddAsync(newEmployee, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return newEmployee.Id;
         }
 
-        public async Task EditEmployeeAsync(EditEmployeeCommand command, CancellationToken cancellationToken)
+        public async Task EditEmployeeAsync(UpdateEmployeeCommand command, CancellationToken cancellationToken)
         {
             var employee = await GetEmployeesByIdAsync(command.EmployeeId, cancellationToken);
 
@@ -51,7 +47,7 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
             employee.Surname = command.Surname;
             employee.BirthDate = command.BirthDate;
 
-            _dbContext.Employee.Update(employee);
+            _dbContext.Employees.Update(employee);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
@@ -59,14 +55,16 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
         {
             var employee = await GetEmployeesByIdAsync(command.EmployeeId, cancellationToken);
 
-            _dbContext.Employee.Remove(employee);
+            await _usersCommandService.UpdateEmployeeIdentifierAsync(command.EmployeeId, cancellationToken);
+
+            _dbContext.Employees.Remove(employee);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Employees> GetEmployeesByIdAsync(Guid employeeId, CancellationToken cancellationToken)
+        public async Task<Employee> GetEmployeesByIdAsync(Guid employeeId, CancellationToken cancellationToken)
         {
-            var employee = await _dbContext.Employee.FindAsync(employeeId, cancellationToken);
+            var employee = await _dbContext.Employees.FindAsync(employeeId, cancellationToken);
 
             if(employee == null)
             {
@@ -78,7 +76,7 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
 
         public async Task<List<EmployeeDto>> GetAllEmployeesAsDtoAsync(CancellationToken cancellationToken)
         {
-            var employees = await _dbContext.Employee.Select(x => x.EmployeePraseToDto()).ToListAsync(cancellationToken);
+            var employees = await _dbContext.Employees.Select(x => x.EmployeePraseToDto()).ToListAsync(cancellationToken);
 
             return employees;
         }

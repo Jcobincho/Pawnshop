@@ -16,7 +16,7 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
         _userClaimsDataProviderService = userClaimsDataProviderService;
     }
     
-    public DbSet<Employees> Employee { get; set; }
+    public DbSet<Employee> Employees { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

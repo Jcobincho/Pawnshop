@@ -140,17 +140,17 @@
     {
         try
         {
-            EditEmployeeCommand updateEmployee = new EditEmployeeCommand();
+            UpdateEmployeeCommand updatedEmployee = new UpdateEmployeeCommand();
 
-            updateEmployee.EmployeeId = CurrentEmployee.EmployeeId;
-            updateEmployee.Name = CurrentEmployee.Name;
-            updateEmployee.SecondName = CurrentEmployee.SecondName;
-            updateEmployee.Surname = CurrentEmployee.Surname;
-            updateEmployee.BirthDate = CurrentEmployee.BirthDate;
+            updatedEmployee.EmployeeId = CurrentEmployee.EmployeeId;
+            updatedEmployee.Name = CurrentEmployee.Name;
+            updatedEmployee.SecondName = CurrentEmployee.SecondName;
+            updatedEmployee.Surname = CurrentEmployee.Surname;
+            updatedEmployee.BirthDate = CurrentEmployee.BirthDate;
 
-            EditEmployeeResponse updateEmployeeResponse = new EditEmployeeResponse();
+            UpdateEmployeeResponse updatedEmployeeResponse = new UpdateEmployeeResponse();
 
-            updateEmployeeResponse = await ApiService.PutAsync<EditEmployeeCommand, EditEmployeeResponse>("/Employees/update", updateEmployee);
+            updatedEmployeeResponse = await ApiService.PutAsync<UpdateEmployeeCommand, UpdateEmployeeResponse>("/Employees/update", updatedEmployee);
 
             await CrudCompleted();
         }

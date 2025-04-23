@@ -8,7 +8,7 @@ namespace Pawnshop.Domain.Entities;
 public class Users : IdentityUser<Guid>
 {
     public Guid? EmployeesId { get; set; }
-    public Employees? Employee { get; set; }
+    public Employee? Employee { get; set; }
 
     public IReadOnlyCollection<UserRefreshToken> RefreshToken => _refreshToken;
 

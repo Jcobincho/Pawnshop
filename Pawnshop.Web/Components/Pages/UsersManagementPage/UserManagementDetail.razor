@@ -1,8 +1,16 @@
 ﻿@using Pawnshop.Application.EmployeesApplication.Dto
+@using Pawnshop.Application.UsersApplication.Commands.CreateUser
+@using Pawnshop.Application.UsersApplication.Commands.DeleteUser
+@using Pawnshop.Application.UsersApplication.Commands.EditUser
 @using Pawnshop.Application.UsersApplication.Dto
+@using Pawnshop.Application.UsersApplication.Responses
 @using Pawnshop.Domain.Roles
 @using Pawnshop.Web.Components.Common
 @using Pawnshop.Web.Components.Pages.EmployeeManagementPage
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService;
 
 <DetailModalOverlay>
     <MudCard Class="w-50">
@@ -22,52 +30,112 @@
         </MudCardHeader>
         
         <MudCardContent>
-            <MudTextField @bind-Value="@(CurrentUser.UserName)"
-                          Label="Username"
-                          Variant="Variant.Outlined"
-                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
 
-            <MudTextField @bind-Value="@(CurrentUser.Email)" 
-                          InputType="InputType.Email"
-                          Label="Email"
-                          Variant="Variant.Outlined"
-                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+            <MudGrid>
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentUser.UserName)"
+                                  Label="Username"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
 
-            <MudTextField @bind-Value="@(password)"
-                          InputType="InputType.Password"
-                          Label="Password"
-                          Variant="Variant.Outlined"
-                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentUser.Email)"
+                                  InputType="InputType.Email"
+                                  Label="Email"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
 
-            <MudTextField @bind-Value="@(repeatPassword)"
-                          InputType="InputType.Password"
-                          Label="Repeat password"
-                          Variant="Variant.Outlined"
-                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(password)"
+                                  InputType="InputType.Password"
+                                  Label="Password" HelperText="@(SelectedAction == UniversalCrudMenu.CrudAction.Update ? "If the password field is left blank, the password will not change." : "")"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
 
-            <MudSelect T="string" 
-                       Label="Roles"
-                       Variant="Variant.Outlined"
-                       MultiSelection="true"
-                       SelectedValues="@CurrentUser.Roles"
-                       SelectedValuesChanged="@( (IEnumerable<string> values) => OnRolesSelected(values))"
-                       ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)">
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(repeatPassword)"
+                                  InputType="InputType.Password"
+                                  Label="Repeat password"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
 
-                @foreach (var role in availableRoles)
-                {
-                    <MudSelectItem Value="@role">@role</MudSelectItem>
-                }
+                <MudItem md="12">
+                    <MudSelect T="string"
+                               Label="Roles"
+                               Variant="Variant.Outlined"
+                               MultiSelection="true"
+                               SelectedValues="@CurrentUser.Roles"
+                               SelectedValuesChanged="@( (IEnumerable<string> values) => OnRolesSelected(values))"
+                               ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)">
 
-            </MudSelect>
+                        @foreach (var role in availableRoles)
+                        {
+                            <MudSelectItem Value="@role">@role</MudSelectItem>
+                        }
 
-            <MudTextField Label="Employee ID"
-                          @bind-Value="@(CurrentUser.Employee.EmployeeId)"
-                          Variant="Variant.Outlined"
-                          ReadOnly="true"
-                          Adornment="Adornment.End"
-                          AdornmentIcon="@Icons.Material.Filled.Search"
-                          OnAdornmentClick="@(() => showEmployeeGrid = true)"/>
+                    </MudSelect>
+                </MudItem>
 
+                <MudItem md="12">
+                    <MudCard Class="w-100" Outlined="true">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">Employee detail</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem md="4">
+                                    <MudTextField Label="Name"
+                                                  @bind-Value="@(CurrentUser.Employee.Name)"
+                                                  Variant="Variant.Outlined"
+                                                  ReadOnly="true"
+                                                  Adornment="Adornment.End"
+                                                  AdornmentIcon="@(SelectedAction != UniversalCrudMenu.CrudAction.View && SelectedAction != UniversalCrudMenu.CrudAction.Delete ? Icons.Material.Filled.Search : null)"
+                                                  OnAdornmentClick="@(() =>
+                                                  {
+                                                    if (SelectedAction != UniversalCrudMenu.CrudAction.View && SelectedAction != UniversalCrudMenu.CrudAction.Delete)
+                                                        showEmployeeGrid = true;
+                                                  })" />
+                                </MudItem>
+
+                                <MudItem md="4">
+                                    <MudTextField Label="Second name"
+                                                  @bind-Value="@(CurrentUser.Employee.SecondName)"
+                                                  Variant="Variant.Outlined"
+                                                  ReadOnly="true"
+                                                  Adornment="Adornment.End"
+                                                  AdornmentIcon="@(SelectedAction != UniversalCrudMenu.CrudAction.View && SelectedAction != UniversalCrudMenu.CrudAction.Delete ? Icons.Material.Filled.Search : null)"
+                                                  OnAdornmentClick="@(() =>
+                                                  {
+                                                    if (SelectedAction != UniversalCrudMenu.CrudAction.View && SelectedAction != UniversalCrudMenu.CrudAction.Delete)
+                                                        showEmployeeGrid = true;
+                                                  })" />
+                                </MudItem>
+
+                                <MudItem md="4">
+                                    <MudTextField Label="Surname"
+                                                  @bind-Value="@(CurrentUser.Employee.Surname)"
+                                                  Variant="Variant.Outlined"
+                                                  ReadOnly="true"
+                                                  Adornment="Adornment.End"
+                                                  AdornmentIcon="@(SelectedAction != UniversalCrudMenu.CrudAction.View && SelectedAction != UniversalCrudMenu.CrudAction.Delete ? Icons.Material.Filled.Search : null)"
+                                                  OnAdornmentClick="@(() =>
+                                                  {
+                                                    if (SelectedAction != UniversalCrudMenu.CrudAction.View && SelectedAction != UniversalCrudMenu.CrudAction.Delete)
+                                                        showEmployeeGrid = true;
+                                                  })" />
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
 
             @if (showEmployeeGrid)
             {
@@ -157,17 +225,73 @@
 
     private async Task CrudAddHandler()
     {
+        try
+        {
+            CreateUserCommand newUser = new CreateUserCommand();
 
+            newUser.UserName = CurrentUser.UserName;
+            newUser.Email = CurrentUser.Email;
+            newUser.Password = password;
+            newUser.RepeatedPassword = repeatPassword;
+            newUser.EmployeeId = CurrentUser.Employee.EmployeeId;
+            newUser.UserRoles = CurrentUser.Roles;
+
+            CreateUserResponse createUserResponse = new CreateUserResponse();
+
+            createUserResponse = await ApiService.PostAsync<CreateUserCommand, CreateUserResponse>("/Users/add", newUser);
+
+            await CrudCompleted();
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
     }
 
     private async Task CrudUpdateHandler()
     {
+        try
+        {
+            UpdateUserCommand updatedUser = new UpdateUserCommand();
 
+            updatedUser.UserId = CurrentUser.UserId;
+            updatedUser.UserName = CurrentUser.UserName;
+            updatedUser.Email = CurrentUser.Email;
+            updatedUser.Password = password;
+            updatedUser.RepeatedPassword = repeatPassword;
+            updatedUser.EmployeeId = CurrentUser.Employee.EmployeeId;
+            updatedUser.UserRoles = CurrentUser.Roles;
+
+            UpdateUserResponse updatedUserResponse = new UpdateUserResponse();
+
+            updatedUserResponse = await ApiService.PutAsync<UpdateUserCommand, UpdateUserResponse>("/Users/update", updatedUser);
+
+            await CrudCompleted();
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
     }
 
     private async Task CrudDeleteHandler()
     {
+        try
+        {
+            DeleteUserCommand deleteUser = new DeleteUserCommand();
 
+            deleteUser.UserId = CurrentUser.UserId;
+
+            DeleteUserResponse deleteUserResponse = new DeleteUserResponse();
+
+            deleteUserResponse = await ApiService.DeleteAsync<DeleteUserCommand, DeleteUserResponse>("/Users/delete", deleteUser);
+
+            await CrudCompleted();
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
     }
 
     private async Task HandleDetailCancel()
