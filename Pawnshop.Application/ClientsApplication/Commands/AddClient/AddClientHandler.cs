@@ -15,7 +15,12 @@ namespace Pawnshop.Application.ClientsApplication.Commands.AddClient
 
         public async Task<AddClientResponse> Handle(AddClientCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var clientId = await _clientsCommandService.AddClientAsync(request, cancellationToken);
+
+            return new AddClientResponse()
+            {
+                ClientId = clientId
+            };
         }
     }
 }

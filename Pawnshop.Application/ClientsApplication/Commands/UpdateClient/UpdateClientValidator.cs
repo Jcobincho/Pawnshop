@@ -1,15 +1,10 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Pawnshop.Application.ClientsApplication.Commands.AddClient
+namespace Pawnshop.Application.ClientsApplication.Commands.UpdateClient
 {
-    public sealed class AddClientValidator : AbstractValidator<AddClientCommand>
+    public sealed class UpdateClientValidator : AbstractValidator<UpdateClientCommand>
     {
-        public AddClientValidator()
+        public UpdateClientValidator()
         {
             RuleFor(x => x.Pesel)
                 .NotEmpty().WithMessage("PESEL is required.")
