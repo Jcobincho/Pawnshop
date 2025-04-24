@@ -6,7 +6,7 @@ using Pawnshop.Application.EmployeesApplication.Dto;
 using Pawnshop.Application.EmployeesApplication.Dto.DtoExtension;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
-using Pawnshop.Domain.Entities;
+using Pawnshop.Domain.Entitie;
 using Pawnshop.Domain.Exceptions;
 
 namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services

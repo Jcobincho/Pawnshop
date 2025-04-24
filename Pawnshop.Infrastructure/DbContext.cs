@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
+using Pawnshop.Domain.Entitie;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
 

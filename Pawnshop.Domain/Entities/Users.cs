@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Pawnshop.Domain.AuthTokens;
+using Pawnshop.Domain.Entitie;
 
 namespace Pawnshop.Domain.Entities;
 

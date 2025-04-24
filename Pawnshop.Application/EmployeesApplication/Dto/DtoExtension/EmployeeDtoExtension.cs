@@ -1,4 +1,4 @@
-﻿using Pawnshop.Domain.Entities;
+﻿using Pawnshop.Domain.Entitie;
 
 namespace Pawnshop.Application.EmployeesApplication.Dto.DtoExtension
 {
