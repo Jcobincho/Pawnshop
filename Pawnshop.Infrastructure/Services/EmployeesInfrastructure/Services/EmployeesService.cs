@@ -6,7 +6,7 @@ using Pawnshop.Application.EmployeesApplication.Dto;
 using Pawnshop.Application.EmployeesApplication.Dto.DtoExtension;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
-using Pawnshop.Domain.Entities;
+using Pawnshop.Domain.Entitie;
 using Pawnshop.Domain.Exceptions;
 
 namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
@@ -40,7 +40,7 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
 
         public async Task EditEmployeeAsync(UpdateEmployeeCommand command, CancellationToken cancellationToken)
         {
-            var employee = await GetEmployeesByIdAsync(command.EmployeeId, cancellationToken);
+            var employee = await GetEmployeeByIdAsync(command.EmployeeId, cancellationToken);
 
             employee.Name = command.Name;
             employee.SecondName = command.SecondName;
@@ -53,7 +53,7 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
 
         public async Task DeleteEmployeeAsync(DeleteEmployeeCommand command, CancellationToken cancellationToken)
         {
-            var employee = await GetEmployeesByIdAsync(command.EmployeeId, cancellationToken);
+            var employee = await GetEmployeeByIdAsync(command.EmployeeId, cancellationToken);
 
             await _usersCommandService.UpdateEmployeeIdentifierAsync(command.EmployeeId, cancellationToken);
 
@@ -62,7 +62,7 @@ namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Employee> GetEmployeesByIdAsync(Guid employeeId, CancellationToken cancellationToken)
+        public async Task<Employee> GetEmployeeByIdAsync(Guid employeeId, CancellationToken cancellationToken)
         {
             var employee = await _dbContext.Employees.FindAsync(employeeId, cancellationToken);
 

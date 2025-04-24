@@ -1,6 +1,5 @@
 ﻿@using Pawnshop.Domain.Roles
 
-
 <MudNavMenu>
     <AuthorizeView>
         <Authorized>
@@ -12,12 +11,12 @@
         </Authorized>
     </AuthorizeView>
 
-    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.UsersDisplayAndModify}, {UserRoles.UsersDisplay}")">
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.ClientsDisplay}, {UserRoles.ClientsDisplayAndModify}")">
         <Authorized>
-            <MudNavLink Href="/User-management-page"
+            <MudNavLink Href="/Clients-management-page"
                         Match="NavLinkMatch.All"
-                        Icon="@Icons.Material.Filled.ManageAccounts">
-                User management
+                        Icon="@Icons.Material.Filled.EmojiPeople">
+                Client management
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
@@ -32,5 +31,13 @@
         </Authorized>
     </AuthorizeView>
     
-    @* <MudNavLink Href="/Cos" Match="NavLinkMatch.Prefix">Gdzies</MudNavLink> *@
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.UsersDisplay}, {UserRoles.UsersDisplayAndModify}")">
+        <Authorized>
+            <MudNavLink Href="/User-management-page"
+                        Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.ManageAccounts">
+                User management
+            </MudNavLink>
+        </Authorized>
+    </AuthorizeView>
 </MudNavMenu>

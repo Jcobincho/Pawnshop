@@ -1,23 +1,23 @@
-﻿using Pawnshop.Domain.Entities;
+﻿using Pawnshop.Domain.Entitie;
 
 namespace Pawnshop.Application.EmployeesApplication.Dto.DtoExtension
 {
     public static class EmployeeDtoExtension
     {
-        public static EmployeeDto EmployeePraseToDto(this Employee employees)
+        public static EmployeeDto EmployeePraseToDto(this Employee employee)
         {
 
             return new EmployeeDto
             {
-                EmployeeId = employees.Id,
-                Name = employees.Name,
-                SecondName = employees.SecondName,
-                Surname = employees.Surname,
-                BirthDate = employees.BirthDate,
-                CreatedAt = employees.CreatedAt,
-                CreatedBy = employees.CreatedBy,
-                EditedAt = employees.EditedAt,
-                EditedBy = employees.EditedBy,
+                EmployeeId = employee.Id,
+                Name = employee.Name,
+                SecondName = employee.SecondName,
+                Surname = employee.Surname,
+                BirthDate = employee.BirthDate,
+                CreatedAt = employee.CreatedAt,
+                CreatedBy = employee.CreatedBy,
+                EditedAt = employee.EditedAt,
+                EditedBy = employee.EditedBy,
             };
         }
     }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
+using Pawnshop.Domain.Entitie;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
 
@@ -17,6 +18,7 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
     }
     
     public DbSet<Employee> Employees { get; set; }
+    public DbSet<Client> Clients { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,3 +76,5 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
         }
     }
 }
+
+// Add-Migration init -Project Pawnshop.Infrastructure -StartupProject Pawnshop.Api

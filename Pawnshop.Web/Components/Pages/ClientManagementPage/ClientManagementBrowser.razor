@@ -1,0 +1,31 @@
+﻿@page "/Clients-management-page"
+@using Pawnshop.Application.ClientsApplication.Dto
+@using Pawnshop.Web.Components.Common
+
+<UniversalCrudMenu IsItemSelected="@(currentClient != null)" OnActionSelected="HandleCrudAction" />
+
+<ClientManagementGrid OnClientSelected="HandleClientSelected" @ref="clientGrid" />
+
+@if(showDetail)
+{
+    <ClientManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentClient="currentClient" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
+}
+
+@code {
+    private ClientDto currentClient = null;
+    private bool showDetail = false;
+    private UniversalCrudMenu.CrudAction selectedAction;
+    private ClientManagementGrid clientGrid;
+
+    private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
+    {
+        selectedAction = action;
+        showDetail = true;
+    }
+
+    private void HandleClientSelected(ClientDto selectedClient) => currentClient = selectedClient;
+
+    private void HandleDetailCanceled() => showDetail = false;
+
+    private async Task HandleCrudCompleted() => await clientGrid.ReloadDataAsync();
+}

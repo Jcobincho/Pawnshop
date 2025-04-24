@@ -1,0 +1,76 @@
+﻿@using Pawnshop.Application.ClientsApplication.Dto
+@using Pawnshop.Application.ClientsApplication.Responses
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService 
+
+<MudDataGrid T="ClientDto" 
+             Items="@(clientsFromApi?.AllClientsList ?? new List<ClientDto>())"
+             RowClick="OnRowClicked" 
+             DragDropColumnReordering="true" 
+             ColumnsPanelReordering="true"
+             ColumnResizeMode="ResizeMode.Column"
+             RowClassFunc="@( (client, intex) => client == selectedEmployee ? "selected-row" : string.Empty )"
+             Hideable="true" 
+             Filterable="true" 
+             Groupable="true" 
+             FilterMode="DataGridFilterMode.Simple" 
+             Striped="true" 
+             ShowMenuIcon="true">
+
+    <Columns>
+        <PropertyColumn Property="x => x.ClientId" Title="Client id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="@(x => x.BirthDate.ToString("dd.MM.yyyy"))" Title="Birth date" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Pesel" Title="PESEL" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.IdCardNumber" Title="ID card number" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.TelephoneNumber" Title="Telephone number" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Email" Title="Email" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Description" Title="Description" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="ClientDto" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public EventCallback<ClientDto> OnClientSelected { get; set; }
+
+    private ClientDto selectedEmployee;
+    public GetAllClientsResponse clientsFromApi = null;
+    List<string> apiExceptions = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetClientsFromApiAsync();
+    }
+
+    public async Task ReloadDataAsync()
+    {
+        await GetClientsFromApiAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task GetClientsFromApiAsync()
+    {
+        try
+        {
+            clientsFromApi = await ApiService.GetAsync<GetAllClientsResponse>("/Clients/get");
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task OnRowClicked(DataGridRowClickEventArgs<ClientDto> row)
+    {
+        selectedEmployee = row.Item;
+        await OnClientSelected.InvokeAsync(selectedEmployee);
+    }
+}
