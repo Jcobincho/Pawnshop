@@ -76,3 +76,5 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
         }
     }
 }
+
+// Add-Migration init -Project Pawnshop.Infrastructure -StartupProject Pawnshop.Api

@@ -1,5 +1,7 @@
-﻿<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style="backdrop-filter: blur(3px); z-index: 1050;" @onclick="HandleBackdropClick">
+﻿<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50 overflow-auto" style="backdrop-filter: blur(3px); z-index: 1000;" @onclick="HandleBackdropClick">
+    
     @ChildContent
+
 </div>
 
 @code {

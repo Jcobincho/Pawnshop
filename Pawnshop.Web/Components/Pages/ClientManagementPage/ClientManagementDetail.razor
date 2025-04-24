@@ -1,0 +1,245 @@
+﻿@using Pawnshop.Application.ClientsApplication.Commands.AddClient
+@using Pawnshop.Application.ClientsApplication.Commands.DeleteClient
+@using Pawnshop.Application.ClientsApplication.Commands.UpdateClient
+@using Pawnshop.Application.ClientsApplication.Dto
+@using Pawnshop.Application.ClientsApplication.Responses
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService
+
+<DetailModalOverlay>
+    <MudCard Class="w-50" Style="max-height: 75vh; overflow: auto;">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Client detail</MudText>
+
+                @if(apiExceptions != null)
+                {
+                    foreach(var error in apiExceptions)
+                    {
+                        <MudAlert Severity="Severity.Error" Class="mt-2">@error</MudAlert>
+                    }
+                }
+
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentClient.Name)"
+                                  Label="Name"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentClient.SecondName)"
+                                  Label="Second name"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentClient.Surname)"
+                                  Label="Surname"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudDatePicker Label="Birth date"
+                                   Editable="true"
+                                   Date="@CurrentClient.BirthDate"
+                                   DateChanged="@HandleBirthDateChanged"
+                                   Mask="@(new DateMask("00.00.0000"))"
+                                   DateFormat="dd.MM.yyyy"
+                                   Placeholder="Birth date"
+                                   Variant="Variant.Outlined"
+                                   ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentClient.Pesel)"
+                                  Label="Pesel"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentClient.IdCardNumber)"
+                                  Label="ID card number"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentClient.TelephoneNumber)"
+                                  Label="Telephone number"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentClient.Email)"
+                                  InputType="InputType.Email"
+                                  Label="Email"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="12">
+                    <MudTextField @bind-Value="@(CurrentClient.Description)"
+                                  Label="Description"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+
+        <MudCardActions Class="gap-2 justify-content-end">
+
+            @if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudAddHandler">Add</MudButton>
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudUpdateHandler">Update</MudButton>
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudDeleteHandler">Delete</MudButton>
+            }
+
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="HandleDetailCancel">Cancel</MudButton>
+
+        </MudCardActions>
+    </MudCard>
+</DetailModalOverlay>
+
+@code {
+    [Parameter]
+    public ClientDto CurrentClient { get; set; }
+
+    [Parameter]
+    public UniversalCrudMenu.CrudAction SelectedAction { get; set; }
+
+    [Parameter]
+    public EventCallback OnCrudCompleted { get; set; }
+
+    [Parameter]
+    public EventCallback OnDetailCancel { get; set; }
+
+    private List<string> apiExceptions = null;
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentClient == null || SelectedAction == UniversalCrudMenu.CrudAction.Add)
+        {
+            CurrentClient = new ClientDto
+            {
+                Name = string.Empty,
+                SecondName = string.Empty,
+                Surname = string.Empty,
+                BirthDate = DateTime.Today,
+                Pesel = string.Empty,
+                IdCardNumber = string.Empty,
+                TelephoneNumber = string.Empty,
+                Email = string.Empty,
+                Description = string.Empty
+            };
+        }
+    }
+
+    private void HandleBirthDateChanged(DateTime? date)
+    {
+        CurrentClient.BirthDate = date ?? DateTime.Today;
+    }
+
+    private async Task HandleDetailCancel()
+    {
+        await OnDetailCancel.InvokeAsync();
+    }
+
+    private async Task CrudAddHandler()
+    {
+        try
+        {
+            AddClientCommand newClient = new AddClientCommand()
+            {
+                Name = CurrentClient.Name,
+                SecondName = CurrentClient.SecondName,
+                Surname = CurrentClient.Surname,
+                BirthDate = CurrentClient.BirthDate,
+                Pesel = CurrentClient.Pesel,
+                IdCardNumber = CurrentClient.IdCardNumber,
+                TelephoneNumber = CurrentClient.TelephoneNumber,
+                Email = CurrentClient.Email,
+                Description = CurrentClient.Email
+            };
+
+            AddClientResponse addClientResponse = await ApiService.PostAsync<AddClientCommand, AddClientResponse>("/Clients/add", newClient);
+
+            await CrudCompleted();
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudUpdateHandler()
+    {
+        try
+        {
+            UpdateClientCommand updateClient = new UpdateClientCommand()
+            {
+                ClientId = CurrentClient.ClientId,
+                Name = CurrentClient.Name,
+                SecondName = CurrentClient.SecondName,
+                Surname = CurrentClient.Surname,
+                BirthDate = CurrentClient.BirthDate,
+                Pesel = CurrentClient.Pesel,
+                IdCardNumber = CurrentClient.IdCardNumber,
+                TelephoneNumber = CurrentClient.TelephoneNumber,
+                Email = CurrentClient.Email,
+                Description = CurrentClient.Email
+            };
+
+            UpdateClientResponse updateUserResponse = await ApiService.PutAsync<UpdateClientCommand, UpdateClientResponse>("/Clients/update", updateClient);
+
+            await CrudCompleted();
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudDeleteHandler()
+    {
+        try
+        {
+            DeleteClientCommand deleteClient = new DeleteClientCommand()
+            {
+                ClientId = CurrentClient.ClientId
+            };
+
+            DeleteClientResponse deleteClientResponse = await ApiService.DeleteAsync<DeleteClientCommand, DeleteClientResponse>("/Clients/delete", deleteClient);
+
+            await CrudCompleted();
+        }
+        catch(ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudCompleted()
+    {
+        await HandleDetailCancel();
+        await OnCrudCompleted.InvokeAsync();
+    }
+}

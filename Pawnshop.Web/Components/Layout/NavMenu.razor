@@ -11,6 +11,16 @@
         </Authorized>
     </AuthorizeView>
 
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.ClientsDisplay}, {UserRoles.ClientsDisplayAndModify}")">
+        <Authorized>
+            <MudNavLink Href="/Clients-management-page"
+                        Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.EmojiPeople">
+                Client management
+            </MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+
     <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.EmployeesDisplay}, {UserRoles.EmployeesDisplayAndModify}")">
         <Authorized>
             <MudNavLink Href="/Employee-management-page"
@@ -21,7 +31,7 @@
         </Authorized>
     </AuthorizeView>
     
-    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.UsersDisplayAndModify}, {UserRoles.UsersDisplay}")">
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.UsersDisplay}, {UserRoles.UsersDisplayAndModify}")">
         <Authorized>
             <MudNavLink Href="/User-management-page"
                         Match="NavLinkMatch.All"

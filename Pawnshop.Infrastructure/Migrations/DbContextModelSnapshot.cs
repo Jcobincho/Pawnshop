@@ -221,6 +221,10 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.Property<Guid>("EditedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("IdCardNumber")
                         .IsRequired()
                         .HasColumnType("text");
@@ -244,6 +248,10 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TelephoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
 

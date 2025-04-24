@@ -12,8 +12,8 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250424130928_AddClientsEntity")]
-    partial class AddClientsEntity
+    [Migration("20250424192311_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -224,6 +224,10 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.Property<Guid>("EditedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("IdCardNumber")
                         .IsRequired()
                         .HasColumnType("text");
@@ -247,6 +251,10 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TelephoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
 

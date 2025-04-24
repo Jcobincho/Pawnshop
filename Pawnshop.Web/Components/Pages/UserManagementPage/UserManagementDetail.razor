@@ -13,7 +13,7 @@
 @inject ApiService ApiService;
 
 <DetailModalOverlay>
-    <MudCard Class="w-50">
+    <MudCard Class="w-50" Style="max-height: 75vh; overflow: auto;">
         <MudCardHeader>
             <CardHeaderContent>
                 <MudText Typo="Typo.h6">User detail</MudText>
@@ -227,18 +227,17 @@
     {
         try
         {
-            CreateUserCommand newUser = new CreateUserCommand();
+            CreateUserCommand newUser = new CreateUserCommand()
+            {
+                UserName = CurrentUser.UserName,
+                Email = CurrentUser.Email,
+                Password = password,
+                RepeatedPassword = repeatPassword,
+                EmployeeId = CurrentUser.Employee.EmployeeId,
+                UserRoles = CurrentUser.Roles
+            };
 
-            newUser.UserName = CurrentUser.UserName;
-            newUser.Email = CurrentUser.Email;
-            newUser.Password = password;
-            newUser.RepeatedPassword = repeatPassword;
-            newUser.EmployeeId = CurrentUser.Employee.EmployeeId;
-            newUser.UserRoles = CurrentUser.Roles;
-
-            CreateUserResponse createUserResponse = new CreateUserResponse();
-
-            createUserResponse = await ApiService.PostAsync<CreateUserCommand, CreateUserResponse>("/Users/add", newUser);
+            CreateUserResponse createUserResponse = await ApiService.PostAsync<CreateUserCommand, CreateUserResponse>("/Users/add", newUser);
 
             await CrudCompleted();
         }
@@ -252,19 +251,18 @@
     {
         try
         {
-            UpdateUserCommand updatedUser = new UpdateUserCommand();
+            UpdateUserCommand updatedUser = new UpdateUserCommand()
+            {
+                UserId = CurrentUser.UserId,
+                UserName = CurrentUser.UserName,
+                Email = CurrentUser.Email,
+                Password = password,
+                RepeatedPassword = repeatPassword,
+                EmployeeId = CurrentUser.Employee.EmployeeId,
+                UserRoles = CurrentUser.Roles
+            };
 
-            updatedUser.UserId = CurrentUser.UserId;
-            updatedUser.UserName = CurrentUser.UserName;
-            updatedUser.Email = CurrentUser.Email;
-            updatedUser.Password = password;
-            updatedUser.RepeatedPassword = repeatPassword;
-            updatedUser.EmployeeId = CurrentUser.Employee.EmployeeId;
-            updatedUser.UserRoles = CurrentUser.Roles;
-
-            UpdateUserResponse updatedUserResponse = new UpdateUserResponse();
-
-            updatedUserResponse = await ApiService.PutAsync<UpdateUserCommand, UpdateUserResponse>("/Users/update", updatedUser);
+            UpdateUserResponse updatedUserResponse = await ApiService.PutAsync<UpdateUserCommand, UpdateUserResponse>("/Users/update", updatedUser);
 
             await CrudCompleted();
         }
@@ -278,13 +276,12 @@
     {
         try
         {
-            DeleteUserCommand deleteUser = new DeleteUserCommand();
+            DeleteUserCommand deleteUser = new DeleteUserCommand()
+            {
+                UserId = CurrentUser.UserId
+            };
 
-            deleteUser.UserId = CurrentUser.UserId;
-
-            DeleteUserResponse deleteUserResponse = new DeleteUserResponse();
-
-            deleteUserResponse = await ApiService.DeleteAsync<DeleteUserCommand, DeleteUserResponse>("/Users/delete", deleteUser);
+            DeleteUserResponse deleteUserResponse = await ApiService.DeleteAsync<DeleteUserCommand, DeleteUserResponse>("/Users/delete", deleteUser);
 
             await CrudCompleted();
         }

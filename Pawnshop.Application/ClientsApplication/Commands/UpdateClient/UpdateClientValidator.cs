@@ -12,8 +12,10 @@ namespace Pawnshop.Application.ClientsApplication.Commands.UpdateClient
                 .Matches(@"^\d+$").WithMessage("PESEL must contain only numbers.");
 
             RuleFor(x => x.TelephoneNumber)
-                .Length(9).WithMessage("Telephone number must contain exactly 11 characters.")
-                .Matches(@"^\d+$").WithMessage("Telephone number must contain only numbers.");
+            .Length(9).WithMessage("Telephone number must contain exactly 9 characters.")
+                .When(x => !string.IsNullOrEmpty(x.TelephoneNumber))
+            .Matches(@"^\d+$").WithMessage("Telephone number must contain only numbers.")
+                .When(x => !string.IsNullOrEmpty(x.TelephoneNumber));
         }
     }
 }

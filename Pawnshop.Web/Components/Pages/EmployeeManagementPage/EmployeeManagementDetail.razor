@@ -10,7 +10,7 @@
 @inject ApiService ApiService
 
 <DetailModalOverlay>
-    <MudCard Class="w-50">
+    <MudCard Class="w-50" Style="max-height: 75vh; overflow: auto;">
         <MudCardHeader>
             <CardHeaderContent>
                 <MudText Typo="Typo.h6">Employee detail</MudText>
@@ -117,16 +117,15 @@
     {
         try
         {
-            AddEmployeeCommand newEmployee = new AddEmployeeCommand();
+            AddEmployeeCommand newEmployee = new AddEmployeeCommand()
+            {
+                Name = CurrentEmployee.Name,
+                SecondName = CurrentEmployee.SecondName,
+                Surname = CurrentEmployee.Surname,
+                BirthDate = CurrentEmployee.BirthDate
+            };
 
-            newEmployee.Name = CurrentEmployee.Name;
-            newEmployee.SecondName = CurrentEmployee.SecondName;
-            newEmployee.Surname = CurrentEmployee.Surname;
-            newEmployee.BirthDate = CurrentEmployee.BirthDate;
-
-            AddEmployeeResponse addEmployeeResponse = new AddEmployeeResponse();
-
-            addEmployeeResponse = await ApiService.PostAsync<AddEmployeeCommand, AddEmployeeResponse>("/Employees/add", newEmployee);
+            AddEmployeeResponse addEmployeeResponse = await ApiService.PostAsync<AddEmployeeCommand, AddEmployeeResponse>("/Employees/add", newEmployee);
 
             await CrudCompleted();
         }
@@ -140,17 +139,16 @@
     {
         try
         {
-            UpdateEmployeeCommand updatedEmployee = new UpdateEmployeeCommand();
+            UpdateEmployeeCommand updatedEmployee = new UpdateEmployeeCommand()
+            {
+                EmployeeId = CurrentEmployee.EmployeeId,
+                Name = CurrentEmployee.Name,
+                SecondName = CurrentEmployee.SecondName,
+                Surname = CurrentEmployee.Surname,
+                BirthDate = CurrentEmployee.BirthDate
+            };
 
-            updatedEmployee.EmployeeId = CurrentEmployee.EmployeeId;
-            updatedEmployee.Name = CurrentEmployee.Name;
-            updatedEmployee.SecondName = CurrentEmployee.SecondName;
-            updatedEmployee.Surname = CurrentEmployee.Surname;
-            updatedEmployee.BirthDate = CurrentEmployee.BirthDate;
-
-            UpdateEmployeeResponse updatedEmployeeResponse = new UpdateEmployeeResponse();
-
-            updatedEmployeeResponse = await ApiService.PutAsync<UpdateEmployeeCommand, UpdateEmployeeResponse>("/Employees/update", updatedEmployee);
+            UpdateEmployeeResponse updatedEmployeeResponse = await ApiService.PutAsync<UpdateEmployeeCommand, UpdateEmployeeResponse>("/Employees/update", updatedEmployee);
 
             await CrudCompleted();
         }
@@ -164,13 +162,12 @@
     {
         try
         {
-            DeleteEmployeeCommand deleteEmployee = new DeleteEmployeeCommand();
+            DeleteEmployeeCommand deleteEmployee = new DeleteEmployeeCommand()
+            {
+                EmployeeId = CurrentEmployee.EmployeeId
+            };
 
-            deleteEmployee.EmployeeId = CurrentEmployee.EmployeeId;
-
-            DeleteEmployeeResponse deleteEmployeeResponse = new DeleteEmployeeResponse();
-
-            deleteEmployeeResponse = await ApiService.DeleteAsync<DeleteEmployeeCommand, DeleteEmployeeResponse>("/Employees/delete", deleteEmployee);
+            DeleteEmployeeResponse deleteEmployeeResponse = await ApiService.DeleteAsync<DeleteEmployeeCommand, DeleteEmployeeResponse>("/Employees/delete", deleteEmployee);
 
             await CrudCompleted();
         }
