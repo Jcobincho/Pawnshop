@@ -15,6 +15,10 @@ public static class UserRoles
     public const string EmployeesDisplay = nameof(EmployeesDisplay);
     public const string EmployeesDisplayAndModify = nameof(EmployeesDisplayAndModify);
 
+    // Priviliges to Clients
+    public const string ClientsDisplay = nameof(ClientsDisplay);
+    public const string ClientsDisplayAndModify = nameof(ClientsDisplayAndModify);
+
     private static List<IdentityRole<Guid>> Roles;
 
     static UserRoles()
@@ -27,6 +31,9 @@ public static class UserRoles
             new(UsersDisplayAndModify),
 
             new(EmployeesDisplay),
+            new(EmployeesDisplayAndModify),
+
+            new(ClientsDisplay),
             new(EmployeesDisplayAndModify)
         };
     }
