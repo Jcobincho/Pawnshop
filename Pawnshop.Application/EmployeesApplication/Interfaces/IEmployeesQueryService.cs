@@ -5,7 +5,7 @@ namespace Pawnshop.Application.EmployeesApplication.Interfaces
 {
     public interface IEmployeesQueryService
     {
-        Task<Employee> GetEmployeesByIdAsync(Guid employeeId, CancellationToken cancellationToken);
+        Task<Employee> GetEmployeeByIdAsync(Guid employeeId, CancellationToken cancellationToken);
         Task<List<EmployeeDto>> GetAllEmployeesAsDtoAsync(CancellationToken cancellationToken);
     }
 }

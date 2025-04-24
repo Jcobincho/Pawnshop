@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pawnshop.Application.Base;
+using Pawnshop.Application.ClientsApplication.Responses;
+using System.ComponentModel.DataAnnotations;
 
 namespace Pawnshop.Application.ClientsApplication.Commands.DeleteClient
 {
-    internal class DeleteClientCommand
+    public sealed class DeleteClientCommand : BaseCommand<DeleteClientResponse>
     {
+        [Required(ErrorMessage = "Client id is required.")]
+        public Guid ClientId { get; set; }
     }
 }

@@ -15,7 +15,9 @@ namespace Pawnshop.Application.ClientsApplication.Commands.UpdateClient
 
         public async Task<UpdateClientResponse> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _clientsCommandService.UpdateClientAsync(request, cancellationToken);
+
+            return new UpdateClientResponse();
         }
     }
 }
