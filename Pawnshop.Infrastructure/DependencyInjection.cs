@@ -7,6 +7,7 @@ using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
+using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Infrastructure.Behaviors;
 using Pawnshop.Infrastructure.Persistance.Extensions;
@@ -15,6 +16,7 @@ using Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UsersInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.WorkplacesInfrastructure.Services;
 
 namespace Pawnshop.Infrastructure;
 
@@ -46,6 +48,10 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         // Interfaces Dependency Injection
+
+        // Workplaces service
+        services.AddScoped<IWorkplacesCommandService, WorkplacesService>();
+        services.AddScoped<IWorkplacesQueryService, WorkplacesService>();
 
         // Clients services
         services.AddScoped<IClientsCommandService, ClientsService>();
