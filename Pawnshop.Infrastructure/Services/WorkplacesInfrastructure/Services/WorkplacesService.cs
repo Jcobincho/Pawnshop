@@ -1,4 +1,5 @@
 ﻿using Pawnshop.Application.WorkplacesApplication.Commands.AddWorkplace;
+using Pawnshop.Application.WorkplacesApplication.Commands.DeleteWorkplace;
 using Pawnshop.Application.WorkplacesApplication.Commands.UpdateWorkplace;
 using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities;
@@ -49,6 +50,14 @@ namespace Pawnshop.Infrastructure.Services.WorkplacesInfrastructure.Services
             workplace.City = command.City;
 
             _dbContext.Workplaces.Update(workplace);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeleteWorkplaceAsync(DeleteWorkplaceCommand command, CancellationToken cancellationToken)
+        {
+            var workplace = await GetWorkplaceByIdAsync(command.WorkplaceId, cancellationToken);
+
+            _dbContext.Workplaces.Remove(workplace);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
