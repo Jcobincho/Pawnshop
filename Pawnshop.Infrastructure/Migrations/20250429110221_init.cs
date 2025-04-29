@@ -72,6 +72,27 @@ namespace Pawnshop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Workplaces",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
+                    Region = table.Column<string>(type: "text", nullable: false),
+                    StreetAndBuildingNumber = table.Column<string>(type: "text", nullable: false),
+                    ZipCode = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Workplaces", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -298,6 +319,9 @@ namespace Pawnshop.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserRefreshToken");
+
+            migrationBuilder.DropTable(
+                name: "Workplaces");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

@@ -1,15 +1,12 @@
-﻿using Pawnshop.Application.WorkplacesApplication.Commands.AddWorkplace;
+﻿using Microsoft.EntityFrameworkCore;
+using Pawnshop.Application.WorkplacesApplication.Commands.AddWorkplace;
 using Pawnshop.Application.WorkplacesApplication.Commands.DeleteWorkplace;
 using Pawnshop.Application.WorkplacesApplication.Commands.UpdateWorkplace;
+using Pawnshop.Application.WorkplacesApplication.Dto;
+using Pawnshop.Application.WorkplacesApplication.Dto.DtoExtension;
 using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.WorkplacesInfrastructure.Services
 {
@@ -69,6 +66,14 @@ namespace Pawnshop.Infrastructure.Services.WorkplacesInfrastructure.Services
                 throw new NotFoundException("Workplace doesn't exist.");
 
             return workplace;
+        }
+
+        public async Task<List<WorkplaceDto>> GetAllWorkplacesAsync(CancellationToken cancellationToken)
+        {
+            var workplaces = await _dbContext.Workplaces.Select(x => x.WorkplaceParseToDto())
+                                                        .ToListAsync(cancellationToken);
+
+            return workplaces;
         }
     }
 }

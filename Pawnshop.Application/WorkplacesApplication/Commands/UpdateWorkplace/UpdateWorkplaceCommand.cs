@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Pawnshop.Application.Base;
+using Pawnshop.Application.WorkplacesApplication.Responses;
+using System.ComponentModel.DataAnnotations;
 
 namespace Pawnshop.Application.WorkplacesApplication.Commands.UpdateWorkplace
 {
-    public sealed class UpdateWorkplaceCommand
+    public sealed class UpdateWorkplaceCommand : BaseCommand<UpdateWorkplaceResponse>
     {
         [Required(ErrorMessage = "Workplace id is required.")]
         public Guid WorkplaceId { get; set; }
