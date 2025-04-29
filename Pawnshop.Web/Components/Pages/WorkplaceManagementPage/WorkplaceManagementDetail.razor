@@ -176,7 +176,7 @@
                 WorkplaceId = CurrentWorkplace.WorkplaceId
             };
 
-            DeleteWorkplaceResponse deleteClientResponse = await ApiService.DeleteAsync<DeleteWorkplaceCommand, DeleteWorkplaceResponse>("/Wrokplaces/delete", deleteWorkplace);
+            DeleteWorkplaceResponse deleteClientResponse = await ApiService.DeleteAsync<DeleteWorkplaceCommand, DeleteWorkplaceResponse>("/Workplaces/delete", deleteWorkplace);
 
             await CrudCompleted();
         }
