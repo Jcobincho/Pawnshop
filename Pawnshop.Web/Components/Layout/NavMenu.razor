@@ -10,6 +10,16 @@
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
+    
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.WorkplaceDisplay}, {UserRoles.WorkplaceDisplayAndModify}")">
+        <Authorized>
+            <MudNavLink Href="/Workplace-management-page"
+                        Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.AddLocationAlt">
+                Workplace management
+            </MudNavLink>
+        </Authorized>
+    </AuthorizeView>
 
     <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.ClientsDisplay}, {UserRoles.ClientsDisplayAndModify}")">
         <Authorized>
