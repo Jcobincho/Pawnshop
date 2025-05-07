@@ -1,0 +1,194 @@
+﻿@using Pawnshop.Application.WorkplacesApplication.Commands.AddWorkplace
+@using Pawnshop.Application.WorkplacesApplication.Commands.DeleteWorkplace
+@using Pawnshop.Application.WorkplacesApplication.Commands.UpdateWorkplace
+@using Pawnshop.Application.WorkplacesApplication.Dto
+@using Pawnshop.Application.WorkplacesApplication.Responses
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService
+
+<DetailModalOverlay>
+    <MudCard Class="w-50" Style="max-height: 75vh; overflow: auto;">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Client detail</MudText>
+
+                @if (apiExceptions != null)
+                {
+                    foreach (var error in apiExceptions)
+                    {
+                        <MudAlert Severity="Severity.Error" Class="mt-2">@error</MudAlert>
+                    }
+                }
+
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentWorkplace.Country)"
+                                  Label="Country"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentWorkplace.Region)"
+                                  Label="Region"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentWorkplace.ZipCode)"
+                                  Label="Zip code"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="6">
+                    <MudTextField @bind-Value="@(CurrentWorkplace.City)"
+                                  Label="City"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+
+                <MudItem md="12">
+                    <MudTextField @bind-Value="@(CurrentWorkplace.StreetAndBuildingNumber)"
+                                  Label="Street and building number"
+                                  Variant="Variant.Outlined"
+                                  ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+
+        <MudCardActions Class="gap-2 justify-content-end">
+
+            @if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudAddHandler">Add</MudButton>
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudUpdateHandler">Update</MudButton>
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudDeleteHandler">Delete</MudButton>
+            }
+
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="HandleDetailCancel">Cancel</MudButton>
+
+        </MudCardActions>
+    </MudCard>
+</DetailModalOverlay>
+
+@code {
+    [Parameter]
+    public WorkplaceDto CurrentWorkplace { get; set; }
+
+    [Parameter]
+    public UniversalCrudMenu.CrudAction SelectedAction { get; set; }
+
+    [Parameter]
+    public EventCallback OnCrudCompleted { get; set; }
+
+    [Parameter]
+    public EventCallback OnDetailCancel { get; set; }
+
+    private List<string> apiExceptions = null;
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentWorkplace == null || SelectedAction == UniversalCrudMenu.CrudAction.Add)
+        {
+            CurrentWorkplace = new WorkplaceDto
+            {
+                Country = string.Empty,
+                Region = string.Empty,
+                StreetAndBuildingNumber = string.Empty,
+                ZipCode = string.Empty,
+                City = string.Empty
+            };
+        }
+    }
+
+    private async Task HandleDetailCancel()
+    {
+        await OnDetailCancel.InvokeAsync();
+    }
+
+    private async Task CrudAddHandler()
+    {
+        try
+        {
+            AddWorkplaceCommand newWorkplace = new AddWorkplaceCommand()
+            {
+                Country = CurrentWorkplace.Country,
+                Region = CurrentWorkplace.Region,
+                StreetAndBuildingNumber = CurrentWorkplace.StreetAndBuildingNumber,
+                ZipCode = CurrentWorkplace.ZipCode,
+                City = CurrentWorkplace.City
+            };
+
+            AddWorkplaceResponse addClientResponse = await ApiService.PostAsync<AddWorkplaceCommand, AddWorkplaceResponse>("/Workplaces/add", newWorkplace);
+
+            await CrudCompleted();
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudUpdateHandler()
+    {
+        try
+        {
+            UpdateWorkplaceCommand updateWorkplace = new UpdateWorkplaceCommand()
+            {
+                WorkplaceId = CurrentWorkplace.WorkplaceId,
+                Country = CurrentWorkplace.Country,
+                Region = CurrentWorkplace.Region,
+                StreetAndBuildingNumber = CurrentWorkplace.StreetAndBuildingNumber,
+                ZipCode = CurrentWorkplace.ZipCode,
+                City = CurrentWorkplace.City
+            };
+
+            UpdateWorkplaceResponse updateUserResponse = await ApiService.PutAsync<UpdateWorkplaceCommand, UpdateWorkplaceResponse>("/Workplaces/update", updateWorkplace);
+
+            await CrudCompleted();
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudDeleteHandler()
+    {
+        try
+        {
+            DeleteWorkplaceCommand deleteWorkplace = new DeleteWorkplaceCommand()
+            {
+                WorkplaceId = CurrentWorkplace.WorkplaceId
+            };
+
+            DeleteWorkplaceResponse deleteClientResponse = await ApiService.DeleteAsync<DeleteWorkplaceCommand, DeleteWorkplaceResponse>("/Workplaces/delete", deleteWorkplace);
+
+            await CrudCompleted();
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudCompleted()
+    {
+        await HandleDetailCancel();
+        await OnCrudCompleted.InvokeAsync();
+    }
+}

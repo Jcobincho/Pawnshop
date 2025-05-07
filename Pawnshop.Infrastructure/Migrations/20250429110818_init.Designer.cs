@@ -12,7 +12,7 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250424192311_init")]
+    [Migration("20250429110818_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -354,6 +354,55 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Workplace", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("StreetAndBuildingNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Workplaces");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

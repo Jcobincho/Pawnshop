@@ -1,0 +1,74 @@
+﻿@using Pawnshop.Application.ClientsApplication.Dto
+@using Pawnshop.Application.ClientsApplication.Responses
+@using Pawnshop.Application.WorkplacesApplication.Dto
+@using Pawnshop.Application.WorkplacesApplication.Responses
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService
+
+<MudDataGrid T="WorkplaceDto"
+             Items="@(workplacesFromApi?.AllWorkplacesList ?? new List<WorkplaceDto>())"
+             RowClick="OnRowClicked"
+             DragDropColumnReordering="true"
+             ColumnsPanelReordering="true"
+             ColumnResizeMode="ResizeMode.Column"
+             RowClassFunc="@( (workplace, intex) => workplace == selectedWorkplace ? "selected-row" : string.Empty )"
+             Hideable="true"
+             Filterable="true"
+             Groupable="true"
+             FilterMode="DataGridFilterMode.Simple"
+             Striped="true"
+             ShowMenuIcon="true">
+
+    <Columns>
+        <PropertyColumn Property="x => x.WorkplaceId" Title="Workplace id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Country" Title="Country" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.Region" Title="Region" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.StreetAndBuildingNumber" Title="Street/building number" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.ZipCode" Title="Zip code" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+        <PropertyColumn Property="x => x.City" Title="City" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="WorkplaceDto" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public EventCallback<WorkplaceDto> OnClientSelected { get; set; }
+
+    private WorkplaceDto selectedWorkplace;
+    public GetAllWorkplacesResponse workplacesFromApi = null;
+    List<string> apiExceptions = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetWorkplacesFromApiAsync();
+    }
+
+    public async Task ReloadDataAsync()
+    {
+        await GetWorkplacesFromApiAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task GetWorkplacesFromApiAsync()
+    {
+        try
+        {
+            workplacesFromApi = await ApiService.GetAsync<GetAllWorkplacesResponse>("/Workplaces/get");
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task OnRowClicked(DataGridRowClickEventArgs<WorkplaceDto> row)
+    {
+        selectedWorkplace = row.Item;
+        await OnClientSelected.InvokeAsync(selectedWorkplace);
+    }
+}

@@ -19,6 +19,7 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
     
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Client> Clients { get; set; }
+    public DbSet<Workplace> Workplaces { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
