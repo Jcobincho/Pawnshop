@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Domain.Entitie;
 using Pawnshop.Domain.Entities;
+using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Exceptions;
 
 namespace Pawnshop.Infrastructure;
@@ -20,6 +21,9 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Client> Clients { get; set; }
     public DbSet<Workplace> Workplaces { get; set; }
+    public DbSet<ItemCategory> ItemCategories { get; set; }
+    public DbSet<Item> Items { get; set; }
+    public DbSet<ItemHistory> ItemHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
