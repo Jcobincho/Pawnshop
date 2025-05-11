@@ -1,6 +1,6 @@
 ﻿namespace Pawnshop.Domain.Entities.Item
 {
-    public class Item : BaseEntity
+    public class ItemDetail : BaseEntity
     {
         public string Name { get; set; }
 

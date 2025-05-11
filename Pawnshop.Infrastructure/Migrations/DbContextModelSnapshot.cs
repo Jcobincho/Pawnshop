@@ -260,6 +260,285 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.ToTable("Clients");
                 });
 
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ItemCategories");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("ItemCategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemCategoryId");
+
+                    b.ToTable("ItemsDetail");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("DateFrom")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ItemDetailId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ItemStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<Guid>("WorkplaceId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemDetailId");
+
+                    b.HasIndex("WorkplaceId");
+
+                    b.ToTable("ItemHistories");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemValuation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ItemHistoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Justification")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<DateTime>("ValuationOnDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemHistoryId");
+
+                    b.ToTable("ItemsValuation");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Transactions.ItemInPurchaseSaleTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ItemDetailId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("ItemPrice")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("PurchaseSaleTransactionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemDetailId");
+
+                    b.HasIndex("PurchaseSaleTransactionId");
+
+                    b.ToTable("ItemsInPurchaseSaleTransaction");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Transactions.PurchaseSaleTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("EmployeeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<float>("TotalPrice")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TypeOfTransaction")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("PurchasesSaleTransaction");
+                });
+
             modelBuilder.Entity("Pawnshop.Domain.Entities.UserRefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -451,6 +730,75 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemDetail", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Item.ItemCategory", "ItemCategory")
+                        .WithMany()
+                        .HasForeignKey("ItemCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemCategory");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemHistory", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Item.ItemDetail", "ItemDetail")
+                        .WithMany()
+                        .HasForeignKey("ItemDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pawnshop.Domain.Entities.Workplace", "Workplace")
+                        .WithMany()
+                        .HasForeignKey("WorkplaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemDetail");
+
+                    b.Navigation("Workplace");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemValuation", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Item.ItemHistory", "ItemHistory")
+                        .WithMany()
+                        .HasForeignKey("ItemHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemHistory");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Transactions.ItemInPurchaseSaleTransaction", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Item.ItemDetail", "ItemDetail")
+                        .WithMany()
+                        .HasForeignKey("ItemDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pawnshop.Domain.Entities.Transactions.PurchaseSaleTransaction", "PurchaseSaleTransaction")
+                        .WithMany()
+                        .HasForeignKey("PurchaseSaleTransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemDetail");
+
+                    b.Navigation("PurchaseSaleTransaction");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Transactions.PurchaseSaleTransaction", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entitie.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.UserRefreshToken", b =>
