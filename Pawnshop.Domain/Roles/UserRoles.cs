@@ -20,8 +20,8 @@ public static class UserRoles
     public const string ClientsDisplayAndModify = nameof(ClientsDisplayAndModify);
 
     // Priviliges to Workplaces
-    public const string WorkplaceDisplay = nameof(WorkplaceDisplay);
-    public const string WorkplaceDisplayAndModify = nameof(WorkplaceDisplayAndModify);
+    public const string WorkplacesDisplay = nameof(WorkplacesDisplay);
+    public const string WorkplacesDisplayAndModify = nameof(WorkplacesDisplayAndModify);
 
     private static List<IdentityRole<Guid>> Roles;
 
@@ -38,10 +38,10 @@ public static class UserRoles
             new(EmployeesDisplayAndModify),
 
             new(ClientsDisplay),
-            new(EmployeesDisplayAndModify),
+            new(ClientsDisplayAndModify),
 
-            new(WorkplaceDisplay),
-            new(WorkplaceDisplayAndModify)
+            new(WorkplacesDisplay),
+            new(WorkplacesDisplayAndModify)
         };
     }
     

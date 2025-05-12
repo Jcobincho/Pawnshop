@@ -12,7 +12,7 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250512181939_init")]
+    [Migration("20250512201946_init")]
     partial class init
     {
         /// <inheritdoc />

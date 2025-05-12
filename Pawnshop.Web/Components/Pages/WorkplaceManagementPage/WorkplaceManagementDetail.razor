@@ -130,7 +130,7 @@
                 Region = CurrentWorkplace.Region,
                 StreetAndBuildingNumber = CurrentWorkplace.StreetAndBuildingNumber,
                 ZipCode = CurrentWorkplace.ZipCode,
-                City = CurrentWorkplace.City
+                City = CurrentWorkplace.City,
             };
 
             AddWorkplaceResponse addClientResponse = await ApiService.PostAsync<AddWorkplaceCommand, AddWorkplaceResponse>("/Workplaces/add", newWorkplace);
