@@ -2,6 +2,6 @@
 {
     public enum ItemStatus
     {
-        Pawned,Sold,Purchased
+        Pawned, Expired, ItemForSale, Purchased, Sold
     }
 }

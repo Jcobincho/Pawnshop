@@ -132,6 +132,36 @@ namespace Pawnshop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PawnAgreements",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgreementDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ContractEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LoanAmount = table.Column<float>(type: "real", nullable: false),
+                    Interest = table.Column<float>(type: "real", nullable: false),
+                    StorageFee = table.Column<float>(type: "real", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ContractTerms = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PawnAgreements", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PawnAgreements_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -214,6 +244,60 @@ namespace Pawnshop.Infrastructure.Migrations
                         name: "FK_ItemsDetail_ItemCategories_ItemCategoryId",
                         column: x => x.ItemCategoryId,
                         principalTable: "ItemCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PawnDebtRepayments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PawnAgreementId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DebtRepaymentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DebtRepaymentPrice = table.Column<float>(type: "real", nullable: false),
+                    PaymentMethod = table.Column<int>(type: "integer", nullable: false),
+                    FullRepayment = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PawnDebtRepayments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PawnDebtRepayments_PawnAgreements_PawnAgreementId",
+                        column: x => x.PawnAgreementId,
+                        principalTable: "PawnAgreements",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PawnExtensions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PawnAgreementId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExtensionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ExtensionDateTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PaidPrice = table.Column<float>(type: "real", nullable: false),
+                    Comment = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PawnExtensions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PawnExtensions_PawnAgreements_PawnAgreementId",
+                        column: x => x.PawnAgreementId,
+                        principalTable: "PawnAgreements",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -387,6 +471,38 @@ namespace Pawnshop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PawnItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PawnAgreementId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ItemDetailId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ItemPrice = table.Column<float>(type: "real", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PawnItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PawnItems_ItemsDetail_ItemDetailId",
+                        column: x => x.ItemDetailId,
+                        principalTable: "ItemsDetail",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PawnItems_PawnAgreements_PawnAgreementId",
+                        column: x => x.PawnAgreementId,
+                        principalTable: "PawnAgreements",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ItemsValuation",
                 columns: table => new
                 {
@@ -485,6 +601,31 @@ namespace Pawnshop.Infrastructure.Migrations
                 column: "ItemHistoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PawnAgreements_ClientId",
+                table: "PawnAgreements",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PawnDebtRepayments_PawnAgreementId",
+                table: "PawnDebtRepayments",
+                column: "PawnAgreementId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PawnExtensions_PawnAgreementId",
+                table: "PawnExtensions",
+                column: "PawnAgreementId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PawnItems_ItemDetailId",
+                table: "PawnItems",
+                column: "ItemDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PawnItems_PawnAgreementId",
+                table: "PawnItems",
+                column: "PawnAgreementId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PurchasesSaleTransaction_EmployeeId",
                 table: "PurchasesSaleTransaction",
                 column: "EmployeeId");
@@ -514,13 +655,19 @@ namespace Pawnshop.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Clients");
-
-            migrationBuilder.DropTable(
                 name: "ItemsInPurchaseSaleTransaction");
 
             migrationBuilder.DropTable(
                 name: "ItemsValuation");
+
+            migrationBuilder.DropTable(
+                name: "PawnDebtRepayments");
+
+            migrationBuilder.DropTable(
+                name: "PawnExtensions");
+
+            migrationBuilder.DropTable(
+                name: "PawnItems");
 
             migrationBuilder.DropTable(
                 name: "UserRefreshToken");
@@ -535,6 +682,9 @@ namespace Pawnshop.Infrastructure.Migrations
                 name: "ItemHistories");
 
             migrationBuilder.DropTable(
+                name: "PawnAgreements");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
@@ -542,6 +692,9 @@ namespace Pawnshop.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Workplaces");
+
+            migrationBuilder.DropTable(
+                name: "Clients");
 
             migrationBuilder.DropTable(
                 name: "Employees");

@@ -450,6 +450,200 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.ToTable("ItemsValuation");
                 });
 
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Pawning.PawnAgreement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AgreementDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ContractEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ContractTerms")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Interest")
+                        .HasColumnType("real");
+
+                    b.Property<float>("LoanAmount")
+                        .HasColumnType("real");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("StorageFee")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("PawnAgreements");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Pawning.PawnDebtRepayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("DebtRepaymentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<float>("DebtRepaymentPrice")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("FullRepayment")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("PawnAgreementId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PawnAgreementId");
+
+                    b.ToTable("PawnDebtRepayments");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Pawning.PawnExtension", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ExtensionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExtensionDateTo")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<float>("PaidPrice")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("PawnAgreementId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PawnAgreementId");
+
+                    b.ToTable("PawnExtensions");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Pawning.PawnItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ItemDetailId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("ItemPrice")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("PawnAgreementId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemDetailId");
+
+                    b.HasIndex("PawnAgreementId");
+
+                    b.ToTable("PawnItems");
+                });
+
             modelBuilder.Entity("Pawnshop.Domain.Entities.Transactions.ItemInPurchaseSaleTransaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -771,6 +965,58 @@ namespace Pawnshop.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ItemHistory");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Pawning.PawnAgreement", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Pawning.PawnDebtRepayment", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Pawning.PawnAgreement", "PawnAgreement")
+                        .WithMany()
+                        .HasForeignKey("PawnAgreementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PawnAgreement");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Pawning.PawnExtension", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Pawning.PawnAgreement", "PawnAgreement")
+                        .WithMany()
+                        .HasForeignKey("PawnAgreementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PawnAgreement");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Pawning.PawnItem", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Item.ItemDetail", "ItemDetail")
+                        .WithMany()
+                        .HasForeignKey("ItemDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pawnshop.Domain.Entities.Pawning.PawnAgreement", "PawnAgreement")
+                        .WithMany()
+                        .HasForeignKey("PawnAgreementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemDetail");
+
+                    b.Navigation("PawnAgreement");
                 });
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.Transactions.ItemInPurchaseSaleTransaction", b =>
