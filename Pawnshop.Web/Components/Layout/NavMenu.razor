@@ -11,7 +11,7 @@
         </Authorized>
     </AuthorizeView>
     
-    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.WorkplaceDisplay}, {UserRoles.WorkplaceDisplayAndModify}")">
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.WorkplacesDisplay}, {UserRoles.WorkplacesDisplayAndModify}")">
         <Authorized>
             <MudNavLink Href="/Workplace-management-page"
                         Match="NavLinkMatch.All"

@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Domain.Entitie;
 using Pawnshop.Domain.Entities;
+using Pawnshop.Domain.Entities.Item;
+using Pawnshop.Domain.Entities.Pawning;
+using Pawnshop.Domain.Entities.Transactions;
 using Pawnshop.Domain.Exceptions;
 
 namespace Pawnshop.Infrastructure;
@@ -20,6 +23,16 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Client> Clients { get; set; }
     public DbSet<Workplace> Workplaces { get; set; }
+    public DbSet<ItemCategory> ItemCategories { get; set; }
+    public DbSet<ItemDetail> ItemsDetail { get; set; }
+    public DbSet<ItemHistory> ItemHistories { get; set; }
+    public DbSet<ItemValuation> ItemsValuation { get; set; }
+    public DbSet<ItemInPurchaseSaleTransaction> ItemsInPurchaseSaleTransaction { get; set; }
+    public DbSet<PurchaseSaleTransaction> PurchasesSaleTransaction { get; set; }
+    public DbSet<PawnAgreement> PawnAgreements { get; set; }
+    public DbSet<PawnDebtRepayment> PawnDebtRepayments { get; set; }
+    public DbSet<PawnExtension> PawnExtensions { get; set; }
+    public DbSet<PawnItem> PawnItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
