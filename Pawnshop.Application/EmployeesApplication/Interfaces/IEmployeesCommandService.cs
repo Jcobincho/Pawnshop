@@ -1,11 +1,6 @@
 ﻿using Pawnshop.Application.EmployeesApplication.Commands.AddEmployee;
 using Pawnshop.Application.EmployeesApplication.Commands.DeleteEmployee;
 using Pawnshop.Application.EmployeesApplication.Commands.EditEmployee;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Application.EmployeesApplication.Interfaces
 {

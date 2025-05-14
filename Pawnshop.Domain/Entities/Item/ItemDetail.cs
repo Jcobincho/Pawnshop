@@ -12,6 +12,6 @@
         public string SerialNumber { get; set; }
         public DateTime AddedOn { get; set; }
         public string Comments { get; set; }
-        public bool IsAvailable { get; set; }
+        public bool IsAvailable { get; set; } // probably to be removed
     }
 }
