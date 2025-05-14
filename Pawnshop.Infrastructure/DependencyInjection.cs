@@ -21,6 +21,10 @@ using Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UsersInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.WorkplacesInfrastructure.Services;
+using Pawnshop.Application.CompanyEmailsApplication.Interfaces;
+using Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services;
+using Pawnshop.Application.CryptographyApplication.Interface;
+using Pawnshop.Infrastructure.Services.CryptographyInfrastructure.Services;
 
 namespace Pawnshop.Infrastructure;
 
@@ -53,6 +57,10 @@ public static class DependencyInjection
 
         // Interfaces Dependency Injection
 
+        // CompanyEmail services
+        services.AddScoped<ICompanyEmailsCommandService, CompanyEmailsService>();
+        services.AddScoped<ICompanyEmailsQueryService, CompanyEmailsService>();
+
         // Itemdetails service
         services.AddScoped<IItemDetailsCommandService, ItemDetailsService>();
         services.AddScoped<IItemDetailsQueryService, ItemDetailsService>();
@@ -82,6 +90,9 @@ public static class DependencyInjection
 
         // User claims data provicer service
         services.AddScoped<IUserClaimsDataProviderService, UserClaimsDataProviderService>();
+
+        // Cryptography service
+        services.AddScoped<ICryptographyService, CryptographyService>();
 
         // Register pipeline behavior for getting user id from claims
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UserIdPipelineBehavior<,>));
