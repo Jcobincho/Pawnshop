@@ -326,9 +326,6 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.Property<Guid>("EditedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("boolean");
-
                     b.Property<Guid>("ItemCategoryId")
                         .HasColumnType("uuid");
 

@@ -4,9 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pawnshop.Application.ClientsApplication.Interfaces;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
-<<<<<<< HEAD
 using Pawnshop.Application.ItemDetailsApplication.Interfaces;
-=======
 using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;

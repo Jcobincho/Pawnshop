@@ -1,6 +1,10 @@
-﻿using Pawnshop.Application.ItemDetailsApplication.Commands.AddItemDetail;
+﻿using Microsoft.EntityFrameworkCore;
+using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
+using Pawnshop.Application.ItemDetailsApplication.Commands.AddItemDetail;
 using Pawnshop.Application.ItemDetailsApplication.Commands.DeleteItemDetail;
 using Pawnshop.Application.ItemDetailsApplication.Commands.UpdateItemDetail;
+using Pawnshop.Application.ItemDetailsApplication.Dto;
+using Pawnshop.Application.ItemDetailsApplication.Dto.DtoExtension;
 using Pawnshop.Application.ItemDetailsApplication.Interfaces;
 using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Exceptions;
@@ -10,14 +14,23 @@ namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
     internal sealed class ItemDetailsService : IItemDetailsCommandService, IItemDetailsQueryService
     {
         private readonly DbContext _dbContext;
+        private readonly IItemCategoriesQueryService _itemCategoriesQueryService;
 
-        public ItemDetailsService(DbContext dbContext)
+        public ItemDetailsService(DbContext dbContext, IItemCategoriesQueryService itemCategoriesQueryService)
         {
             _dbContext = dbContext;
+            _itemCategoriesQueryService = itemCategoriesQueryService;
         }
 
         public async Task<Guid> AddItemDetailAsync(AddItemDetailsCommand command, CancellationToken cancellationToken)
         {
+            bool isCategoryExist = await _itemCategoriesQueryService.CategoryExistsAsync(command.ItemCategoryId, cancellationToken);
+
+            if (!isCategoryExist)
+            {
+                throw new NotFoundException("Category doesn't exist.");
+            }
+
             var newItemDetail = new ItemDetail()
             {
                 Name = command.Name,
@@ -27,7 +40,6 @@ namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
                 SerialNumber = command.SerialNumber,
                 AddedOn = command.AddedOn,
                 Comments = command.Comments,
-                IsAvailable = command.IsAvailable
             };
 
             await _dbContext.ItemsDetail.AddAsync(newItemDetail, cancellationToken);
@@ -38,6 +50,13 @@ namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
 
         public async Task UpdateItemDetailAsync(UpdateItemDetailCommand command, CancellationToken cancellationToken)
         {
+            bool isCategoryExist = await _itemCategoriesQueryService.CategoryExistsAsync(command.ItemCategoryId, cancellationToken);
+
+            if (!isCategoryExist)
+            {
+                throw new NotFoundException("Category doesn't exist.");
+            }
+
             var item = await GetItemDetailByIdAsync(command.UpdateItemId, cancellationToken);
 
             item.Name = command.Name;
@@ -47,7 +66,6 @@ namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
             item.SerialNumber = command.SerialNumber;
             item.AddedOn = command.AddedOn;
             item.Comments = command.Comments;
-            item.IsAvailable = command.IsAvailable;
 
             _dbContext.ItemsDetail.Update(item);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -71,6 +89,13 @@ namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
             }
 
             return itemDetail;
+        }
+
+        public async Task<List<ItemDetailDto>> GetAllItemDetailsAsDtoAsync(CancellationToken cancellationToken)
+        {
+            var itemDetailsList = await _dbContext.ItemsDetail.Select(x => x.ItemDetailParseToDto()).ToListAsync();
+
+            return itemDetailsList;
         }
     }
 }
