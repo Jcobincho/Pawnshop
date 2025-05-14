@@ -12,7 +12,7 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250514185603_init")]
+    [Migration("20250514202530_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -743,6 +743,9 @@ namespace Pawnshop.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ClientId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -757,9 +760,6 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("EditedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("EmployeeId")
                         .HasColumnType("uuid");
 
                     b.Property<uint>("RowVersion")
@@ -779,7 +779,7 @@ namespace Pawnshop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("ClientId");
 
                     b.ToTable("PurchasesSaleTransaction");
                 });
@@ -1091,11 +1091,11 @@ namespace Pawnshop.Infrastructure.Migrations
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.Transactions.PurchaseSaleTransaction", b =>
                 {
-                    b.HasOne("Pawnshop.Domain.Entitie.Employee", "Employee")
+                    b.HasOne("Pawnshop.Domain.Entities.Client", "Client")
                         .WithMany()
-                        .HasForeignKey("EmployeeId");
+                        .HasForeignKey("ClientId");
 
-                    b.Navigation("Employee");
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.UserRefreshToken", b =>

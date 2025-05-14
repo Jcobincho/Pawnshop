@@ -184,6 +184,32 @@ namespace Pawnshop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PurchasesSaleTransaction",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TypeOfTransaction = table.Column<int>(type: "integer", nullable: false),
+                    TransactionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TotalPrice = table.Column<float>(type: "real", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchasesSaleTransaction", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PurchasesSaleTransaction_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -210,32 +236,6 @@ namespace Pawnshop.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Employees_EmployeesId",
                         column: x => x.EmployeesId,
-                        principalTable: "Employees",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PurchasesSaleTransaction",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TypeOfTransaction = table.Column<int>(type: "integer", nullable: false),
-                    TransactionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TotalPrice = table.Column<float>(type: "real", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PurchasesSaleTransaction", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PurchasesSaleTransaction_Employees_EmployeeId",
-                        column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
                 });
@@ -647,9 +647,9 @@ namespace Pawnshop.Infrastructure.Migrations
                 column: "PawnAgreementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchasesSaleTransaction_EmployeeId",
+                name: "IX_PurchasesSaleTransaction_ClientId",
                 table: "PurchasesSaleTransaction",
-                column: "EmployeeId");
+                column: "ClientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRefreshToken_UsersId",
