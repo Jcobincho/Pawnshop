@@ -1,18 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pawnshop.Application.ItemCategoriesApplication.Commands.AddCategory;
-using Pawnshop.Application.ItemCategoriesApplication.Commands.DeleteCategory;
-using Pawnshop.Application.ItemCategoriesApplication.Commands.UpdateCategory;
+using Pawnshop.Application.ItemCategoriesApplication.Commands.AddItemCategory;
+using Pawnshop.Application.ItemCategoriesApplication.Commands.DeleteItemCategory;
+using Pawnshop.Application.ItemCategoriesApplication.Commands.UpdateItemCategory;
 using Pawnshop.Application.ItemCategoriesApplication.Dto;
 using Pawnshop.Application.ItemCategoriesApplication.Dto.DtoExtension;
 using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
 using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services
 {
@@ -24,7 +18,7 @@ namespace Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services
         {
             _dbContext = dbContext;
         }
-        public async Task<Guid> AddCategoryServiceAsync(AddCategoryCommand command, CancellationToken cancellationToken)
+        public async Task<Guid> AddItemCategoryServiceAsync(AddItemCategoryCommand command, CancellationToken cancellationToken)
         {
             ItemCategory newItemCategory = new ItemCategory()
             {
@@ -37,7 +31,7 @@ namespace Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services
             return newItemCategory.Id;
         }
 
-        public async Task UpdateCategoryServiceAsync(UpdateCategoryCommand command, CancellationToken cancellationToken)
+        public async Task UpdateItemCategoryServiceAsync(UpdateItemCategoryCommand command, CancellationToken cancellationToken)
         {
             var itemCategory = await GetItemCategoryByIdAsync(command.ItemCategoryId, cancellationToken);
 
@@ -48,7 +42,7 @@ namespace Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteCategoryServiceAsync(DeleteCategoryCommand command, CancellationToken cancellationToken)
+        public async Task DeleteItemCategoryServiceAsync(DeleteItemCategoryCommand command, CancellationToken cancellationToken)
         {
             var itemCategory = await GetItemCategoryByIdAsync(command.CategoryId, cancellationToken);
 

@@ -1,18 +1,13 @@
-﻿using Pawnshop.Application.ItemCategoriesApplication.Commands.AddCategory;
-using Pawnshop.Application.ItemCategoriesApplication.Commands.DeleteCategory;
-using Pawnshop.Application.ItemCategoriesApplication.Commands.UpdateCategory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pawnshop.Application.ItemCategoriesApplication.Commands.AddItemCategory;
+using Pawnshop.Application.ItemCategoriesApplication.Commands.DeleteItemCategory;
+using Pawnshop.Application.ItemCategoriesApplication.Commands.UpdateItemCategory;
 
 namespace Pawnshop.Application.ItemCategoriesApplication.Interfaces
 {
     public interface IItemCaterogoriesCommandService
     {
-        Task<Guid> AddCategoryServiceAsync(AddCategoryCommand command, CancellationToken cancellationToken);
-        Task UpdateCategoryServiceAsync(UpdateCategoryCommand command, CancellationToken cancellationToken);
-        Task DeleteCategoryServiceAsync(DeleteCategoryCommand command, CancellationToken cancellationToken);
+        Task<Guid> AddItemCategoryServiceAsync(AddItemCategoryCommand command, CancellationToken cancellationToken);
+        Task UpdateItemCategoryServiceAsync(UpdateItemCategoryCommand command, CancellationToken cancellationToken);
+        Task DeleteItemCategoryServiceAsync(DeleteItemCategoryCommand command, CancellationToken cancellationToken);
     }
 }

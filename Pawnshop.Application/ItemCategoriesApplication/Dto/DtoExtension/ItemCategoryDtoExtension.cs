@@ -1,10 +1,4 @@
-﻿using Pawnshop.Domain.Entities;
-using Pawnshop.Domain.Entities.Item;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pawnshop.Domain.Entities.Item;
 
 namespace Pawnshop.Application.ItemCategoriesApplication.Dto.DtoExtension
 {
