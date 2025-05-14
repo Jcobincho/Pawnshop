@@ -60,11 +60,15 @@ namespace Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services
 
             return itemCategory;
         }
-        public async Task<List<ItemCategoryDto>> GetAllItemCategoriesAsync(CancellationToken cancellationToken)
+        public async Task<List<ItemCategoryDto>> GetAllItemCategoriesAsDtoAsync(CancellationToken cancellationToken)
         {
             var itemCategories = await _dbContext.ItemCategories.Select(x => x.ItemCategoryParseToDto()).ToListAsync(cancellationToken);
             return itemCategories;
         }
 
+        public async Task<bool> CategoryExistsAsync(Guid itemCategoryId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.ItemCategories.AnyAsync(x => x.Id == itemCategoryId, cancellationToken);
+        }
     }
 }

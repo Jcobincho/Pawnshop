@@ -12,7 +12,7 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250512201946_init")]
+    [Migration("20250514170052_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -328,9 +328,6 @@ namespace Pawnshop.Infrastructure.Migrations
 
                     b.Property<Guid>("EditedBy")
                         .HasColumnType("uuid");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("boolean");
 
                     b.Property<Guid>("ItemCategoryId")
                         .HasColumnType("uuid");

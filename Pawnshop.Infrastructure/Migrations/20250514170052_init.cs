@@ -230,7 +230,6 @@ namespace Pawnshop.Infrastructure.Migrations
                     SerialNumber = table.Column<string>(type: "text", nullable: false),
                     AddedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Comments = table.Column<string>(type: "text", nullable: false),
-                    IsAvailable = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
