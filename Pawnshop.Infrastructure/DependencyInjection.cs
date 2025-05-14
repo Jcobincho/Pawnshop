@@ -4,7 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pawnshop.Application.ClientsApplication.Interfaces;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
+<<<<<<< HEAD
 using Pawnshop.Application.ItemDetailsApplication.Interfaces;
+=======
+using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
+>>>>>>> origin/main
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
@@ -14,7 +18,11 @@ using Pawnshop.Infrastructure.Behaviors;
 using Pawnshop.Infrastructure.Persistance.Extensions;
 using Pawnshop.Infrastructure.Services.ClientsInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services;
+<<<<<<< HEAD
 using Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services;
+=======
+using Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services;
+>>>>>>> origin/main
 using Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UsersInfrastructure.Services;
@@ -71,6 +79,9 @@ public static class DependencyInjection
         services.AddScoped<IEmployeesCommandService, EmployeesService>();
         services.AddScoped<IEmployeesQueryService, EmployeesService>();
 
+        //ItemCategories services
+        services.AddScoped<IItemCaterogoriesCommandService, ItemCategoriesService>();
+        services.AddScoped<IItemCategoriesQueryService, ItemCategoriesService>();
         // JsonWebToken service
         services.AddScoped<IJsonWebTokenService, JsonWebTokenService>();
 
