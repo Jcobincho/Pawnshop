@@ -1,8 +1,12 @@
-﻿using Pawnshop.Application.ItemDetailsApplication.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Pawnshop.Application.ItemDetailsApplication.Interfaces;
 using Pawnshop.Application.ItemHistoriesApplication.Commands.AddItemHistory;
 using Pawnshop.Application.ItemHistoriesApplication.Commands.DeleteItemHistory;
 using Pawnshop.Application.ItemHistoriesApplication.Commands.UpdateItemHistory;
+using Pawnshop.Application.ItemHistoriesApplication.Dto;
+using Pawnshop.Application.ItemHistoriesApplication.Dto.DtoExtension;
 using Pawnshop.Application.ItemHistoriesApplication.Interfaces;
+using Pawnshop.Application.ItemHistoriesApplication.Queries.GetItemHistoriesForItemDetail;
 using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Exceptions;
@@ -74,6 +78,24 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
 
             return itemHistory;
         }
+
+        public async Task<List<ItemHistoryForItemDetailDto>> GetItemHistoryForItemDetailAsync(GetItemHistoriesForItemDetailQuery query, CancellationToken cancellationToken)
+        {
+            var isItemDetailExist = await _itemDetailsQueryService.ItemDetailExistsAsync(query.ItemDetailId, cancellationToken);
+
+            if (!isItemDetailExist)
+                throw new NotFoundException("Item detail doesn't exist.");
+
+            var itemHistories = await _dbContext.ItemHistories
+                .Where(history => history.ItemDetailId == query.ItemDetailId)
+                .Include(history => history.Workplace)
+                .OrderByDescending(history => history.DateFrom)
+                .Select(history => history.ItemHistoryForItemDetailParseToDto())
+                .ToListAsync(cancellationToken);
+
+            return itemHistories;
+        }
+
 
         private async Task CheckWrokplaceAndItemDetailExistsAsync(Guid itemDetailId, Guid workplaceId, CancellationToken cancellationToken)
         {

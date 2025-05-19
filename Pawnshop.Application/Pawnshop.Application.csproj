@@ -18,8 +18,4 @@
       <ProjectReference Include="..\Pawnshop.Domain\Pawnshop.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="ItemHistoriesApplication\Dto\" />
-    </ItemGroup>
-
 </Project>
