@@ -7,5 +7,6 @@ namespace Pawnshop.Application.ItemDetailsApplication.Interfaces
     {
         Task<ItemDetail> GetItemDetailByIdAsync(Guid itemDetailId, CancellationToken cancellationToken);
         Task<List<ItemDetailDto>> GetAllItemDetailsAsDtoAsync(CancellationToken cancellationToken);
+        Task<bool> ItemDetailExistsAsync(Guid itemDetailId, CancellationToken cancellationToken);
     }
 }

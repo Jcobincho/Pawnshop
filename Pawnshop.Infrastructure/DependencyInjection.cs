@@ -25,6 +25,8 @@ using Pawnshop.Application.CompanyEmailsApplication.Interfaces;
 using Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services;
 using Pawnshop.Application.CryptographyApplication.Interface;
 using Pawnshop.Infrastructure.Services.CryptographyInfrastructure.Services;
+using Pawnshop.Application.ItemHistoriesApplication.Interfaces;
+using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services;
 
 namespace Pawnshop.Infrastructure;
 
@@ -56,6 +58,10 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         // Interfaces Dependency Injection
+
+        // Item history services
+        services.AddScoped<IItemHistoriesCommandService, ItemHistoriesService>();
+        services.AddScoped<IItemHistoriesQueryService, ItemHistoriesService>();
 
         // CompanyEmail services
         services.AddScoped<ICompanyEmailsCommandService, CompanyEmailsService>();

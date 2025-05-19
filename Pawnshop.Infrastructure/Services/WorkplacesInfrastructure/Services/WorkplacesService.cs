@@ -75,5 +75,10 @@ namespace Pawnshop.Infrastructure.Services.WorkplacesInfrastructure.Services
 
             return workplaces;
         }
+
+        public async Task<bool> WorkplaceExistsAsync(Guid workplaceId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Workplaces.AnyAsync(x => x.Id == workplaceId, cancellationToken);
+        }
     }
 }
