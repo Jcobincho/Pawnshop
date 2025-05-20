@@ -81,17 +81,15 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
 
         public async Task<List<ItemHistoryForItemDetailDto>> GetItemHistoryForItemDetailAsync(GetItemHistoriesForItemDetailQuery query, CancellationToken cancellationToken)
         {
-            var isItemDetailExist = await _itemDetailsQueryService.ItemDetailExistsAsync(query.ItemDetailId, cancellationToken);
-
-            if (!isItemDetailExist)
-                throw new NotFoundException("Item detail doesn't exist.");
-
             var itemHistories = await _dbContext.ItemHistories
                 .Where(history => history.ItemDetailId == query.ItemDetailId)
                 .Include(history => history.Workplace)
                 .OrderByDescending(history => history.DateFrom)
                 .Select(history => history.ItemHistoryForItemDetailParseToDto())
                 .ToListAsync(cancellationToken);
+
+            if (itemHistories == null)
+                throw new NotFoundException("Item history doesn't exist.");
 
             return itemHistories;
         }
@@ -108,6 +106,11 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
 
             if(!isWorkplaceExist)
                 throw new NotFoundException("Workplace doesn't exist.");
+        }
+
+        public async Task<bool> IsItemHistoryExistAsync(Guid itemHistoryId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.ItemHistories.AnyAsync(x => x.Id == itemHistoryId, cancellationToken);
         }
     }
 }

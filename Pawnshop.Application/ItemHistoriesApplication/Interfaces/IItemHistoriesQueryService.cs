@@ -8,5 +8,6 @@ namespace Pawnshop.Application.ItemHistoriesApplication.Interfaces
     {
         Task<ItemHistory> GetItemHistoryByIdAsync(Guid itemHistoryId, CancellationToken cancellationToken);
         Task<List<ItemHistoryForItemDetailDto>> GetItemHistoryForItemDetailAsync(GetItemHistoriesForItemDetailQuery query, CancellationToken cancellationToken);
+        Task<bool> IsItemHistoryExistAsync(Guid itemHistoryId, CancellationToken cancellationToken);
     }
 }
