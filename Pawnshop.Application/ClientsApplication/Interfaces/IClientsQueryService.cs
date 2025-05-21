@@ -7,5 +7,6 @@ namespace Pawnshop.Application.ClientsApplication.Interfaces
     {
         Task<Client> GetClientByIdAsync(Guid clientId, CancellationToken cancellationToken);
         Task<List<ClientDto>> GetAllClientsAsDtoAsync(CancellationToken cancellationToken);
+        Task<bool> IsClientExistAsync(Guid clientId, CancellationToken cancellationToken);
     }
 }
