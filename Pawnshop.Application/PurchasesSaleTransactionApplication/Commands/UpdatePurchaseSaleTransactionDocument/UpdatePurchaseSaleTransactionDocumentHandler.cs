@@ -15,7 +15,9 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.Upda
 
         public async Task<UpdatePurchaseSaleTransactionDocumentResponse> Handle(UpdatePurchaseSaleTransactionDocumentCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _purchasesSaleTransactionCommandService.UpdatePurchaseSaleTransactionAsync(request, cancellationToken);
+
+            return new UpdatePurchaseSaleTransactionDocumentResponse();
         }
     }
 }
