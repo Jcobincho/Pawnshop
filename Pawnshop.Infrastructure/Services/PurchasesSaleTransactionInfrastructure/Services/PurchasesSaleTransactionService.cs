@@ -1,5 +1,6 @@
 ﻿using Pawnshop.Application.ClientsApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddPurchaseSaleTransactionDocument;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.DeletePurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.UpdatePurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Domain.Entities.Transactions;
@@ -70,6 +71,14 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
             }
 
             _dbContext.PurchasesSaleTransaction.Update(document);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeletePurchaseSaleTransactionAsync(DeletePurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
+        {
+            var document = await GetPurchaseSateTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
+
+            _dbContext.PurchasesSaleTransaction.Remove(document);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
