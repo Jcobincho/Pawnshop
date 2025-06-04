@@ -23,9 +23,9 @@ namespace Pawnshop.Api.Controllers
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        public override Task<IActionResult> GetAsync([FromQuery] BaseQuery data, CancellationToken cancellation)
+        public override Task<IActionResult> GetAsync([FromQuery] BaseQuery data, CancellationToken cancellationToken)
         {
-            return base.GetAsync(data, cancellation);
+            return base.GetAsync(data, cancellationToken);
         }
     }
 }
