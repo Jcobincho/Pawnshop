@@ -8,6 +8,7 @@ using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtension;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetEverySalesTransaction;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetPurchasesForClient;
 using Pawnshop.Domain.Entities.Transactions;
 using Pawnshop.Domain.Exceptions;
 
@@ -55,7 +56,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
         public async Task UpdatePurchaseSaleTransactionAsync(UpdatePurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
         {
-            var document = await GetPurchaseSateTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
+            var document = await GetPurchaseSaleTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
 
             document.TypeOfTransaction = command.TypeOfTransaction;
             document.TransactionDate = command.TransactionDate;
@@ -81,13 +82,13 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
         public async Task DeletePurchaseSaleTransactionAsync(DeletePurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
         {
-            var document = await GetPurchaseSateTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
+            var document = await GetPurchaseSaleTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
 
             _dbContext.PurchasesSaleTransaction.Remove(document);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<PurchaseSaleTransaction> GetPurchaseSateTransactionByIdAsync(Guid purchaseSateTransactionId, CancellationToken cancellationToken)
+        public async Task<PurchaseSaleTransaction> GetPurchaseSaleTransactionByIdAsync(Guid purchaseSateTransactionId, CancellationToken cancellationToken)
         {
             var purchaseSaleTransaction = await _dbContext.PurchasesSaleTransaction.FindAsync(purchaseSateTransactionId, cancellationToken);
 
@@ -99,22 +100,48 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
             return purchaseSaleTransaction;
         }
 
-        public async Task<PagedResult<SalesTransactionDto>> GetEverySalesTransactionsAsDtoAsync(GetEverySalesTransactionQuery query, CancellationToken cancellationToken)
+        public async Task<PagedResult<SalesTransactionDto>> GetEverySalesTransactionsPagedAsDtoAsync(GetEverySalesTransactionQuery query, CancellationToken cancellationToken)
         {
             var dbQuery = _dbContext.PurchasesSaleTransaction
                                              .Where(x => x.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Sale)
                                              .OrderByDescending(x => x.TransactionDate);
 
-            var totalCount = await dbQuery.CountAsync();
+            var totalCount = await dbQuery.CountAsync(cancellationToken);
 
             var salesTransactions = await dbQuery.Skip((query.PaginationParameters.PageNumber - 1) * query.PaginationParameters.PageSize)
                                                  .Take(query.PaginationParameters.PageSize)
-                                                 .Select(x => x.SalesTransactionPraseToDto())
+                                                 .Select(x => x.SalesTransactionParaseToDto())
                                                  .ToListAsync(cancellationToken);
 
             return new PagedResult<SalesTransactionDto>
             (
                 salesTransactions,
+                totalCount,
+                query.PaginationParameters.PageNumber,
+                query.PaginationParameters.PageSize
+            );
+        }
+
+        public async Task<PagedResult<PurchasesTransactionDto>> GetPurchasesForClientPagedAsDtoAsync(GetPurchasesForClientQuery query, CancellationToken cancellationToken)
+        {
+            var isClientExits = await _clientsQueryService.IsClientExistAsync(query.ClientId, cancellationToken);
+
+            if (!isClientExits)
+                throw new NotFoundException("Client doesn't exist.");
+
+            var dbQuery = _dbContext.PurchasesSaleTransaction.Where(x => x.ClientId == query.ClientId)
+                                                             .OrderByDescending(x => x.TransactionDate);
+
+            var totalCount = await dbQuery.CountAsync(cancellationToken);
+
+            var purchasesTransactions = await dbQuery.Skip((query.PaginationParameters.PageNumber - 1) * query.PaginationParameters.PageSize)
+                                                 .Take(query.PaginationParameters.PageSize)
+                                                 .Select(x => x.PurchasesTransactionParseToDto())
+                                                 .ToListAsync(cancellationToken);
+
+            return new PagedResult<PurchasesTransactionDto>
+            (
+                purchasesTransactions,
                 totalCount,
                 query.PaginationParameters.PageNumber,
                 query.PaginationParameters.PageSize
