@@ -1,4 +1,4 @@
-﻿using Pawnshop.Application.Base;
+﻿using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.ItemDetailsApplication.Responses;
 
 namespace Pawnshop.Application.ItemDetailsApplication.Quersies.GetAllItemDetails

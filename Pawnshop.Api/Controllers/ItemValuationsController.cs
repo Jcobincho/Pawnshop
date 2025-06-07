@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Pawnshop.Application.Base;
+using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.ItemValuationsApplication.Commands.AddItemValuation;
 using Pawnshop.Application.ItemValuationsApplication.Commands.DeleteItemValuation;
 using Pawnshop.Application.ItemValuationsApplication.Commands.UpdateItemValuation;

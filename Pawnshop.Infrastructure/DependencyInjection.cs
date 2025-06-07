@@ -11,7 +11,6 @@ using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities;
-using Pawnshop.Infrastructure.Behaviors;
 using Pawnshop.Infrastructure.Persistance.Extensions;
 using Pawnshop.Infrastructure.Services.ClientsInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services;
@@ -31,6 +30,7 @@ using Pawnshop.Application.ItemValuationsApplication.Interfaces;
 using Pawnshop.Infrastructure.Services.ItemValuationsInfrastructure.Services;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Services;
+using Pawnshop.Application.Common.Behaviors;
 
 namespace Pawnshop.Infrastructure;
 

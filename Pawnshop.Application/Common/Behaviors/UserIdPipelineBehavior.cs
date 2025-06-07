@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using Pawnshop.Application.Base;
+using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 
-namespace Pawnshop.Infrastructure.Behaviors
+namespace Pawnshop.Application.Common.Behaviors
 {
     public class UserIdPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : BaseCommand

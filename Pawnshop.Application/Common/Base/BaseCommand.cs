@@ -1,15 +1,14 @@
 ﻿using MediatR;
 using System.Text.Json.Serialization;
 
-namespace Pawnshop.Application.Base
+namespace Pawnshop.Application.Common.Base
 {
-    public abstract class BaseQuery<TResponse> : BaseQuery, IRequest<TResponse>
+    public abstract class BaseCommand<TResponse> : BaseCommand, IRequest<TResponse>
         where TResponse : class
-    { 
-        
+    {
     }
 
-    public abstract class BaseQuery
+    public abstract class BaseCommand
     {
         [JsonIgnore]
         public Guid UserIdFromClaims { get; internal set; }

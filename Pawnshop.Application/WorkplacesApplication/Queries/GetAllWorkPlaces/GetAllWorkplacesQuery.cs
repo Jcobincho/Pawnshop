@@ -1,4 +1,4 @@
-﻿using Pawnshop.Application.Base;
+﻿using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.WorkplacesApplication.Responses;
 
 namespace Pawnshop.Application.WorkplacesApplication.Queries.GetAllWorkPlaces

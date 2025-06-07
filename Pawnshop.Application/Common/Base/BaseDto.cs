@@ -1,4 +1,4 @@
-﻿namespace Pawnshop.Application.Base
+﻿namespace Pawnshop.Application.Common.Base
 {
     public class BaseDto
     {

@@ -1,4 +1,4 @@
-﻿using Pawnshop.Application.Base;
+﻿using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Responses;
 using Pawnshop.Domain.Enums;
 using System.ComponentModel.DataAnnotations;

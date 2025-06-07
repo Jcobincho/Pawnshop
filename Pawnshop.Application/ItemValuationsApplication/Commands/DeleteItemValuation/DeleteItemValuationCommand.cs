@@ -1,4 +1,4 @@
-﻿using Pawnshop.Application.Base;
+﻿using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.ItemValuationsApplication.Responses;
 using System.ComponentModel.DataAnnotations;
 

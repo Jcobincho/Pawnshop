@@ -1,20 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Pawnshop.Application.Base;
+using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddPurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.DeletePurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.UpdatePurchaseSaleTransactionDocument;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetEverySalesTransaction;
 
 namespace Pawnshop.Api.Controllers
 {
     [Route("[controller]")]
     [Authorize]
-    public class PurchasesSaleTransactionController : BaseController<AddPurchaseSaleTransactionDocumentCommand, UpdatePurchaseSaleTransactionDocumentCommand, DeletePurchaseSaleTransactionDocumentCommand, BaseQuery>
+    public class PurchasesSaleTransactionController : BaseController<AddPurchaseSaleTransactionDocumentCommand, UpdatePurchaseSaleTransactionDocumentCommand, DeletePurchaseSaleTransactionDocumentCommand, GetEverySalesTransactionQuery>
     {
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public override Task<IActionResult> GetAsync([FromQuery] BaseQuery data, CancellationToken cancellationToken)
-        {
-            return base.GetAsync(data, cancellationToken);
-        }
+
     }
 }
+
+// Add GET endpoint to get every purchases documents for specific client

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Pawnshop.Application.Base;
+using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.ItemHistoriesApplication.Commands.AddItemHistory;
 using Pawnshop.Application.ItemHistoriesApplication.Commands.DeleteItemHistory;
 using Pawnshop.Application.ItemHistoriesApplication.Commands.UpdateItemHistory;

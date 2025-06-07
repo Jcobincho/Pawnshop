@@ -1,4 +1,4 @@
-﻿using Pawnshop.Application.Base;
+﻿using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.UsersApplication.Responses;
 using System;
 using System.Collections.Generic;

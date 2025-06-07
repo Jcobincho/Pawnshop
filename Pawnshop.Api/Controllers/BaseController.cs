@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Pawnshop.Application.Base;
+using Pawnshop.Application.Common.Base;
 using Pawnshop.Domain.Exceptions;
 
 namespace Pawnshop.Api.Controllers

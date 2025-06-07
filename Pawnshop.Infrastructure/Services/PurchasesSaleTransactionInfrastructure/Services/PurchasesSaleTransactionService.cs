@@ -1,8 +1,13 @@
-﻿using Pawnshop.Application.ClientsApplication.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Pawnshop.Application.ClientsApplication.Interfaces;
+using Pawnshop.Application.Common.Pagination;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddPurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.DeletePurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.UpdatePurchaseSaleTransactionDocument;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtension;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetEverySalesTransaction;
 using Pawnshop.Domain.Entities.Transactions;
 using Pawnshop.Domain.Exceptions;
 
@@ -92,6 +97,28 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
             }
 
             return purchaseSaleTransaction;
+        }
+
+        public async Task<PagedResult<SalesTransactionDto>> GetEverySalesTransactionsAsDtoAsync(GetEverySalesTransactionQuery query, CancellationToken cancellationToken)
+        {
+            var dbQuery = _dbContext.PurchasesSaleTransaction
+                                             .Where(x => x.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Sale)
+                                             .OrderByDescending(x => x.TransactionDate);
+
+            var totalCount = await dbQuery.CountAsync();
+
+            var salesTransactions = await dbQuery.Skip((query.PaginationParameters.PageNumber - 1) * query.PaginationParameters.PageSize)
+                                                 .Take(query.PaginationParameters.PageSize)
+                                                 .Select(x => x.SalesTransactionPraseToDto())
+                                                 .ToListAsync(cancellationToken);
+
+            return new PagedResult<SalesTransactionDto>
+            (
+                salesTransactions,
+                totalCount,
+                query.PaginationParameters.PageNumber,
+                query.PaginationParameters.PageSize
+            );
         }
     }
 }
