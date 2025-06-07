@@ -7,5 +7,6 @@ namespace Pawnshop.Application.WorkplacesApplication.Interfaces
     {
         Task<Workplace> GetWorkplaceByIdAsync(Guid workplaceId, CancellationToken cancellationToken);
         Task<List<WorkplaceDto>> GetAllWorkplacesAsync(CancellationToken cancellationToken);
+        Task<bool> WorkplaceExistsAsync(Guid workplaceId, CancellationToken cancellationToken);
     }
 }

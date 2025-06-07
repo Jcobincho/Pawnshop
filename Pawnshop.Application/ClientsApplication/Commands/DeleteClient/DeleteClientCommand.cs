@@ -1,5 +1,5 @@
-﻿using Pawnshop.Application.Base;
-using Pawnshop.Application.ClientsApplication.Responses;
+﻿using Pawnshop.Application.ClientsApplication.Responses;
+using Pawnshop.Application.Common.Base;
 using System.ComponentModel.DataAnnotations;
 
 namespace Pawnshop.Application.ClientsApplication.Commands.DeleteClient

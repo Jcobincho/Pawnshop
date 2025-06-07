@@ -1,4 +1,4 @@
-﻿using Pawnshop.Application.Base;
+﻿using Pawnshop.Application.Common.Base;
 
 namespace Pawnshop.Application.ItemCategoriesApplication.Dto
 {

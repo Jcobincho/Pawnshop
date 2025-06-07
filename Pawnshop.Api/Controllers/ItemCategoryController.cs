@@ -7,7 +7,7 @@ using Pawnshop.Application.ItemCategoriesApplication.Queries.GetAllItemCategorie
 
 namespace Pawnshop.Api.Controllers
 {
-    [Route("controller")]
+    [Route("[controller]")]
     [Authorize]
     public class ItemCategoriesController : BaseController<AddItemCategoryCommand, UpdateItemCategoryCommand, DeleteItemCategoryCommand, GetAllItemCategoriesQuery>
     {

@@ -87,5 +87,10 @@ namespace Pawnshop.Infrastructure.Services.ClientsInfrastructure.Services
 
             return clients;
         }
+
+        public async Task<bool> IsClientExistAsync(Guid clientId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Clients.AnyAsync(x => x.Id == clientId, cancellationToken);
+        }
     }
 }
