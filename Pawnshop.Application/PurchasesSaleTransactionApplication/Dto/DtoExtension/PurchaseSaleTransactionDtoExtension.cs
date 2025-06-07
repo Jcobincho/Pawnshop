@@ -17,5 +17,19 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtens
                 EditedBy = purchaseSaleTransaction.EditedBy
             };
         }
+
+        public static PurchasesTransactionDto PurchasesTransactionPraseToDto(this PurchaseSaleTransaction purchaseSaleTransaction)
+        {
+            return new PurchasesTransactionDto
+            {
+                TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction,
+                TransactionDate = purchaseSaleTransaction.TransactionDate,
+                Description = purchaseSaleTransaction.Description,
+                CreatedAt = purchaseSaleTransaction.CreatedAt,
+                CreatedBy = purchaseSaleTransaction.CreatedBy,
+                EditedAt = purchaseSaleTransaction.EditedAt,
+                EditedBy = purchaseSaleTransaction.EditedBy
+            };
+        }
     }
 }

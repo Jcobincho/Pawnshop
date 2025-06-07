@@ -1,8 +1,9 @@
-﻿using Pawnshop.Domain.Enums;
+﻿using Pawnshop.Application.Common.Base;
+using Pawnshop.Domain.Enums;
 
 namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto
 {
-    public class PurchasesTransactionDto
+    public class PurchasesTransactionDto : BaseDto
     {
         public TypeOfTransactionEnum TypeOfTransaction { get; set; }
         public DateTime TransactionDate { get; set; }

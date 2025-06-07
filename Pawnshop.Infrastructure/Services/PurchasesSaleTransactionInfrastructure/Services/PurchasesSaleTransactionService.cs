@@ -110,7 +110,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
             var salesTransactions = await dbQuery.Skip((query.PaginationParameters.PageNumber - 1) * query.PaginationParameters.PageSize)
                                                  .Take(query.PaginationParameters.PageSize)
-                                                 .Select(x => x.SalesTransactionParaseToDto())
+                                                 .Select(x => x.SalesTransactionPraseToDto())
                                                  .ToListAsync(cancellationToken);
 
             return new PagedResult<SalesTransactionDto>
@@ -136,7 +136,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
             var purchasesTransactions = await dbQuery.Skip((query.PaginationParameters.PageNumber - 1) * query.PaginationParameters.PageSize)
                                                  .Take(query.PaginationParameters.PageSize)
-                                                 .Select(x => x.PurchasesTransactionParseToDto())
+                                                 .Select(x => x.PurchasesTransactionPraseToDto())
                                                  .ToListAsync(cancellationToken);
 
             return new PagedResult<PurchasesTransactionDto>
