@@ -31,6 +31,8 @@ using Pawnshop.Infrastructure.Services.ItemValuationsInfrastructure.Services;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Services;
 using Pawnshop.Application.Common.Behaviors;
+using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Interfaces;
+using Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastructure.Services;
 
 namespace Pawnshop.Infrastructure;
 
@@ -62,6 +64,10 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         // Interfaces Dependency Injection
+
+        // Item in purchase and sale transaction service
+        services.AddScoped<IItemInPurchaseSaleTransactionCommandService, ItemInPurchaseSaleTransactionService>();
+        services.AddScoped<IItemInPurchaseSaleTransactionQueryService, ItemInPurchaseSaleTransactionService>();
 
         // Purchase and sale transactions services
         services.AddScoped<IPurchasesSaleTransactionCommandService, PurchasesSaleTransactionService>();

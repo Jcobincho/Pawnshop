@@ -14,5 +14,6 @@ namespace Pawnshop.Application.ItemHistoriesApplication.Dto
         public WorkplaceDto Workplace { get; set; }
 
         public DateTime DateFrom { get; set; }
+        public float TransactionPrice { get; set; }
     }
 }

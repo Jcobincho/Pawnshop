@@ -12,6 +12,10 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddP
 
         [Required(ErrorMessage = "Date of transaction is required.")]
         public DateTime TransactionDate { get; set; }
+
+        [Required(ErrorMessage = "Workplace is required.")]
+        public Guid WorkplaceId { get; set; }
+
         public Guid? ClientId { get; set; }
         public string Description { get; set; } = string.Empty;
     }

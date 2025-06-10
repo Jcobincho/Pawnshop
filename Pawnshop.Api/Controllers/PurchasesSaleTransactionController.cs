@@ -29,5 +29,3 @@ namespace Pawnshop.Api.Controllers
         }
     }
 }
-
-// Add GET endpoint to get every purchases documents for specific client

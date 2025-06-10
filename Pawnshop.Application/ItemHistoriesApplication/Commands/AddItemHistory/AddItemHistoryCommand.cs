@@ -19,5 +19,7 @@ namespace Pawnshop.Application.ItemHistoriesApplication.Commands.AddItemHistory
         public Guid WorkplaceId { get; set; }
 
         public DateTime DateFrom { get; set; } = DateTime.Now;
-}
+
+        public float TransactionPrice { get; set; } = 0;
     }
+}

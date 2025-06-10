@@ -9,6 +9,7 @@ using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtension;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetEverySalesTransaction;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetPurchasesForClient;
+using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities.Transactions;
 using Pawnshop.Domain.Exceptions;
 
@@ -18,20 +19,28 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
     {
         private readonly DbContext _dbContext;
         private readonly IClientsQueryService _clientsQueryService;
+        private readonly IWorkplacesQueryService _workplacesQueryService;
 
-        public PurchasesSaleTransactionService(DbContext dbContext, IClientsQueryService clientsQueryService)
+        public PurchasesSaleTransactionService(DbContext dbContext, IClientsQueryService clientsQueryService, IWorkplacesQueryService workplacesQueryService)
         {
             _dbContext = dbContext;
             _clientsQueryService = clientsQueryService;
+            _workplacesQueryService = workplacesQueryService;
         }
 
         public async Task<Guid> AddPurchaseSaleTransactionAsync(AddPurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
         {
+            var isWorkplaceExist = await _workplacesQueryService.WorkplaceExistsAsync(command.WorkplaceId, cancellationToken);
+
+            if (!isWorkplaceExist)
+                throw new NotFoundException("Workplace doesn't exist.");
+
             var newPurchaseSaleTransaction = new PurchaseSaleTransaction
             {
                 TypeOfTransaction = command.TypeOfTransaction,
                 TransactionDate = command.TransactionDate,
-                Description = command.Description
+                Description = command.Description,
+                WorkplaceId = command.WorkplaceId,
             };
             
             if(command.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Purchase)
@@ -58,9 +67,15 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
         {
             var document = await GetPurchaseSaleTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
 
+            var isWorkplaceExist = await _workplacesQueryService.WorkplaceExistsAsync(command.WorkplaceId, cancellationToken);
+
+            if (!isWorkplaceExist)
+                throw new NotFoundException("Workplace doesn't exist.");
+
             document.TypeOfTransaction = command.TypeOfTransaction;
             document.TransactionDate = command.TransactionDate;
             document.Description = command.Description;
+            document.WorkplaceId = command.WorkplaceId;
 
             if (command.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Purchase)
             {
@@ -102,9 +117,9 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
         public async Task<PagedResult<SalesTransactionDto>> GetEverySalesTransactionsPagedAsDtoAsync(GetEverySalesTransactionQuery query, CancellationToken cancellationToken)
         {
-            var dbQuery = _dbContext.PurchasesSaleTransaction
-                                             .Where(x => x.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Sale)
-                                             .OrderByDescending(x => x.TransactionDate);
+            var dbQuery = _dbContext.PurchasesSaleTransaction.Where(x => x.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Sale)
+                                                             .Include(x => x.Workplace)
+                                                             .OrderByDescending(x => x.TransactionDate);
 
             var totalCount = await dbQuery.CountAsync(cancellationToken);
 
@@ -130,6 +145,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
                 throw new NotFoundException("Client doesn't exist.");
 
             var dbQuery = _dbContext.PurchasesSaleTransaction.Where(x => x.ClientId == query.ClientId)
+                                                             .Include(x => x.Workplace)
                                                              .OrderByDescending(x => x.TransactionDate);
 
             var totalCount = await dbQuery.CountAsync(cancellationToken);
@@ -146,6 +162,11 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
                 query.PaginationParameters.PageNumber,
                 query.PaginationParameters.PageSize
             );
+        }
+
+        public async Task<bool> IsPurchaseSaleTransactionExistAsync(Guid purchaseSaleTransactionId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.PurchasesSaleTransaction.AnyAsync(x => x.Id == purchaseSaleTransactionId, cancellationToken);
         }
     }
 }

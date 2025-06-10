@@ -37,6 +37,7 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
                 Description = command.Description,
                 WorkplaceId = command.WorkplaceId,
                 DateFrom = command.DateFrom,
+                TransactionPrice = command.TransactionPrice,
             };
 
             await _dbContext.ItemHistories.AddAsync(newItemHistory, cancellationToken);
@@ -56,6 +57,7 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
             itemHistory.Description = command.Description;
             itemHistory.WorkplaceId = command.WorkplaceId;
             itemHistory.DateFrom = command.DateFrom;
+            itemHistory.TransactionPrice = command.TransactionPrice;
 
             _dbContext.ItemHistories.Update(itemHistory);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -97,7 +99,7 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
 
         private async Task CheckWrokplaceAndItemDetailExistsAsync(Guid itemDetailId, Guid workplaceId, CancellationToken cancellationToken)
         {
-            var isItemDetailExit = await _itemDetailsQueryService.ItemDetailExistsAsync(itemDetailId, cancellationToken);
+            var isItemDetailExit = await _itemDetailsQueryService.IsItemDetailExistsAsync(itemDetailId, cancellationToken);
 
             if (!isItemDetailExit)
                 throw new NotFoundException("Item doesn't exist.");

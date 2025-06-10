@@ -98,7 +98,7 @@ namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
             return itemDetailsList;
         }
 
-        public async Task<bool> ItemDetailExistsAsync(Guid itemDetailId, CancellationToken cancellationToken)
+        public async Task<bool> IsItemDetailExistsAsync(Guid itemDetailId, CancellationToken cancellationToken)
         {
             return await _dbContext.ItemsDetail.AnyAsync(x => x.Id == itemDetailId, cancellationToken);
         }
