@@ -52,10 +52,6 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
                 newPurchaseSaleTransaction.ClientId = command.ClientId;
             }
-            else
-            {
-                newPurchaseSaleTransaction.ClientId = Guid.Empty;
-            }
 
             await _dbContext.PurchasesSaleTransaction.AddAsync(newPurchaseSaleTransaction, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);

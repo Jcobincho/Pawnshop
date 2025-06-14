@@ -1,4 +1,6 @@
-﻿using Pawnshop.Domain.Enums;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
+using Pawnshop.Domain.Enums;
 
 namespace Pawnshop.Domain.Entities.Transactions
 {
@@ -11,5 +13,16 @@ namespace Pawnshop.Domain.Entities.Transactions
         public string Description { get; set; }
         public Guid WorkplaceId { get; set; }
         public Workplace Workplace { get; set; }
+    }
+
+    public class PurchaseSaleTransactionrConfiguration : IEntityTypeConfiguration<PurchaseSaleTransaction>
+    {
+        public void Configure(EntityTypeBuilder<PurchaseSaleTransaction> builder)
+        {
+            builder.HasOne(u => u.Client)
+                   .WithMany()
+                   .HasForeignKey(u => u.ClientId)
+                   .IsRequired(false);
+        }
     }
 }
