@@ -34,7 +34,7 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Consumers
                     {
                         ItemDetailId = message.ItemDetailId,
                         Description = message.Description,
-                        WorkplaceId = document.Id,
+                        WorkplaceId = document.WorkplaceId,
                         DateFrom = DateTime.Now,
                         TransactionPrice = message.ItemPrice
                     };
