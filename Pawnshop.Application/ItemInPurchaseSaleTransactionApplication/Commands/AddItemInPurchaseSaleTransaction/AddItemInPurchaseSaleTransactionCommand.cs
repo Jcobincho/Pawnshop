@@ -17,11 +17,11 @@ namespace Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Commands
 
         // DATA TO ITEM HISTORY
         public bool AddItemHistory { get; set; } = false;
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         // DATA TO ITEM VALUATION
         public bool AddItemValuation { get; set; } = false;
-        public float ItemValuationPrice { get; set; }
-        public string Justification { get; set; }
+        public float ItemValuationPrice { get; set; } = 0;
+        public string Justification { get; set; } = string.Empty;
     }
 }

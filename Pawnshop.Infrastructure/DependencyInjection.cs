@@ -33,6 +33,8 @@ using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Se
 using Pawnshop.Application.Common.Behaviors;
 using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Interfaces;
 using Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastructure.Services;
+using Pawnshop.Application.ItemHistoriesApplication.Producers;
+using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Producers;
 
 namespace Pawnshop.Infrastructure;
 
@@ -42,7 +44,9 @@ public static class DependencyInjection
     {
         services.DatabaseConfiguration(configuration);
         services.AuthorizationSettings(configuration);
-        
+        services.AddMassTransitWithRabbitMq(configuration);
+
+
         services.AddScoped<SignInManager<Users>>();
         services.AddScoped<UserManager<Users>>();
 
@@ -64,6 +68,9 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         // Interfaces Dependency Injection
+
+        // MassTransit create item history with valuation
+        services.AddScoped<IItemHistoryEventPublisher, ItemHistoryEventPublisher>();
 
         // Item in purchase and sale transaction service
         services.AddScoped<IItemInPurchaseSaleTransactionCommandService, ItemInPurchaseSaleTransactionService>();
