@@ -45,6 +45,7 @@ public static class DependencyInjection
         services.DatabaseConfiguration(configuration);
         services.AuthorizationSettings(configuration);
         services.AddMassTransitWithRabbitMq(configuration);
+        services.AddFileStorageConfiguration(configuration);
 
 
         services.AddScoped<SignInManager<Users>>();
