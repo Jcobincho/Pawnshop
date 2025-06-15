@@ -1,4 +1,5 @@
-﻿using Pawnshop.Domain.Entities.Transactions;
+﻿using Pawnshop.Application.WorkplacesApplication.Dto.DtoExtension;
+using Pawnshop.Domain.Entities.Transactions;
 
 namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtension
 {
@@ -11,6 +12,7 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtens
                 TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction,
                 TransactionDate = purchaseSaleTransaction.TransactionDate,
                 Description = purchaseSaleTransaction.Description,
+                Workplace = purchaseSaleTransaction.Workplace.WorkplaceParseToDto(),
                 CreatedAt = purchaseSaleTransaction.CreatedAt,
                 CreatedBy = purchaseSaleTransaction.CreatedBy,
                 EditedAt = purchaseSaleTransaction.EditedAt,
@@ -25,6 +27,7 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtens
                 TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction,
                 TransactionDate = purchaseSaleTransaction.TransactionDate,
                 Description = purchaseSaleTransaction.Description,
+                Workplace = purchaseSaleTransaction.Workplace.WorkplaceParseToDto(),
                 CreatedAt = purchaseSaleTransaction.CreatedAt,
                 CreatedBy = purchaseSaleTransaction.CreatedBy,
                 EditedAt = purchaseSaleTransaction.EditedAt,

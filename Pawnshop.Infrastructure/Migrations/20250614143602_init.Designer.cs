@@ -12,7 +12,7 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250514202530_init")]
+    [Migration("20250614143602_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -445,6 +445,9 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
+                    b.Property<float>("TransactionPrice")
+                        .HasColumnType("real");
+
                     b.Property<Guid>("WorkplaceId")
                         .HasColumnType("uuid");
 
@@ -768,18 +771,20 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.Property<float>("TotalPrice")
-                        .HasColumnType("real");
-
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TypeOfTransaction")
                         .HasColumnType("integer");
 
+                    b.Property<Guid>("WorkplaceId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
+
+                    b.HasIndex("WorkplaceId");
 
                     b.ToTable("PurchasesSaleTransaction");
                 });
@@ -1095,7 +1100,15 @@ namespace Pawnshop.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("ClientId");
 
+                    b.HasOne("Pawnshop.Domain.Entities.Workplace", "Workplace")
+                        .WithMany()
+                        .HasForeignKey("WorkplaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Client");
+
+                    b.Navigation("Workplace");
                 });
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.UserRefreshToken", b =>

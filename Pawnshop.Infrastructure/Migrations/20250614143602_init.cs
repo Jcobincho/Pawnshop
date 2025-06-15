@@ -184,32 +184,6 @@ namespace Pawnshop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PurchasesSaleTransaction",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TypeOfTransaction = table.Column<int>(type: "integer", nullable: false),
-                    TransactionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TotalPrice = table.Column<float>(type: "real", nullable: false),
-                    ClientId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PurchasesSaleTransaction", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PurchasesSaleTransaction_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -265,6 +239,38 @@ namespace Pawnshop.Infrastructure.Migrations
                         name: "FK_ItemsDetail_ItemCategories_ItemCategoryId",
                         column: x => x.ItemCategoryId,
                         principalTable: "ItemCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PurchasesSaleTransaction",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TypeOfTransaction = table.Column<int>(type: "integer", nullable: false),
+                    TransactionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    WorkplaceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchasesSaleTransaction", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PurchasesSaleTransaction_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PurchasesSaleTransaction_Workplaces_WorkplaceId",
+                        column: x => x.WorkplaceId,
+                        principalTable: "Workplaces",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -437,6 +443,7 @@ namespace Pawnshop.Infrastructure.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     WorkplaceId = table.Column<Guid>(type: "uuid", nullable: false),
                     DateFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TransactionPrice = table.Column<float>(type: "real", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -456,37 +463,6 @@ namespace Pawnshop.Infrastructure.Migrations
                         name: "FK_ItemHistories_Workplaces_WorkplaceId",
                         column: x => x.WorkplaceId,
                         principalTable: "Workplaces",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ItemsInPurchaseSaleTransaction",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PurchaseSaleTransactionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ItemDetailId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ItemPrice = table.Column<float>(type: "real", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ItemsInPurchaseSaleTransaction", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ItemsInPurchaseSaleTransaction_ItemsDetail_ItemDetailId",
-                        column: x => x.ItemDetailId,
-                        principalTable: "ItemsDetail",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ItemsInPurchaseSaleTransaction_PurchasesSaleTransaction_Pur~",
-                        column: x => x.PurchaseSaleTransactionId,
-                        principalTable: "PurchasesSaleTransaction",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -519,6 +495,37 @@ namespace Pawnshop.Infrastructure.Migrations
                         name: "FK_PawnItems_PawnAgreements_PawnAgreementId",
                         column: x => x.PawnAgreementId,
                         principalTable: "PawnAgreements",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ItemsInPurchaseSaleTransaction",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PurchaseSaleTransactionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ItemDetailId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ItemPrice = table.Column<float>(type: "real", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ItemsInPurchaseSaleTransaction", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ItemsInPurchaseSaleTransaction_ItemsDetail_ItemDetailId",
+                        column: x => x.ItemDetailId,
+                        principalTable: "ItemsDetail",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ItemsInPurchaseSaleTransaction_PurchasesSaleTransaction_Pur~",
+                        column: x => x.PurchaseSaleTransactionId,
+                        principalTable: "PurchasesSaleTransaction",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -650,6 +657,11 @@ namespace Pawnshop.Infrastructure.Migrations
                 name: "IX_PurchasesSaleTransaction_ClientId",
                 table: "PurchasesSaleTransaction",
                 column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchasesSaleTransaction_WorkplaceId",
+                table: "PurchasesSaleTransaction",
+                column: "WorkplaceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRefreshToken_UsersId",

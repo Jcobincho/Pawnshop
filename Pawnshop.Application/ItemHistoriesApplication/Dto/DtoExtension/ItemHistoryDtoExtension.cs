@@ -14,6 +14,7 @@ namespace Pawnshop.Application.ItemHistoriesApplication.Dto.DtoExtension
                 Description = itemHistory.Description,
                 Workplace = itemHistory.Workplace.WorkplaceParseToDto(),
                 DateFrom = itemHistory.DateFrom,
+                TransactionPrice = itemHistory.TransactionPrice,
                 CreatedAt = itemHistory.CreatedAt,
                 CreatedBy = itemHistory.CreatedBy,
                 EditedAt = itemHistory.EditedAt,
