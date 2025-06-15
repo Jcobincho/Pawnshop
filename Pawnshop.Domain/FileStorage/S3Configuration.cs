@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pawnshop.Domain.FileStorage
+﻿namespace Pawnshop.Domain.FileStorage
 {
-    internal class S3Configuration
+    public class S3Configuration
     {
+        public string S3Url { get; set; }
+        public string AccessKey { get; set; }
+        public string SecretKey { get; set; }
+        public string BucketName { get; set; }
     }
 }
