@@ -28,7 +28,7 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
 
         public async Task<Guid> AddItemHistoryAsync(AddItemHistoryCommand command, CancellationToken cancellationToken)
         {
-            await CheckWrokplaceAndItemDetailExistsAsync(command.ItemDetailId, command.WorkplaceId, cancellationToken);
+            await CheckWorkplaceAndItemDetailExistsAsync(command.ItemDetailId, command.WorkplaceId, cancellationToken);
 
             var newItemHistory = new ItemHistory
             {
@@ -48,7 +48,7 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
 
         public async Task UpdateItemHistoryAsync(UpdateItemHistoryCommand command, CancellationToken cancellationToken)
         {
-            await CheckWrokplaceAndItemDetailExistsAsync(command.ItemDetailId, command.WorkplaceId, cancellationToken);
+            await CheckWorkplaceAndItemDetailExistsAsync(command.ItemDetailId, command.WorkplaceId, cancellationToken);
 
             var itemHistory = await GetItemHistoryByIdAsync(command.ItemHistoryId, cancellationToken);
 
@@ -96,8 +96,12 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
             return itemHistories;
         }
 
+        public async Task<bool> IsItemHistoryExistAsync(Guid itemHistoryId, CancellationToken cancellationToken)
+        {
+            return await _dbContext.ItemHistories.AnyAsync(x => x.Id == itemHistoryId, cancellationToken);
+        }
 
-        private async Task CheckWrokplaceAndItemDetailExistsAsync(Guid itemDetailId, Guid workplaceId, CancellationToken cancellationToken)
+        private async Task CheckWorkplaceAndItemDetailExistsAsync(Guid itemDetailId, Guid workplaceId, CancellationToken cancellationToken)
         {
             var isItemDetailExit = await _itemDetailsQueryService.IsItemDetailExistsAsync(itemDetailId, cancellationToken);
 
@@ -106,13 +110,8 @@ namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
 
             var isWorkplaceExist = await _workplacesQueryService.WorkplaceExistsAsync(workplaceId, cancellationToken);
 
-            if(!isWorkplaceExist)
+            if (!isWorkplaceExist)
                 throw new NotFoundException("Workplace doesn't exist.");
-        }
-
-        public async Task<bool> IsItemHistoryExistAsync(Guid itemHistoryId, CancellationToken cancellationToken)
-        {
-            return await _dbContext.ItemHistories.AnyAsync(x => x.Id == itemHistoryId, cancellationToken);
         }
     }
 }

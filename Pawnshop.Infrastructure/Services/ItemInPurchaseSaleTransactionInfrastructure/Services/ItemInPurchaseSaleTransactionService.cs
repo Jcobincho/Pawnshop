@@ -1,5 +1,6 @@
 ﻿using Pawnshop.Application.ItemDetailsApplication.Interfaces;
 using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Commands.AddItemInPurchaseSaleTransaction;
+using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Commands.DeleteItemInPurchaseSaleTransaction;
 using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Domain.Entities.Transactions;
@@ -35,6 +36,24 @@ namespace Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastr
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return itemInPurchaseSaleTransaction.Id;
+        }
+
+        public async Task DeleteItemInPurchaseSaleTransactionAsync(DeleteItemInPurchaseSaleTransactionCommand command, CancellationToken cancellationToken)
+        {
+            var itemInTransaction = await GetItemInPurchaseSaleTransactionAsync(command.ItemInPurchaseSaleTransactionId, cancellationToken);
+
+            _dbContext.ItemsInPurchaseSaleTransaction.Remove(itemInTransaction);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<ItemInPurchaseSaleTransaction> GetItemInPurchaseSaleTransactionAsync(Guid ItemInPurchaseSaleTransactionId, CancellationToken cancellationToken)
+        {
+            var itemInPurchaseSaleTransaction = await _dbContext.ItemsInPurchaseSaleTransaction.FindAsync(ItemInPurchaseSaleTransactionId, cancellationToken);
+
+            if (itemInPurchaseSaleTransaction == null)
+                throw new NotFoundException("Item in transaction doesn't exist.");
+
+            return itemInPurchaseSaleTransaction;
         }
 
         private async Task IsItemDetailAndPurchaseSaleTransactionExistAsync(Guid purchaseSaleTransactionId, Guid ItemDetailId, CancellationToken cancellationToken)
