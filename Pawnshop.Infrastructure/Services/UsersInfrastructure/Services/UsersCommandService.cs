@@ -1,5 +1,4 @@
-﻿using FluentValidation.Internal;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Commands.CreateUser;
@@ -7,8 +6,6 @@ using Pawnshop.Application.UsersApplication.Commands.EditUser;
 using Pawnshop.Application.UsersApplication.Commands.LoginUser;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
-using Pawnshop.Application.UsersApplication.Dto;
-using Pawnshop.Application.UsersApplication.Dto.DtoExtension;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.AuthTokens;
 using Pawnshop.Domain.Entities;
@@ -18,20 +15,19 @@ using System.Security.Claims;
 
 namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
 {
-    internal sealed class UsersService : IUsersCommandService, IUsersQueryService
+    internal sealed class UsersCommandService : IUsersCommandService
     {
-
         private readonly DbContext _dbContext;
         private readonly SignInManager<Users> _signInManager;
         private readonly UserManager<Users> _userManager;
         private readonly IJsonWebTokenService _jsonWebTokenService;
 
-        public UsersService(DbContext dbContext, SignInManager<Users> signInManager, UserManager<Users> userManager, IJsonWebTokenService jsonWebTokenService)
+        public UsersCommandService(IJsonWebTokenService jsonWebTokenService, UserManager<Users> userManager, SignInManager<Users> signInManager, DbContext dbContext)
         {
-            _dbContext = dbContext;
-            _signInManager = signInManager;
-            _userManager = userManager;
             _jsonWebTokenService = jsonWebTokenService;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _dbContext = dbContext;
         }
 
         public async Task<Guid> CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken)
@@ -48,11 +44,11 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
                 Email = command.Email
             };
 
-            if(command.EmployeeId != Guid.Empty)
+            if (command.EmployeeId != Guid.Empty)
             {
                 bool isEmployeeExists = await _dbContext.Employees.AnyAsync(x => x.Id == command.EmployeeId, cancellationToken);
 
-                if(isEmployeeExists)
+                if (isEmployeeExists)
                 {
                     newUser.EmployeesId = command.EmployeeId;
                 }
@@ -63,23 +59,22 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             if (!createUser.Succeeded) throw new CreateUserException(createUser.Errors);
 
             IdentityResult addUserRoles;
-
             List<string> userRolesToAdd = new();
 
-            if(command.UserRoles.Any())
-            { 
-                foreach(var role in command.UserRoles)
+            if (command.UserRoles.Any())
+            {
+                foreach (var role in command.UserRoles)
                 {
                     bool isRoleValid = UserRoles.GetRoles().Any(x => x.Name == role);
 
-                    if(isRoleValid)
+                    if (isRoleValid)
                     {
                         userRolesToAdd.Add(role);
                     }
                 }
             }
 
-            if(userRolesToAdd.Any())
+            if (userRolesToAdd.Any())
             {
                 addUserRoles = await _userManager.AddToRolesAsync(newUser, userRolesToAdd);
 
@@ -99,14 +94,14 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
         {
             var user = await _userManager.FindByNameAsync(command.Username);
 
-            if(user == null) 
+            if (user == null)
                 throw new NotFoundException("Login or password incorrect.");
 
             var passwordVerification = await _signInManager.CheckPasswordSignInAsync(user, command.Password, true);
 
-            if(!passwordVerification.Succeeded)
+            if (!passwordVerification.Succeeded)
                 throw new NotFoundException("Login or password incorrect.");
-            
+
 
             var userRoles = await _userManager.GetRolesAsync(user);
             var userClaims = await _userManager.GetClaimsAsync(user);
@@ -159,7 +154,7 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
         {
             var user = await _userManager.Users.Include(x => x.RefreshToken)
                                                   .SingleOrDefaultAsync(x => x.Id == command.UserIdFromClaims, cancellationToken);
-                                                
+
 
             if (user == null)
             {
@@ -169,12 +164,11 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             var token = user.RefreshToken.FirstOrDefault(x => x.Token == command.RefreshToken);
 
             if (token is null) throw new NotFoundException("Invalid refresh token.");
-            
+
 
             user.DeleteRefreshToken(token);
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
             await _signInManager.SignOutAsync();
         }
 
@@ -246,41 +240,11 @@ namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<List<GetAllUsersDto>> GetAllUsersAsync(CancellationToken cancellationToken)
-        {
-            var users = await _userManager.Users
-                .Include(u => u.Employee)
-                .ToListAsync(cancellationToken);
-
-            var userRoles = await _dbContext.UserRoles
-                .Join(
-                    _dbContext.Roles,
-                    ur => ur.RoleId,
-                    r => r.Id,
-                    (ur, r) => new { ur.UserId, RoleName = r.Name }
-                )
-                .GroupBy(ur => ur.UserId)
-                .ToDictionaryAsync(
-                    g => g.Key,
-                    g => g.Select(ur => ur.RoleName).ToList(),
-                    cancellationToken
-                );
-
-            var result = users.Select(user =>
-            {
-                var dto = user.UserPraseToDto();
-                dto.Roles = userRoles.GetValueOrDefault(user.Id) ?? new List<string>();
-                return dto;
-            }).ToList();
-
-            return result;
-        }
-
         public async Task UpdateEmployeeIdentifierAsync(Guid employeeId, CancellationToken cancellationToken)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.EmployeesId == employeeId, cancellationToken);
 
-            if(user != null)
+            if (user != null)
             {
                 user.EmployeesId = employeeId;
 

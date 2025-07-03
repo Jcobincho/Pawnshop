@@ -1,26 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Pawnshop.Application.ItemHistoriesApplication.Interfaces;
+﻿using Pawnshop.Application.ItemHistoriesApplication.Interfaces;
 using Pawnshop.Application.ItemValuationsApplication.Commands.AddItemValuation;
 using Pawnshop.Application.ItemValuationsApplication.Commands.DeleteItemValuation;
 using Pawnshop.Application.ItemValuationsApplication.Commands.UpdateItemValuation;
-using Pawnshop.Application.ItemValuationsApplication.Dto;
-using Pawnshop.Application.ItemValuationsApplication.Dto.DtoExtension;
 using Pawnshop.Application.ItemValuationsApplication.Interfaces;
-using Pawnshop.Application.ItemValuationsApplication.Queries.GetItemValuationForItemHistory;
 using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.ItemValuationsInfrastructure.Services
 {
-    internal sealed class ItemValuationsService : IItemValuationsCommandService, IItemValuationsQueryService
+    internal sealed class ItemValuationsCommandService : IItemValuationsCommandService
     {
         private readonly DbContext _dbContext;
         private readonly IItemHistoriesQueryService _itemHistoriesQueryService;
+        private readonly IItemValuationsQueryService _itemValuationsQueryService;
 
-        public ItemValuationsService(DbContext dbContext, IItemHistoriesQueryService itemHistoriesQueryService)
+        public ItemValuationsCommandService(DbContext dbContext, IItemHistoriesQueryService itemHistoriesQueryService, IItemValuationsQueryService itemValuationsQueryService)
         {
             _dbContext = dbContext;
             _itemHistoriesQueryService = itemHistoriesQueryService;
+            _itemValuationsQueryService = itemValuationsQueryService;
         }
 
         public async Task<Guid> AddItemValuationAsync(AddItemValuationCommand command, CancellationToken cancellationToken)
@@ -46,7 +49,7 @@ namespace Pawnshop.Infrastructure.Services.ItemValuationsInfrastructure.Services
 
         public async Task UpdateItemValuationAsync(UpdateItemValuationCommand command, CancellationToken cancellationToken)
         {
-            var itemValuation = await GetItemValuationByIdAsync(command.ItemValuationId, cancellationToken);
+            var itemValuation = await _itemValuationsQueryService.GetItemValuationByIdAsync(command.ItemValuationId, cancellationToken);
 
             var isItemHistoryExist = await _itemHistoriesQueryService.IsItemHistoryExistAsync(command.ItemHistoryId, cancellationToken);
 
@@ -64,34 +67,10 @@ namespace Pawnshop.Infrastructure.Services.ItemValuationsInfrastructure.Services
 
         public async Task DeleteItemValuationAsync(DeleteItemValuationCommand command, CancellationToken cancellationToken)
         {
-            var itemValuation = await GetItemValuationByIdAsync(command.ItemValuationId, cancellationToken);
+            var itemValuation = await _itemValuationsQueryService.GetItemValuationByIdAsync(command.ItemValuationId, cancellationToken);
 
             _dbContext.ItemsValuation.Remove(itemValuation);
             await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task<ItemValuation> GetItemValuationByIdAsync(Guid itemValuationId, CancellationToken cancellationToken)
-        {
-            var itemValuation = await _dbContext.ItemsValuation.FindAsync(itemValuationId, cancellationToken);
-
-            if (itemValuation == null)
-                throw new NotFoundException("Item valuation doesn't exist.");
-
-            return itemValuation;
-        }
-
-        public async Task<List<ItemValuationForItemHistoryDto>> GetItemValuationForItemHistoryAsync(GetItemValuationForItemHistoryQuery query, CancellationToken cancellationToken)
-        {
-            var itemValuation = await _dbContext.ItemsValuation
-                .Where(valuation => valuation.ItemHistoryId == query.ItemHistoryId)
-                .OrderByDescending(valuation => valuation.ValuationOnDate)
-                .Select(valuation => valuation.ItemValuationForItemHistoryParseToDto())
-                .ToListAsync(cancellationToken);
-
-            if (itemValuation == null)
-                throw new NotFoundException("Item valuations doesn't exist.");
-
-            return itemValuation;
         }
     }
 }

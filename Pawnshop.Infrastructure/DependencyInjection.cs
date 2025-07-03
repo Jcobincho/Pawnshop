@@ -74,48 +74,48 @@ public static class DependencyInjection
         services.AddScoped<IItemHistoryEventPublisher, ItemHistoryEventPublisher>();
 
         // Item in purchase and sale transaction service
-        services.AddScoped<IItemInPurchaseSaleTransactionCommandService, ItemInPurchaseSaleTransactionService>();
-        services.AddScoped<IItemInPurchaseSaleTransactionQueryService, ItemInPurchaseSaleTransactionService>();
+        services.AddScoped<IItemInPurchaseSaleTransactionCommandService, ItemInPurchaseSaleTransactionCommandService>();
+        services.AddScoped<IItemInPurchaseSaleTransactionQueryService, ItemInPurchaseSaleTransactionQueryService>();
 
         // Purchase and sale transactions services
-        services.AddScoped<IPurchasesSaleTransactionCommandService, PurchasesSaleTransactionService>();
-        services.AddScoped<IPurchasesSaleTransactionQueryService, PurchasesSaleTransactionService>();
+        services.AddScoped<IPurchasesSaleTransactionCommandService, PurchasesSaleTransactionCommandService>();
+        services.AddScoped<IPurchasesSaleTransactionQueryService, PurchasesSaleTransactionQueryService>();
 
         // Item valuation services
-        services.AddScoped<IItemValuationsCommandService, ItemValuationsService>();
-        services.AddScoped<IItemValuationsQueryService, ItemValuationsService>();
+        services.AddScoped<IItemValuationsCommandService, ItemValuationsCommandService>();
+        services.AddScoped<IItemValuationsQueryService, ItemValuationsQueryService>();
 
         // Item history services
-        services.AddScoped<IItemHistoriesCommandService, ItemHistoriesService>();
-        services.AddScoped<IItemHistoriesQueryService, ItemHistoriesService>();
+        services.AddScoped<IItemHistoriesCommandService, ItemHistoriesCommandService>();
+        services.AddScoped<IItemHistoriesQueryService, ItemHistoriesQueryService>();
 
         // CompanyEmail services
-        services.AddScoped<ICompanyEmailsCommandService, CompanyEmailsService>();
-        services.AddScoped<ICompanyEmailsQueryService, CompanyEmailsService>();
+        services.AddScoped<ICompanyEmailsCommandService, CompanyEmailsCommandService>();
+        services.AddScoped<ICompanyEmailsQueryService, CompanyEmailsQueryService>();
 
         // Itemdetails service
-        services.AddScoped<IItemDetailsCommandService, ItemDetailsService>();
-        services.AddScoped<IItemDetailsQueryService, ItemDetailsService>();
+        services.AddScoped<IItemDetailsCommandService, ItemDetailsCommandService>();
+        services.AddScoped<IItemDetailsQueryService, ItemDetailsQueryService>();
 
         // Workplaces service
-        services.AddScoped<IWorkplacesCommandService, WorkplacesService>();
-        services.AddScoped<IWorkplacesQueryService, WorkplacesService>();
+        services.AddScoped<IWorkplacesCommandService, WorkplacesCommandService>();
+        services.AddScoped<IWorkplacesQueryService, WorkplacesQueryService>();
 
         // Clients services
-        services.AddScoped<IClientsCommandService, ClientsService>();
-        services.AddScoped<IClientsQueryService, ClientsService>();
+        services.AddScoped<IClientsCommandService, ClientsCommandService>();
+        services.AddScoped<IClientsQueryService, ClientsQueryService>();
 
         // Users services
-        services.AddScoped<IUsersCommandService, UsersService>();
-        services.AddScoped<IUsersQueryService, UsersService>();
+        services.AddScoped<IUsersCommandService, UsersCommandService>();
+        services.AddScoped<IUsersQueryService, UsersQueryService>();
 
         // Employees services
-        services.AddScoped<IEmployeesCommandService, EmployeesService>();
-        services.AddScoped<IEmployeesQueryService, EmployeesService>();
+        services.AddScoped<IEmployeesCommandService, EmployeesCommandService>();
+        services.AddScoped<IEmployeesQueryService, EmployeesQueryService>();
 
         //ItemCategories services
-        services.AddScoped<IItemCaterogoriesCommandService, ItemCategoriesService>();
-        services.AddScoped<IItemCategoriesQueryService, ItemCategoriesService>();
+        services.AddScoped<IItemCaterogoriesCommandService, ItemCaterogoriesCommandService>();
+        services.AddScoped<IItemCategoriesQueryService, ItemCategoriesQueryService>();
 
         // JsonWebToken service
         services.AddScoped<IJsonWebTokenService, JsonWebTokenService>();

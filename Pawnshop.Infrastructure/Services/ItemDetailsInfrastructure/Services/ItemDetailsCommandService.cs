@@ -1,25 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
+﻿using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
 using Pawnshop.Application.ItemDetailsApplication.Commands.AddItemDetail;
 using Pawnshop.Application.ItemDetailsApplication.Commands.DeleteItemDetail;
 using Pawnshop.Application.ItemDetailsApplication.Commands.UpdateItemDetail;
-using Pawnshop.Application.ItemDetailsApplication.Dto;
-using Pawnshop.Application.ItemDetailsApplication.Dto.DtoExtension;
 using Pawnshop.Application.ItemDetailsApplication.Interfaces;
 using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
 {
-    internal sealed class ItemDetailsService : IItemDetailsCommandService, IItemDetailsQueryService
+    internal sealed class ItemDetailsCommandService : IItemDetailsCommandService
     {
         private readonly DbContext _dbContext;
         private readonly IItemCategoriesQueryService _itemCategoriesQueryService;
+        private readonly IItemDetailsQueryService _itemDetailsQueryService;
 
-        public ItemDetailsService(DbContext dbContext, IItemCategoriesQueryService itemCategoriesQueryService)
+        public ItemDetailsCommandService(DbContext dbContext, IItemCategoriesQueryService itemCategoriesQueryService, IItemDetailsQueryService itemDetailsQueryService)
         {
             _dbContext = dbContext;
             _itemCategoriesQueryService = itemCategoriesQueryService;
+            _itemDetailsQueryService = itemDetailsQueryService;
         }
 
         public async Task<Guid> AddItemDetailAsync(AddItemDetailsCommand command, CancellationToken cancellationToken)
@@ -57,7 +61,7 @@ namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
                 throw new NotFoundException("Category doesn't exist.");
             }
 
-            var item = await GetItemDetailByIdAsync(command.UpdateItemId, cancellationToken);
+            var item = await _itemDetailsQueryService.GetItemDetailByIdAsync(command.UpdateItemId, cancellationToken);
 
             item.Name = command.Name;
             item.ItemCategoryId = command.ItemCategoryId;
@@ -73,34 +77,10 @@ namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
 
         public async Task DeleteItemDetailAsync(DeleteItemDetailCommand command, CancellationToken cancellationToken)
         {
-            var item = await GetItemDetailByIdAsync(command.ItemId, cancellationToken);
+            var item = await _itemDetailsQueryService.GetItemDetailByIdAsync(command.ItemId, cancellationToken);
 
             _dbContext.ItemsDetail.Remove(item);
             await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task<ItemDetail> GetItemDetailByIdAsync(Guid itemDetailId, CancellationToken cancellationToken)
-        {
-            var itemDetail = await _dbContext.ItemsDetail.FindAsync(itemDetailId, cancellationToken);
-
-            if(itemDetail == null)
-            {
-                throw new NotFoundException("Item doesn't exist.");
-            }
-
-            return itemDetail;
-        }
-
-        public async Task<List<ItemDetailDto>> GetAllItemDetailsAsDtoAsync(CancellationToken cancellationToken)
-        {
-            var itemDetailsList = await _dbContext.ItemsDetail.Select(x => x.ItemDetailParseToDto()).ToListAsync();
-
-            return itemDetailsList;
-        }
-
-        public async Task<bool> IsItemDetailExistsAsync(Guid itemDetailId, CancellationToken cancellationToken)
-        {
-            return await _dbContext.ItemsDetail.AnyAsync(x => x.Id == itemDetailId, cancellationToken);
         }
     }
 }

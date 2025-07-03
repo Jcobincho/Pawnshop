@@ -1,32 +1,35 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Pawnshop.Application.CompanyEmailsApplication.Commands.AddCompanyEmail;
+﻿using Pawnshop.Application.CompanyEmailsApplication.Commands.AddCompanyEmail;
 using Pawnshop.Application.CompanyEmailsApplication.Commands.DeleteCompanyEmail;
 using Pawnshop.Application.CompanyEmailsApplication.Commands.UpdateCompanyEmail;
-using Pawnshop.Application.CompanyEmailsApplication.Dto;
-using Pawnshop.Application.CompanyEmailsApplication.Dto.DtoExtension;
 using Pawnshop.Application.CompanyEmailsApplication.Interfaces;
 using Pawnshop.Application.CryptographyApplication.Interface;
 using Pawnshop.Domain.Entities.CompanyEmail;
-using Pawnshop.Domain.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services
 {
-    internal sealed class CompanyEmailsService : ICompanyEmailsCommandService, ICompanyEmailsQueryService
+    internal sealed class CompanyEmailsCommandService : ICompanyEmailsCommandService
     {
         private readonly DbContext _dbContext;
+        private readonly ICompanyEmailsQueryService _companyEmailsQueryService;
         private readonly ICryptographyService _cryptographyService;
 
-        public CompanyEmailsService(DbContext dbContext, ICryptographyService cryptographyService)
+        public CompanyEmailsCommandService(DbContext dbContext, ICompanyEmailsQueryService companyEmailsQueryService, ICryptographyService cryptographyService)
         {
             _dbContext = dbContext;
+            _companyEmailsQueryService = companyEmailsQueryService;
             _cryptographyService = cryptographyService;
         }
 
         public async Task<Guid> AddCompanyEmailAsync(AddCompanyEmailCommand command, CancellationToken cancellationToken)
         {
-            if(command.IsMainEmail == true)
+            if (command.IsMainEmail == true)
             {
-                await IsAnotherEmailPrimaryStatusAsync(cancellationToken);
+                await _companyEmailsQueryService.IsAnotherEmailPrimaryStatusAsync(cancellationToken);
             }
 
             string encryptedPassword = _cryptographyService.Encrypt(command.SmtpPassword);
@@ -49,17 +52,17 @@ namespace Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services
 
         public async Task UpdateCompanyEmailAsync(UpdateCompanyEmailCommand command, CancellationToken cancellationToken)
         {
-            var companyEmail = await GetCompanyEmailByIdAsync(command.CompanyEmailId, cancellationToken);
+            var companyEmail = await _companyEmailsQueryService.GetCompanyEmailByIdAsync(command.CompanyEmailId, cancellationToken);
 
-            if(command.IsMainEmail == true)
+            if (command.IsMainEmail == true)
             {
-                await IsAnotherEmailPrimaryStatusAsync(cancellationToken);
+                await _companyEmailsQueryService.IsAnotherEmailPrimaryStatusAsync(cancellationToken);
             }
 
             companyEmail.SmtpHost = command.SmtpHost;
             companyEmail.SmtpPort = command.SmtpPort;
             companyEmail.SmtpUser = command.SmtpUser;
-            if(!string.IsNullOrEmpty(command.SmtpPassword))
+            if (!string.IsNullOrEmpty(command.SmtpPassword))
             {
                 string encryptedPassword = _cryptographyService.Encrypt(command.SmtpPassword);
                 companyEmail.SmtpPassword = encryptedPassword;
@@ -73,39 +76,10 @@ namespace Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services
 
         public async Task DeleteCompanyEmailAsync(DeleteCompanyEmailCommand command, CancellationToken cancellationToken)
         {
-            var email = await GetCompanyEmailByIdAsync(command.CompanyEmailId, cancellationToken);
+            var email = await _companyEmailsQueryService.GetCompanyEmailByIdAsync(command.CompanyEmailId, cancellationToken);
 
             _dbContext.CompanyEmails.Remove(email);
             await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task IsAnotherEmailPrimaryStatusAsync(CancellationToken cancellationToken)
-        {
-            var email = await _dbContext.CompanyEmails.FirstOrDefaultAsync(x => x.IsMainEmail == true, cancellationToken);
-
-            if(email != null)
-            {
-                throw new BadRequestException($"You can't add another main email. Currently, this status is held by the email {email.Email}");
-            }
-        }
-
-        public async Task<CompanyEmail> GetCompanyEmailByIdAsync(Guid companyEmailId, CancellationToken cancellationToken)
-        {
-            var companyEmail = await _dbContext.CompanyEmails.FindAsync(companyEmailId, cancellationToken);
-
-            if (companyEmail == null)
-            {
-                throw new BadRequestException("Company E-mail doesn't exist.");
-            }
-
-            return companyEmail;
-        }
-
-        public async Task<List<CompanyEmailDto>> GetAllCompanyEmailsAsDtoAsync(CancellationToken cancellationToken)
-        {
-            var companyEmails = await _dbContext.CompanyEmails.Select(x => x.CompanyEmailParseToDto()).ToListAsync();
-
-            return companyEmails;
         }
     }
 }

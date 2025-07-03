@@ -5,20 +5,27 @@ using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Domain.Entities.Transactions;
 using Pawnshop.Domain.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastructure.Services
 {
-    internal sealed class ItemInPurchaseSaleTransactionService : IItemInPurchaseSaleTransactionCommandService, IItemInPurchaseSaleTransactionQueryService
+    internal sealed class ItemInPurchaseSaleTransactionCommandService : IItemInPurchaseSaleTransactionCommandService
     {
         private readonly DbContext _dbContext;
-        private readonly IPurchasesSaleTransactionQueryService _purchasesSaleTransactionQueryService;
+        private readonly IItemInPurchaseSaleTransactionQueryService _itemInPurchaseSaleTransactionQueryService;
         private readonly IItemDetailsQueryService _itemDetailsQueryService;
+        private readonly IPurchasesSaleTransactionQueryService _purchasesSaleTransactionQueryService;
 
-        public ItemInPurchaseSaleTransactionService(DbContext dbContext, IPurchasesSaleTransactionQueryService purchasesSaleTransactionQueryService, IItemDetailsQueryService itemDetailsQueryService)
+        public ItemInPurchaseSaleTransactionCommandService(DbContext dbContext, IItemInPurchaseSaleTransactionQueryService itemInPurchaseSaleTransactionQueryService, IItemDetailsQueryService itemDetailsQueryService, IPurchasesSaleTransactionQueryService purchasesSaleTransactionQueryService)
         {
             _dbContext = dbContext;
-            _purchasesSaleTransactionQueryService = purchasesSaleTransactionQueryService;
+            _itemInPurchaseSaleTransactionQueryService = itemInPurchaseSaleTransactionQueryService;
             _itemDetailsQueryService = itemDetailsQueryService;
+            _purchasesSaleTransactionQueryService = purchasesSaleTransactionQueryService;
         }
 
         public async Task<Guid> AddItemInPurchaseSaleTransactionAsync(AddItemInPurchaseSaleTransactionCommand command, CancellationToken cancellationToken)
@@ -40,20 +47,10 @@ namespace Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastr
 
         public async Task DeleteItemInPurchaseSaleTransactionAsync(DeleteItemInPurchaseSaleTransactionCommand command, CancellationToken cancellationToken)
         {
-            var itemInTransaction = await GetItemInPurchaseSaleTransactionAsync(command.ItemInPurchaseSaleTransactionId, cancellationToken);
+            var itemInTransaction = await _itemInPurchaseSaleTransactionQueryService.GetItemInPurchaseSaleTransactionAsync(command.ItemInPurchaseSaleTransactionId, cancellationToken);
 
             _dbContext.ItemsInPurchaseSaleTransaction.Remove(itemInTransaction);
             await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task<ItemInPurchaseSaleTransaction> GetItemInPurchaseSaleTransactionAsync(Guid ItemInPurchaseSaleTransactionId, CancellationToken cancellationToken)
-        {
-            var itemInPurchaseSaleTransaction = await _dbContext.ItemsInPurchaseSaleTransaction.FindAsync(ItemInPurchaseSaleTransactionId, cancellationToken);
-
-            if (itemInPurchaseSaleTransaction == null)
-                throw new NotFoundException("Item in transaction doesn't exist.");
-
-            return itemInPurchaseSaleTransaction;
         }
 
         private async Task IsItemDetailAndPurchaseSaleTransactionExistAsync(Guid purchaseSaleTransactionId, Guid ItemDetailId, CancellationToken cancellationToken)
@@ -64,7 +61,7 @@ namespace Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastr
                 throw new NotFoundException("Transaction document doesn't exist");
 
             var isItemDetailExist = await _itemDetailsQueryService.IsItemDetailExistsAsync(ItemDetailId, cancellationToken);
-             
+
             if (!isItemDetailExist)
                 throw new NotFoundException("Item doesn't exist");
         }
