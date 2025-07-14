@@ -1,0 +1,32 @@
+﻿@page "/ItemCategories-management-page"
+
+@using Pawnshop.Application.ItemCategoriesApplication.Dto
+@using Pawnshop.Web.Components.Common
+
+<UniversalCrudMenu IsItemSelected="@(currentItemCategory != null)" OnActionSelected="HandleCrudAction" />
+
+<ItemCategoriesManagmentGrid OnCategorySelected="HandleItemCategorySelected" @ref="itemCategoryGrid" />
+
+@if(showDetail)
+{
+    <ItemCategoriesManagmentDetail OnDetailCancel="HandleDetailCanceled" CurrentItemCategory="currentItemCategory" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
+}
+
+@code {
+    private ItemCategoryDto currentItemCategory = null;
+    private bool showDetail = false;
+    private UniversalCrudMenu.CrudAction selectedAction;
+    private ItemCategoriesManagmentGrid itemCategoryGrid;
+
+    private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
+    {
+        selectedAction = action;
+        showDetail = true;
+    }
+
+    private void HandleItemCategorySelected(ItemCategoryDto selectedItemCategory) => currentItemCategory = selectedItemCategory;
+
+    private void HandleDetailCanceled() => showDetail = false;
+
+    private async Task HandleCrudCompleted() => await itemCategoryGrid.ReloadDataAsync();
+}

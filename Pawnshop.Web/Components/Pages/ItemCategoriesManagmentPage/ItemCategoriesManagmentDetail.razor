@@ -1,0 +1,157 @@
+﻿@using Pawnshop.Application.ItemCategoriesApplication.Commands.AddItemCategory
+@using Pawnshop.Application.ItemCategoriesApplication.Commands.UpdateItemCategory
+@using Pawnshop.Application.ItemCategoriesApplication.Commands.DeleteItemCategory
+@using Pawnshop.Application.ItemCategoriesApplication.Dto
+@using Pawnshop.Application.ItemCategoriesApplication.Responses
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService
+
+<DetailModalOverlay>
+    <MudCard Class="w-50" Style="max-height: 75vh; overflow: auto;">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Item Category detail</MudText>
+
+                @if (apiExceptions != null)
+                {
+                    foreach (var error in apiExceptions)
+                    {
+                        <MudAlert Severity="Severity.Error" Class="mt-2">@error</MudAlert>
+                    }
+                }
+
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="@(CurrentItemCategory.Name)"
+                          Label="Name"
+                          Variant="Variant.Outlined"
+                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+            <MudTextField @bind-Value="@(CurrentItemCategory.Description)"
+                          Label="Description"
+                          Variant="Variant.Outlined"
+                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+        </MudCardContent>
+        <MudCardActions Class="gap-2 justify-content-end">
+
+            @if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudAddHandler">Add</MudButton>
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudUpdateHandler">Update</MudButton>
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudDeleteHandler">Delete</MudButton>
+            }
+
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="HandleDetailCancel">Cancel</MudButton>
+
+        </MudCardActions>
+    </MudCard>
+</DetailModalOverlay>
+
+
+@code {
+    [Parameter]
+    public ItemCategoryDto CurrentItemCategory { get; set; }
+
+    [Parameter]
+    public UniversalCrudMenu.CrudAction SelectedAction { get; set; }
+
+    [Parameter]
+    public EventCallback OnCrudCompleted { get; set; }
+
+    [Parameter]
+    public EventCallback OnDetailCancel { get; set; }
+
+    private List<string> apiExceptions = null;
+    
+    protected override void OnParametersSet()
+    {
+        if (CurrentItemCategory == null || SelectedAction == UniversalCrudMenu.CrudAction.Add)
+        {
+            CurrentItemCategory = new ItemCategoryDto
+                {
+                    Name = string.Empty,
+                    Description = string.Empty
+                };
+        }
+    }
+
+    private async Task HandleDetailCancel()
+    {
+        await OnDetailCancel.InvokeAsync();
+    }
+
+    private async Task CrudAddHandler()
+    {
+        try
+        {
+            AddItemCategoryCommand newCategory = new AddItemCategoryCommand()
+                {
+                    Name = CurrentItemCategory.Name,
+                    Description = CurrentItemCategory.Description
+                };
+
+            AddItemCategoryResponse addCategoryResponse = await ApiService.PostAsync<AddItemCategoryCommand, AddItemCategoryResponse>("/controller/add", newCategory);
+
+            await CrudCompleted();
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+
+    private async Task CrudUpdateHandler()
+    {
+        try
+        {
+            UpdateItemCategoryCommand updatedCategory = new UpdateItemCategoryCommand()
+                {
+                    ItemCategoryId = CurrentItemCategory.ItemCategoryId,
+                    Name = CurrentItemCategory.Name,
+                    Description = CurrentItemCategory.Description
+                };
+
+            UpdateItemCategoryResponse updatedItemCategoryResponse = await ApiService.PutAsync<UpdateItemCategoryCommand, UpdateItemCategoryResponse>("/controller/update", updatedCategory);
+
+            await CrudCompleted();
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+
+    private async Task CrudDeleteHandler()
+    {
+        try
+        {
+            DeleteItemCategoryCommand deleteItemCategory = new DeleteItemCategoryCommand()
+                {
+                    CategoryId = CurrentItemCategory.ItemCategoryId
+                };
+
+            DeleteItemCategoryResponse deleteItemCategoryResponse = await ApiService.DeleteAsync<DeleteItemCategoryCommand, DeleteItemCategoryResponse>("/controller/delete", deleteItemCategory);
+
+            await CrudCompleted();
+        }
+        catch (ApiException ex)
+        {
+            apiExceptions = ex.ErrorMessages;
+        }
+    }
+    private async Task CrudCompleted()
+    {
+        await HandleDetailCancel();
+        await OnCrudCompleted.InvokeAsync();
+    }
+}
