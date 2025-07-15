@@ -6,6 +6,7 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto
 {
     public class PurchasesTransactionDto : BaseDto
     {
+        public string Symbol { get; set; }
         public TypeOfTransactionEnum TypeOfTransaction { get; set; }
         public DateTime TransactionDate { get; set; }
         public string Description { get; set; }

@@ -1,0 +1,24 @@
+﻿<html>
+    <head>
+        <title> Purchase agreement </title>
+    </head>
+
+    <body>
+        <h1> Agreement </h1>
+        <table>
+            <tr>
+                <th> Item name </th>
+                <th> Item price </th>
+            </tr>
+
+            {{#each ListItem}}
+            <tr>
+                <td> {{ItemName}} </td>
+                <td> {{formatCurrency ItemPrice}} </td>
+            </tr>
+            {{/each}}
+        </table>
+
+        <p><strong> Total: {{formatCurrency Total}} </strong></p>
+    </body>
+</html>

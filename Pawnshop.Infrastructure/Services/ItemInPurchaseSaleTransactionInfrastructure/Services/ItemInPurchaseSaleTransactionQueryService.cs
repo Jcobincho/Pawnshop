@@ -1,13 +1,12 @@
-﻿using Pawnshop.Application.ItemDetailsApplication.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Pawnshop.Application.ItemDetailsApplication.Dto;
+using Pawnshop.Application.ItemDetailsApplication.Interfaces;
+using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Dto;
+using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Dto.DtoExtension;
 using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Domain.Entities.Transactions;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastructure.Services
 {
@@ -28,6 +27,18 @@ namespace Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastr
                 throw new NotFoundException("Item in transaction doesn't exist.");
 
             return itemInPurchaseSaleTransaction;
+        }
+
+        public async Task<List<ItemInPurchaseSaleTransactionDto>> GetItemsForPurchaseSaleTransactionAsync(Guid purchaseSaleTransactionId, CancellationToken cancellationToken)
+        {
+            var items = await _dbContext.ItemsInPurchaseSaleTransaction
+                                        .Where(x => x.PurchaseSaleTransactionId == purchaseSaleTransactionId)
+                                        .Include(x => x.ItemDetail)
+                                            .ThenInclude(x => x.ItemCategory)
+                                        .Select(x => x.ItemInPurchaseSaleTransactionParseToDto())
+                                        .ToListAsync(cancellationToken);
+
+            return items;
         }
     }
 }

@@ -92,5 +92,20 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
         {
             return await _dbContext.PurchasesSaleTransaction.AnyAsync(x => x.Id == purchaseSaleTransactionId, cancellationToken);
         }
+
+        public async Task<PurchaseSaleTransactionAgreementDto> GetPurchaseSaleTransactionInfoToAgreementAsync(Guid purchaseSaleTransactionId, CancellationToken cancellationToken)
+        {
+            var dataToAgreement = await _dbContext.PurchasesSaleTransaction
+                                            .Where(x => x.Id == purchaseSaleTransactionId)
+                                            .Include(x => x.Client)
+                                            .Include(x => x.Workplace)
+                                            .Include(x => x.ItemsInPurchaseSaleTransaction)
+                                                .ThenInclude(id => id.ItemDetail)
+                                                    .ThenInclude(ic => ic.ItemCategory)
+                                            .Select(x => x.PurchaseSaleTransactionAgreementParseToDto())
+                                            .FirstOrDefaultAsync();
+
+            return dataToAgreement;
+        }
     }
 }

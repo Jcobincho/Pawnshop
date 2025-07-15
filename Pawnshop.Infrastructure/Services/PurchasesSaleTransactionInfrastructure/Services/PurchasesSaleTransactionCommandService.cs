@@ -1,4 +1,5 @@
-﻿using Pawnshop.Application.ClientsApplication.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Pawnshop.Application.ClientsApplication.Interfaces;
 using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddPurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.DeletePurchaseSaleTransactionDocument;
@@ -6,6 +7,7 @@ using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.UpdatePu
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
 using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities.Transactions;
+using Pawnshop.Domain.Enums;
 using Pawnshop.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,8 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
         public async Task<Guid> AddPurchaseSaleTransactionAsync(AddPurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
         {
+            await IsSymbolUniqueForTypeOfTransaction(command.Symbol, command.TypeOfTransaction, cancellationToken);
+
             var isWorkplaceExist = await _workplacesQueryService.WorkplaceExistsAsync(command.WorkplaceId, cancellationToken);
 
             if (!isWorkplaceExist)
@@ -36,13 +40,14 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
             var newPurchaseSaleTransaction = new PurchaseSaleTransaction
             {
+                Symbol = command.Symbol,
                 TypeOfTransaction = command.TypeOfTransaction,
                 TransactionDate = command.TransactionDate,
                 Description = command.Description,
                 WorkplaceId = command.WorkplaceId,
             };
 
-            if (command.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Purchase)
+            if (command.TypeOfTransaction == TypeOfTransactionEnum.Purchase)
             {
                 var isClientExist = await _clientsQueryService.IsClientExistAsync((Guid)command.ClientId, cancellationToken);
 
@@ -60,6 +65,8 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
         public async Task UpdatePurchaseSaleTransactionAsync(UpdatePurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
         {
+            await IsSymbolUniqueForTypeOfTransaction(command.Symbol, command.TypeOfTransaction, cancellationToken);
+
             var document = await _purchaseTransactionQueryService.GetPurchaseSaleTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
 
             var isWorkplaceExist = await _workplacesQueryService.WorkplaceExistsAsync(command.WorkplaceId, cancellationToken);
@@ -67,6 +74,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
             if (!isWorkplaceExist)
                 throw new NotFoundException("Workplace doesn't exist.");
 
+            document.Symbol = command.Symbol;
             document.TypeOfTransaction = command.TypeOfTransaction;
             document.TransactionDate = command.TransactionDate;
             document.Description = command.Description;
@@ -96,6 +104,16 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
             _dbContext.PurchasesSaleTransaction.Remove(document);
             await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task IsSymbolUniqueForTypeOfTransaction(string symbol, TypeOfTransactionEnum typeOfTransactionEnum, CancellationToken cancellationToken)
+        {
+            bool isSymbolUniqueForTypeOfTransaction = await _dbContext.PurchasesSaleTransaction.AnyAsync(x => x.Symbol == symbol && x.TypeOfTransaction == typeOfTransactionEnum, cancellationToken);
+
+            if (isSymbolUniqueForTypeOfTransaction)
+            {
+                throw new BadRequestException("The symbol must be unique within the transaction type area.");
+            }
         }
     }
 }
