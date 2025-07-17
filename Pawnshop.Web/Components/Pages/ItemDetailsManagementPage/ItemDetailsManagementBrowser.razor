@@ -1,0 +1,32 @@
+﻿@page "/ItemDetail-management-page"
+
+@using Pawnshop.Application.ItemDetailsApplication.Dto
+@using Pawnshop.Web.Components.Common
+
+<UniversalCrudMenu IsItemSelected="@(currentItemDetail != null)" OnActionSelected="HandleCrudAction" />
+
+<ItemDetailsManagementGrid OnItemDetailSelected="HandleItemDetailSelected" @ref="itemDetailGrid" />
+
+@if(showDetail)
+{
+    <ItemDetailsManagementDetail CurrentItemDetail="currentItemDetail" SelectedAction="selectedAction" OnDetailCancel="HandleDetailCanceled" OnCrudCompleted="HandlerCrudCompleted" />
+}
+
+@code {
+    private ItemDetailDto currentItemDetail = null;
+    private bool showDetail = false;
+    private UniversalCrudMenu.CrudAction selectedAction;
+    private ItemDetailsManagementGrid itemDetailGrid;
+
+    private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
+    {
+        selectedAction = action;
+        showDetail = true;
+    }
+
+    private void HandleItemDetailSelected(ItemDetailDto selectedItemDetail) => currentItemDetail = selectedItemDetail;
+
+    private void HandleDetailCanceled() => showDetail = false;
+
+    private async Task HandlerCrudCompleted() => await itemDetailGrid.ReloadDataAsync();
+}

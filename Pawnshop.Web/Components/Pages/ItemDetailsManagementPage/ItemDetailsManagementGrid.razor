@@ -1,0 +1,73 @@
+﻿@using Pawnshop.Application.ItemDetailsApplication.Dto
+@using Pawnshop.Application.ItemDetailsApplication.Responses
+@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services.ApiService
+
+@inject ApiService ApiService
+
+
+<MudDataGrid T="ItemDetailDto"
+			 Items="@(itemDetailsFromApi?.AllItemDetailsList ?? new List<ItemDetailDto>() )"
+			 RowClassFunc="@( (itemDetail, index) => itemDetail == selectedItemDetail ? "selected-row" : string.Empty)"
+			 RowClick="OnRowClicked"
+			 DragDropColumnReordering="true"
+			 ColumnsPanelReordering="true"
+			 ColumnResizeMode="ResizeMode.Column"
+			 MultiSelection="false"
+			 Hideable="true"
+			 Filterable="true"
+			 Groupable="true"
+			 FilterMode="DataGridFilterMode.Simple"
+			 ShowMenuIcon="true"
+			 Striped="true">
+	<Columns>
+		<PropertyColumn Property="x => x.ItemDetailId" Title="Item id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+		<PropertyColumn Property="x => x.Name" Title="Item name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+		<PropertyColumn Property="x => x.Model" Title="Model" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+		<PropertyColumn Property="x => x.Brand" Title="Brand" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true"/>
+		<PropertyColumn Property="x => x.AddedOn" Title="Added On" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true"/>
+		<PropertyColumn Property="x => x.SerialNumber" Title="Serial Number" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+		<PropertyColumn Property="x => x.Comments" Title="Comments" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+
+		<PropertyColumn Property="@(x => x.ItemCategory.ItemCategoryId)" Title="Item Category id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+		<PropertyColumn Property="x => x.ItemCategory.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+		<PropertyColumn Property="x => x.ItemCategory.Description" Title="Description" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
+	</Columns>
+</MudDataGrid>
+
+@code {
+	[Parameter]
+	public EventCallback<ItemDetailDto> OnItemDetailSelected { get; set; }
+	List<string> apiExceptions = null;
+	public GetAllItemDetailsResponse itemDetailsFromApi = new GetAllItemDetailsResponse();
+	private ItemDetailDto selectedItemDetail;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await GetItemDetailsFromApiAsync();
+		await InvokeAsync(StateHasChanged);
+	}
+
+	public async Task ReloadDataAsync()
+	{
+		await GetItemDetailsFromApiAsync();
+	}
+
+	private async Task GetItemDetailsFromApiAsync()
+	{
+		try
+		{
+			itemDetailsFromApi = await ApiService.GetAsync<GetAllItemDetailsResponse>("/ItemDetails/get");
+		}
+		catch (ApiException ex)
+		{
+			apiExceptions = ex.ErrorMessages;
+		}
+	}
+
+	private async Task OnRowClicked(DataGridRowClickEventArgs<ItemDetailDto> row)
+	{
+		selectedItemDetail = row.Item;
+		await OnItemDetailSelected.InvokeAsync(selectedItemDetail);
+	}
+}

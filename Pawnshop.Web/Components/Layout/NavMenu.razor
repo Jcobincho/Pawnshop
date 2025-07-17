@@ -51,6 +51,16 @@
         </Authorized>
     </AuthorizeView>
 
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.EmployeesDisplay}, {UserRoles.EmployeesDisplayAndModify}")">
+        <Authorized>
+            <MudNavLink Href="/ItemDetail-management-page"
+                        Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.Inventory2">
+                Item Detail management
+            </MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+
     <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.UsersDisplay}, {UserRoles.UsersDisplayAndModify}")">
         <Authorized>
             <MudNavLink Href="/User-management-page"
