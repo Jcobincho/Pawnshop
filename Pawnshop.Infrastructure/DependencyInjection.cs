@@ -37,6 +37,10 @@ using Pawnshop.Application.ItemHistoriesApplication.Producers;
 using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Producers;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Producers;
 using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Producers;
+using Pawnshop.Application.PdfGeneratorApplication.Interfaces;
+using Pawnshop.Infrastructure.Services.PdfGeneratorInfrastructure.Services;
+using Pawnshop.Application.FileStorageApplication.Interfaces;
+using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.Services;
 
 namespace Pawnshop.Infrastructure;
 
@@ -78,6 +82,10 @@ public static class DependencyInjection
 
         // MassTransit generate purchase sale trancastion agreement
         services.AddScoped<IPurchaseSaleTransactionEventPublisher, PurchaseSaleTransactionEventPublisher>();
+
+        // File storage service
+        services.AddScoped<IFileStorageQueryService, FileStorageQueryService>();
+        services.AddScoped<IFileStorageEditService, FileStorageEditService>();
 
         // Item in purchase and sale transaction service
         services.AddScoped<IItemInPurchaseSaleTransactionCommandService, ItemInPurchaseSaleTransactionCommandService>();
@@ -131,6 +139,9 @@ public static class DependencyInjection
 
         // Cryptography service
         services.AddScoped<ICryptographyService, CryptographyService>();
+
+        // Pdf service
+        services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
 
         // Register pipeline behavior for getting user id from claims
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UserIdPipelineBehavior<,>));

@@ -6,6 +6,7 @@ using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Domain.Entitie;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Entities.CompanyEmail;
+using Pawnshop.Domain.Entities.FileStorage;
 using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Entities.Pawning;
 using Pawnshop.Domain.Entities.Transactions;
@@ -35,6 +36,7 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
     public DbSet<PawnExtension> PawnExtensions { get; set; }
     public DbSet<PawnItem> PawnItems { get; set; }
     public DbSet<CompanyEmail> CompanyEmails { get; set; }
+    public DbSet<PurchaseSaleTransactionAgreement> PurchaseSaleTransactionAgreements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
