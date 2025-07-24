@@ -8,6 +8,21 @@ namespace Pawnshop.Infrastructure.Persistance.Extensions
     {
         public static IServiceCollection HandlebarsRegisterSettings(this IServiceCollection services)
         {
+            Handlebars.RegisterHelper("add", (writer, context, parameters) =>
+            {
+                if (parameters.Length == 2 &&
+                    double.TryParse(parameters[0]?.ToString(), out var a) &&
+                    double.TryParse(parameters[1]?.ToString(), out var b))
+                {
+                    writer.Write(a + b);
+                }
+                else
+                {
+                    writer.Write("NaN");
+                }
+            });
+
+
             Handlebars.RegisterHelper("formatDate", (context, arguments) =>
             {
                 if (arguments[0] is DateTime dateTime)

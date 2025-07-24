@@ -2,6 +2,6 @@
 {
     public sealed class GenerateAgreementResponse
     {
-        public string Message { get; set; } = "Success.";
+        public string Message { get; set; } = "Generate in progress.";
     }
 }

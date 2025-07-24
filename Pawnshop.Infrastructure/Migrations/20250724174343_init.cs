@@ -248,6 +248,7 @@ namespace Pawnshop.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Symbol = table.Column<string>(type: "text", nullable: false),
                     TypeOfTransaction = table.Column<int>(type: "integer", nullable: false),
                     TransactionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ClientId = table.Column<Guid>(type: "uuid", nullable: true),
@@ -531,6 +532,34 @@ namespace Pawnshop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PurchaseSaleTransactionAgreements",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PurchaseSaleTransactionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Symbol = table.Column<string>(type: "text", nullable: false),
+                    Url = table.Column<string>(type: "text", nullable: false),
+                    ContentType = table.Column<string>(type: "text", nullable: false),
+                    TotalBytes = table.Column<long>(type: "bigint", nullable: false),
+                    S3Key = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchaseSaleTransactionAgreements", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PurchaseSaleTransactionAgreements_PurchasesSaleTransaction_~",
+                        column: x => x.PurchaseSaleTransactionId,
+                        principalTable: "PurchasesSaleTransaction",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ItemsValuation",
                 columns: table => new
                 {
@@ -654,6 +683,11 @@ namespace Pawnshop.Infrastructure.Migrations
                 column: "PawnAgreementId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PurchaseSaleTransactionAgreements_PurchaseSaleTransactionId",
+                table: "PurchaseSaleTransactionAgreements",
+                column: "PurchaseSaleTransactionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PurchasesSaleTransaction_ClientId",
                 table: "PurchasesSaleTransaction",
                 column: "ClientId");
@@ -706,13 +740,13 @@ namespace Pawnshop.Infrastructure.Migrations
                 name: "PawnItems");
 
             migrationBuilder.DropTable(
+                name: "PurchaseSaleTransactionAgreements");
+
+            migrationBuilder.DropTable(
                 name: "UserRefreshToken");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "PurchasesSaleTransaction");
 
             migrationBuilder.DropTable(
                 name: "ItemHistories");
@@ -721,16 +755,19 @@ namespace Pawnshop.Infrastructure.Migrations
                 name: "PawnAgreements");
 
             migrationBuilder.DropTable(
+                name: "PurchasesSaleTransaction");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "ItemsDetail");
 
             migrationBuilder.DropTable(
-                name: "Workplaces");
+                name: "Clients");
 
             migrationBuilder.DropTable(
-                name: "Clients");
+                name: "Workplaces");
 
             migrationBuilder.DropTable(
                 name: "Employees");

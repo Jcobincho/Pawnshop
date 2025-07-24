@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddPurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.DeletePurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.UpdatePurchaseSaleTransactionDocument;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GenerateAgreement;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetEverySalesTransaction;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetPurchasesForClient;
 
@@ -21,9 +22,19 @@ namespace Pawnshop.Api.Controllers
         [HttpGet("get-purchases-for-specific-client")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPurchasesForSpecificClientAsync([FromQuery] GetPurchasesForClientQuery data, CancellationToken cancellation)
+        public async Task<IActionResult> GetPurchasesForSpecificClientAsync([FromQuery] GetPurchasesForClientQuery data, CancellationToken cancellationToken)
         {
-            var response = await Sender.Send(data, cancellation);
+            var response = await Sender.Send(data, cancellationToken);
+
+            return Ok(response);
+        }
+
+        [HttpGet("generate-agreement")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GeneratePurchaseSaleTransactionAgreement([FromQuery] GenerateAgreementQuery query, CancellationToken cancellationToken)
+        {
+            var response = await Sender.Send(query, cancellationToken);
 
             return Ok(response);
         }

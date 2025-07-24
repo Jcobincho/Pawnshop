@@ -12,7 +12,7 @@ using Pawnshop.Infrastructure;
 namespace Pawnshop.Infrastructure.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20250614143602_init")]
+    [Migration("20250724174343_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -312,6 +312,59 @@ namespace Pawnshop.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CompanyEmails");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.FileStorage.PurchaseSaleTransactionAgreement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EditedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PurchaseSaleTransactionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("S3Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("TotalBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PurchaseSaleTransactionId");
+
+                    b.ToTable("PurchaseSaleTransactionAgreements");
                 });
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemCategory", b =>
@@ -771,6 +824,10 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -982,6 +1039,17 @@ namespace Pawnshop.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Pawnshop.Domain.Entities.FileStorage.PurchaseSaleTransactionAgreement", b =>
+                {
+                    b.HasOne("Pawnshop.Domain.Entities.Transactions.PurchaseSaleTransaction", "PurchaseSaleTransaction")
+                        .WithMany()
+                        .HasForeignKey("PurchaseSaleTransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PurchaseSaleTransaction");
+                });
+
             modelBuilder.Entity("Pawnshop.Domain.Entities.Item.ItemDetail", b =>
                 {
                     b.HasOne("Pawnshop.Domain.Entities.Item.ItemCategory", "ItemCategory")
@@ -1084,7 +1152,7 @@ namespace Pawnshop.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Pawnshop.Domain.Entities.Transactions.PurchaseSaleTransaction", "PurchaseSaleTransaction")
-                        .WithMany()
+                        .WithMany("ItemsInPurchaseSaleTransaction")
                         .HasForeignKey("PurchaseSaleTransactionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1125,6 +1193,11 @@ namespace Pawnshop.Infrastructure.Migrations
                         .HasForeignKey("EmployeesId");
 
                     b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Pawnshop.Domain.Entities.Transactions.PurchaseSaleTransaction", b =>
+                {
+                    b.Navigation("ItemsInPurchaseSaleTransaction");
                 });
 
             modelBuilder.Entity("Pawnshop.Domain.Entities.Users", b =>

@@ -8,11 +8,6 @@ using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetEveryS
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetPurchasesForClient;
 using Pawnshop.Domain.Entities.Transactions;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Services
 {

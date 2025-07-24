@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pawnshop.Application.FileStorageApplication.Interfaces
+namespace Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces
 {
     public interface IFileStorageQueryService
     {

@@ -1,4 +1,4 @@
-﻿namespace Pawnshop.Application.FileStorageApplication.Interfaces
+﻿namespace Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces
 {
     public interface IFileStorageEditService
     {

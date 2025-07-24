@@ -1,12 +1,12 @@
 ﻿using Amazon.S3.Model;
 using Amazon.S3;
 using Amazon.Util;
-using Pawnshop.Application.FileStorageApplication.Interfaces;
 using Pawnshop.Domain.FileStorage;
 using HandlebarsDotNet;
 using Pawnshop.Domain.Exceptions;
+using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
 
-namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.Services
+namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.FileStorage.Services
 {
     internal sealed class FileStorageQueryService : IFileStorageQueryService
     {
@@ -34,7 +34,7 @@ namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.Services
                 {
                     BucketName = _s3Config.BucketName,
                     Key = fileKey,
-                    Expires = System.DateTime.MaxValue
+                    Expires = DateTime.MaxValue
                 };
 
                 var url = _s3Client.GetPreSignedURL(request);

@@ -67,3 +67,5 @@ services:
 volumes:
   pgdata:
     external: false
+  minio_data:
+    driver: local

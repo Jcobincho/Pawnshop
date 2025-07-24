@@ -2,11 +2,11 @@
 using Amazon.S3.Model;
 using HandlebarsDotNet;
 using Microsoft.AspNetCore.Http;
-using Pawnshop.Application.FileStorageApplication.Interfaces;
+using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
 using Pawnshop.Domain.Exceptions;
 using Pawnshop.Domain.FileStorage;
 
-namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.Services
+namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.FileStorage.Services
 {
     internal sealed class FileStorageEditService : IFileStorageEditService
     {
@@ -16,25 +16,21 @@ namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.Services
         public FileStorageEditService(S3Configuration s3Config)
         {
             _s3Config = s3Config;
-
             var connectionConfig = new AmazonS3Config
             {
                 ServiceURL = _s3Config.S3Url,
                 ForcePathStyle = true,
                 UseHttp = true
             };
-
             _s3Client = new AmazonS3Client(_s3Config.AccessKey, _s3Config.SecretKey, connectionConfig);
         }
 
-        public async Task<string> UploadFileAsync(byte[] file, string fileName, string contentType,  CancellationToken cancellationToken)
+        public async Task<string> UploadFileAsync(byte[] file, string fileName, string contentType, CancellationToken cancellationToken)
         {
             var uniqueFileName = $"{Guid.NewGuid()}_{fileName}";
-
             try
             {
                 await using var stream = new MemoryStream(file);
-
                 await _s3Client.PutObjectAsync(new PutObjectRequest()
                 {
                     BucketName = _s3Config.BucketName,
@@ -52,9 +48,7 @@ namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.Services
                         BucketName = _s3Config.BucketName,
                     };
                     await _s3Client.PutBucketAsync(putBucketRequest, cancellationToken);
-
                     await using var stream = new MemoryStream(file);
-
                     await _s3Client.PutObjectAsync(new PutObjectRequest()
                     {
                         BucketName = _s3Config.BucketName,
@@ -62,17 +56,14 @@ namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.Services
                         InputStream = stream,
                         ContentType = contentType
                     }, cancellationToken);
-
                     return uniqueFileName;
                 }
-
                 throw new BadRequestException(e.ErrorCode);
             }
             catch (Exception e)
             {
                 throw new BadRequestException(e.Message);
             }
-
             return uniqueFileName;
         }
 

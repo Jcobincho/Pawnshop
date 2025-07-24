@@ -1,12 +1,11 @@
 ﻿using MassTransit;
-using Microsoft.AspNetCore.Http;
-using Pawnshop.Application.FileStorageApplication.Interfaces;
+using MediatR;
+using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
+using Pawnshop.Application.FileStorageApplication.PurchaseSaleTransactionAgreementStorage.Commands.AddPurchaseSaleTransactionAgreement;
 using Pawnshop.Application.PdfGeneratorApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Customers.GenerateAgreement;
-using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
-using Pawnshop.Domain.Entities.FileStorage;
-using Pawnshop.Domain.Entities.Transactions;
+
 
 namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Consumers
 {
@@ -16,13 +15,15 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
         private readonly IPdfGeneratorService _pdfGeneratorService;
         private readonly IFileStorageEditService _fileStorageEditService;
         private readonly IFileStorageQueryService _fileStorageQueryService;
+        private readonly IMediator _mediator;
 
-        public GenerateAgreementCustomer(IPurchasesSaleTransactionQueryService purchasesSaleTransactionQueryService, IPdfGeneratorService pdfGeneratorService, IFileStorageEditService fileStorageEditService, IFileStorageQueryService fileStorageQueryService)
+        public GenerateAgreementCustomer(IPurchasesSaleTransactionQueryService purchasesSaleTransactionQueryService, IPdfGeneratorService pdfGeneratorService, IFileStorageEditService fileStorageEditService, IFileStorageQueryService fileStorageQueryService, IMediator mediator)
         {
             _purchasesSaleTransactionQueryService = purchasesSaleTransactionQueryService;
             _pdfGeneratorService = pdfGeneratorService;
             _fileStorageEditService = fileStorageEditService;
             _fileStorageQueryService = fileStorageQueryService;
+            _mediator = mediator;
         }
 
         public async Task Consume(ConsumeContext<GenerateAgreementEvent> context)
@@ -35,7 +36,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
                 if(transactionData != null)
                 {
-                    var pdfBytes = await _pdfGeneratorService.GeneratePdfAsync(transactionData, "PurchaseAgreementTemplate", context.CancellationToken);
+                    var pdfBytes = await _pdfGeneratorService.GeneratePdfAsync(transactionData, "PurchaseAgreementTemplate", context.CancellationToken); // 
 
                     var fileName = $"{transactionData.Symbol}.pdf";
 
@@ -44,17 +45,22 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
                     var url = _fileStorageQueryService.GetFileUrl(uploadKey);
 
 
-                    // TO DO: Przerowić na zapis z dedykowanej metody
+                    var command = new AddPurchaseSaleTransactionAgreementCommand
+                    {
+                        PurchaseSaleTransactionId = message.PurchasesSaleTransactionId,
+                        Symbol = fileName,
+                        Url = url,
+                        ContentType = "application/pdf",
+                        TotalBytes = pdfBytes.Length,
+                        S3Key = uploadKey,
+                    };
 
-                    //var agreement = new PurchaseSaleTransactionAgreement
-                    //{
-                    //    PurchaseSaleTransactionId = message.PurchasesSaleTransactionId,
-                    //    Symbol = fileName,
-                    //    Url = url,
-                    //    ContentType = "application/pdf",
-                    //    TotalBytes = pdfBytes.LongLength,
-                    //    S3Key = uploadKey
-                    //};
+                    var resposne = await _mediator.Send(command, context.CancellationToken);
+
+                    if(resposne != null)
+                    {
+                        // powiadom uzytkownika
+                    }
                 }
             }
             catch (Exception ex)

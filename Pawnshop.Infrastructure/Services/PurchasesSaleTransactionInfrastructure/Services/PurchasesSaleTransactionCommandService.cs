@@ -9,11 +9,6 @@ using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities.Transactions;
 using Pawnshop.Domain.Enums;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Services
 {
@@ -24,14 +19,17 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
         private readonly IWorkplacesQueryService _workplacesQueryService;
         private readonly IPurchasesSaleTransactionQueryService _purchaseTransactionQueryService;
 
-        public PurchasesSaleTransactionCommandService(IWorkplacesQueryService workplacesQueryService)
+        public PurchasesSaleTransactionCommandService(IWorkplacesQueryService workplacesQueryService, IClientsQueryService clientsQueryService, IPurchasesSaleTransactionQueryService purchaseTransactionQueryService, DbContext dbContext)
         {
             _workplacesQueryService = workplacesQueryService;
+            _clientsQueryService = clientsQueryService;
+            _purchaseTransactionQueryService = purchaseTransactionQueryService;
+            _dbContext = dbContext;
         }
 
         public async Task<Guid> AddPurchaseSaleTransactionAsync(AddPurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
         {
-            await IsSymbolUniqueForTypeOfTransaction(command.Symbol, command.TypeOfTransaction, cancellationToken);
+            await IsSymbolUniqueForTypeOfTransaction(command.Symbol, cancellationToken);
 
             var isWorkplaceExist = await _workplacesQueryService.WorkplaceExistsAsync(command.WorkplaceId, cancellationToken);
 
@@ -65,7 +63,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
         public async Task UpdatePurchaseSaleTransactionAsync(UpdatePurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
         {
-            await IsSymbolUniqueForTypeOfTransaction(command.Symbol, command.TypeOfTransaction, cancellationToken);
+            await IsSymbolUniqueForTypeOfTransaction(command.Symbol, cancellationToken);
 
             var document = await _purchaseTransactionQueryService.GetPurchaseSaleTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
 
@@ -106,9 +104,9 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task IsSymbolUniqueForTypeOfTransaction(string symbol, TypeOfTransactionEnum typeOfTransactionEnum, CancellationToken cancellationToken)
+        private async Task IsSymbolUniqueForTypeOfTransaction(string symbol, CancellationToken cancellationToken)
         {
-            bool isSymbolUniqueForTypeOfTransaction = await _dbContext.PurchasesSaleTransaction.AnyAsync(x => x.Symbol == symbol && x.TypeOfTransaction == typeOfTransactionEnum, cancellationToken);
+            bool isSymbolUniqueForTypeOfTransaction = await _dbContext.PurchasesSaleTransaction.AnyAsync(x => x.Symbol == symbol, cancellationToken);
 
             if (isSymbolUniqueForTypeOfTransaction)
             {

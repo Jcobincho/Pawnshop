@@ -39,8 +39,10 @@ using Pawnshop.Application.PurchasesSaleTransactionApplication.Producers;
 using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Producers;
 using Pawnshop.Application.PdfGeneratorApplication.Interfaces;
 using Pawnshop.Infrastructure.Services.PdfGeneratorInfrastructure.Services;
-using Pawnshop.Application.FileStorageApplication.Interfaces;
-using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.Services;
+using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
+using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.FileStorage.Services;
+using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.PurchaseSaleTransactionAgreementStorage.Services;
+using Pawnshop.Application.FileStorageApplication.PurchaseSaleTransactionAgreementStorage.Interfaces;
 
 namespace Pawnshop.Infrastructure;
 
@@ -82,6 +84,10 @@ public static class DependencyInjection
 
         // MassTransit generate purchase sale trancastion agreement
         services.AddScoped<IPurchaseSaleTransactionEventPublisher, PurchaseSaleTransactionEventPublisher>();
+
+        // File agreement service
+        services.AddScoped<IPurchaseSaleTransactionAgreementCommandService, PurchaseSaleTransactionAgreementCommandService>();
+        services.AddScoped<IPurchaseSaleTransactionAgreementQueryService, PurchaseSaleTransactionAgreementQueryService>();
 
         // File storage service
         services.AddScoped<IFileStorageQueryService, FileStorageQueryService>();
