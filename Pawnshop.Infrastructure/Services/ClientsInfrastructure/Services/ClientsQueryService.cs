@@ -2,6 +2,7 @@
 using Pawnshop.Application.ClientsApplication.Dto;
 using Pawnshop.Application.ClientsApplication.Dto.DtoExtension;
 using Pawnshop.Application.ClientsApplication.Interfaces;
+using Pawnshop.Application.Common.Mapper;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
 
@@ -28,7 +29,7 @@ namespace Pawnshop.Infrastructure.Services.ClientsInfrastructure.Services
 
         public async Task<List<ClientDto>> GetAllClientsAsDtoAsync(CancellationToken cancellationToken)
         {
-            var clients = await _dbContext.Clients.Select(x => x.ClientParseToDto()).ToListAsync(cancellationToken);
+            var clients = await _dbContext.Clients.MapTo<ClientDto>().ToListAsync(cancellationToken);
 
             return clients;
         }

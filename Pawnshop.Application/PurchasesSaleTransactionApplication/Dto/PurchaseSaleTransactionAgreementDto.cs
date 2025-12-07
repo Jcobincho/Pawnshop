@@ -10,7 +10,7 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto
     {
         public Guid PurchaseSaleTransactionId { get; set; }
         public string Symbol { get; set; }
-        public string TypeOfTransaction { get; set; }
+        public TypeOfTransactionEnum TypeOfTransaction { get; set; }
         public DateTime TransactionDate { get; set; }
         public ClientDto? Client { get; set; }
         public string Description { get; set; }

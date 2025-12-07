@@ -47,7 +47,7 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtens
             {
                 PurchaseSaleTransactionId = purchaseSaleTransaction.Id,
                 Symbol = purchaseSaleTransaction.Symbol,
-                TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction.ToString(),
+                TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction,
                 TransactionDate = purchaseSaleTransaction.TransactionDate,
                 Client = purchaseSaleTransaction.Client != null ? new ClientDto
                 {
