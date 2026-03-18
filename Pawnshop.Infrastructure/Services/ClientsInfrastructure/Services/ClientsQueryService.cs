@@ -2,7 +2,9 @@
 using Pawnshop.Application.ClientsApplication.Dto;
 using Pawnshop.Application.ClientsApplication.Dto.DtoExtension;
 using Pawnshop.Application.ClientsApplication.Interfaces;
+using Pawnshop.Application.ClientsApplication.Queries.GetAllClients;
 using Pawnshop.Application.Common.Mapper;
+using Pawnshop.Application.Common.Pagination;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Exceptions;
 
@@ -27,11 +29,25 @@ namespace Pawnshop.Infrastructure.Services.ClientsInfrastructure.Services
             return client;
         }
 
-        public async Task<List<ClientDto>> GetAllClientsAsDtoAsync(CancellationToken cancellationToken)
+        public async Task<PagedResult<ClientDto>> GetAllClientsAsDtoAsync(GetAllClientsQuery query, CancellationToken cancellationToken)
         {
-            var clients = await _dbContext.Clients.MapTo<ClientDto>().ToListAsync(cancellationToken);
+            var baseQuery = _dbContext.Clients.AsNoTracking();
 
-            return clients;
+            var totalCount = await baseQuery.CountAsync(cancellationToken);
+
+            var clients = await baseQuery.OrderBy(c => c.Surname) 
+                                         .Skip((query.PaginationParameters.PageNumber - 1) * query.PaginationParameters.PageSize)
+                                         .Take(query.PaginationParameters.PageSize)
+                                         .MapTo<ClientDto>()
+                                         .ToListAsync(cancellationToken);
+
+            return new PagedResult<ClientDto>
+            (
+                clients, 
+                totalCount, 
+                query.PaginationParameters.PageNumber, 
+                query.PaginationParameters.PageSize
+            );
         }
 
         public async Task<bool> IsClientExistAsync(Guid clientId, CancellationToken cancellationToken)
