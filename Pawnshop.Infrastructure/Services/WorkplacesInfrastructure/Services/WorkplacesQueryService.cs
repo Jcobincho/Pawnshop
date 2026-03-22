@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pawnshop.Application.Common.Mapper;
 using Pawnshop.Application.WorkplacesApplication.Dto;
 using Pawnshop.Application.WorkplacesApplication.Dto.DtoExtension;
 using Pawnshop.Application.WorkplacesApplication.Interfaces;
@@ -33,8 +34,9 @@ namespace Pawnshop.Infrastructure.Services.WorkplacesInfrastructure.Services
 
         public async Task<List<WorkplaceDto>> GetAllWorkplacesAsync(CancellationToken cancellationToken)
         {
-            var workplaces = await _dbContext.Workplaces.Select(x => x.WorkplaceParseToDto())
-                                                        .ToListAsync(cancellationToken);
+            var baseQuery = _dbContext.Workplaces.AsNoTracking();
+
+            var workplaces = await baseQuery.MapTo<WorkplaceDto>().ToListAsync(cancellationToken);
 
             return workplaces;
         }
