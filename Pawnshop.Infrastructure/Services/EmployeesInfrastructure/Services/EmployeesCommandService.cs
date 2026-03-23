@@ -4,11 +4,6 @@ using Pawnshop.Application.EmployeesApplication.Commands.EditEmployee;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.Entitie;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
 {

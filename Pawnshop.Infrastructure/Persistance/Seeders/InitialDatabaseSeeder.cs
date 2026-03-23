@@ -19,7 +19,7 @@ public class InitialDatabaseSeeder : IHostedService
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetService(typeof(DbContext)) as DbContext;
-        
+
         var roles = scope.ServiceProvider.GetRequiredService(typeof(RoleManager<IdentityRole<Guid>>)) as RoleManager<IdentityRole<Guid>>;
         var userManager = scope.ServiceProvider.GetRequiredService(typeof(UserManager<Users>)) as UserManager<Users>;
 

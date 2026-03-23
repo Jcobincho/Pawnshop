@@ -1,0 +1,34 @@
+version: '3'
+
+tasks:
+  run:
+    desc: Build and start all containers (API + DB) in detached mode
+    cmds:
+      - docker-compose up --build -d
+
+  down:
+    desc: Stop and remove all containers, networks, and images
+    cmds:
+      - docker-compose down
+
+  restart:
+    desc: Restart the entire infrastructure
+    cmds:
+      - task: down
+      - task: run
+
+  watch:
+    desc: Run the Web project with Hot Reload (local development)
+    cmds:
+      - dotnet watch run --project Pawnshop.Web/Pawnshop.Web.csproj
+
+  db-update:
+    desc: Apply Entity Framework migrations to the database
+    cmds:
+      - dotnet ef database update --project Pawnshop.Infrastructure --startup-project Pawnshop.Api
+
+  clean:
+    desc: Force remove all bin and obj folders recursively
+    cmds:
+      - powershell -Command "Get-ChildItem -Recurse -Include bin,obj | Remove-Item -Recurse -Force"
+    platforms: [windows]

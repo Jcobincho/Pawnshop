@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pawnshop.Domain.Entities
+﻿namespace Pawnshop.Domain.Entities
 {
     public class UserRefreshToken
     {
@@ -15,7 +9,7 @@ namespace Pawnshop.Domain.Entities
 
         public UserRefreshToken()
         {
-            
+
         }
 
         private UserRefreshToken(string token, DateTimeOffset expires)

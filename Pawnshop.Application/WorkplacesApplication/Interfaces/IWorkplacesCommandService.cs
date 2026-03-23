@@ -1,11 +1,6 @@
 ﻿using Pawnshop.Application.WorkplacesApplication.Commands.AddWorkplace;
 using Pawnshop.Application.WorkplacesApplication.Commands.DeleteWorkplace;
 using Pawnshop.Application.WorkplacesApplication.Commands.UpdateWorkplace;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Application.WorkplacesApplication.Interfaces
 {

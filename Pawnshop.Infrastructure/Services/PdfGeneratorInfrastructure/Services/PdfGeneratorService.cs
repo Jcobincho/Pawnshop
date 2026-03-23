@@ -77,11 +77,11 @@ namespace Pawnshop.Infrastructure.Services.PdfGeneratorInfrastructure.Services
 
                 return pdfBytes;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
-            
+
         }
     }
 }

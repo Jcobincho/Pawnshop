@@ -1,0 +1,3 @@
+namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Consumers.GenerateTransactionReport;
+
+public sealed record GenerateTransactionReportEvent(Guid TransactionId, string UserId);

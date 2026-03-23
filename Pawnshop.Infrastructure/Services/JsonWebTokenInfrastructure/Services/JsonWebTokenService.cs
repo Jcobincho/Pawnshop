@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
 using Pawnshop.Domain.AuthTokens;
 using Pawnshop.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Security.Principal;
 using System.Text;
 
 namespace Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services
@@ -32,19 +30,19 @@ namespace Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services
                 new(JwtRegisteredClaimNames.Iat, new DateTimeOffset(dtNow).ToUnixTimeSeconds().ToString())
             };
 
-            if(roles?.Any() == true)
+            if (roles?.Any() == true)
             {
-                foreach(var role in roles)
+                foreach (var role in roles)
                 {
                     jwtClaims.Add(new Claim(ClaimTypes.Role, role));
                 }
             }
 
-            if(claims?.Any() == true)
+            if (claims?.Any() == true)
             {
                 var customClaims = new List<Claim>();
 
-                foreach(var claim in claims)
+                foreach (var claim in claims)
                 {
                     customClaims.Add(new Claim(claim.Type, claim.Value));
                 }
@@ -91,9 +89,9 @@ namespace Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services
         {
             var expiredRefreshToken = user.RefreshToken.Where(token => token.IsExpired).ToList();
 
-            foreach(var token in expiredRefreshToken)
+            foreach (var token in expiredRefreshToken)
             {
-                if(token.IsExpired)
+                if (token.IsExpired)
                 {
                     user.DeleteRefreshToken(token);
                 }

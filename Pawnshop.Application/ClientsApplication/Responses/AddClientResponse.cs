@@ -3,6 +3,6 @@
     public sealed class AddClientResponse
     {
         public Guid ClientId { get; set; }
-        public string Message { get; set; } = "Success.";        
+        public string Message { get; set; } = "Success.";
     }
 }

@@ -3,11 +3,6 @@ using Pawnshop.Application.ItemCategoriesApplication.Commands.DeleteItemCategory
 using Pawnshop.Application.ItemCategoriesApplication.Commands.UpdateItemCategory;
 using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
 using Pawnshop.Domain.Entities.Item;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services
 {

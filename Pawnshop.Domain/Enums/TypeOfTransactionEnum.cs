@@ -1,4 +1,4 @@
-﻿ namespace Pawnshop.Domain.Enums
+﻿namespace Pawnshop.Domain.Enums
 {
     public enum TypeOfTransactionEnum
     {

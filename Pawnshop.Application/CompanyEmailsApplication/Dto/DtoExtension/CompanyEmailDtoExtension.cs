@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Pawnshop.Domain.Entities.CompanyEmail;
+﻿using Pawnshop.Domain.Entities.CompanyEmail;
 
 namespace Pawnshop.Application.CompanyEmailsApplication.Dto.DtoExtension
 {

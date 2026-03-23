@@ -6,7 +6,7 @@ namespace Pawnshop.Application.ItemCategoriesApplication.Commands.DeleteItemCate
 {
     public sealed class DeleteItemCategoryCommand : BaseCommand<DeleteItemCategoryResponse>
     {
-        [Required(ErrorMessage ="Category ID is required.")]
+        [Required(ErrorMessage = "Category ID is required.")]
         public Guid CategoryId { get; set; }
     }
 }

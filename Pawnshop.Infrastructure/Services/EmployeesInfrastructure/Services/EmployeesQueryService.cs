@@ -1,15 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pawnshop.Application.Common.Mapper;
 using Pawnshop.Application.EmployeesApplication.Dto;
-using Pawnshop.Application.EmployeesApplication.Dto.DtoExtension;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Domain.Entitie;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services
 {

@@ -1,21 +1,15 @@
-﻿using System.Text.Json;
-using System.Text;
-using Pawnshop.Web.Exceptions;
-using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+﻿// Libraries
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Localization;
-using System.Globalization;
-using System.Net.Http;
-using Microsoft.IdentityModel.Tokens;
-using Pawnshop.Domain.AuthTokens;
-using Pawnshop.Web.Services.AuthenticationService;
-using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
-using Pawnshop.Application.UsersApplication.Responses;
-using MediatR;
+using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
+using Pawnshop.Domain.AuthTokens;
+using Pawnshop.Web.Exceptions;
+using Pawnshop.Web.Services.AuthenticationService;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace Pawnshop.Web.Services.ApiService
 {
@@ -84,7 +78,7 @@ namespace Pawnshop.Web.Services.ApiService
                     {
                         await LogoutHandler();
                     }
-                    else if(sessionState.Expires > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                    else if (sessionState.Expires > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                     {
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.AccessToken);
                     }
@@ -92,17 +86,17 @@ namespace Pawnshop.Web.Services.ApiService
                     {
                         try
                         {
-                            var res = await PostAsync<RefreshTokenCommand,JsonWebToken>("/Users/refresh-token", new RefreshTokenCommand() { RefreshToken = sessionState.RefreshToken.Token });
+                            var res = await PostAsync<RefreshTokenCommand, JsonWebToken>("/Users/refresh-token", new RefreshTokenCommand() { RefreshToken = sessionState.RefreshToken.Token });
 
                             await ((AuthStateProviderService)_authStateProvider).MarkUserAsAuthenticated(res);
                             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", res.AccessToken);
                         }
-                        catch(ApiException)
+                        catch (ApiException)
                         {
                             await LogoutHandler();
                         }
                     }
-                    
+
                 }
                 else
                 {
@@ -120,7 +114,7 @@ namespace Pawnshop.Web.Services.ApiService
             var requestUri = BuildUriWithQuery(uri, queryParams);
             var request = new HttpRequestMessage(method, requestUri);
 
-            if(requireAuth)
+            if (requireAuth)
             {
                 await SetAuthorizeHeader(request);
             }
@@ -201,7 +195,7 @@ namespace Pawnshop.Web.Services.ApiService
                     }
                 }
             }
-            catch(JsonException)
+            catch (JsonException)
             {
                 errorMessages.Add("Invalid error response format.");
             }

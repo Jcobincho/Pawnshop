@@ -1,6 +1,4 @@
-﻿using Pawnshop.Domain.Enums;
-
-namespace Pawnshop.Application.ItemHistoriesApplication.Consumers.AddItemHistoryAndItemValuation
+﻿namespace Pawnshop.Application.ItemHistoriesApplication.Consumers.AddItemHistoryAndItemValuation
 {
     public sealed record AddItemHistoryAndItemValuationEvent
     (

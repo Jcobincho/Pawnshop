@@ -17,9 +17,9 @@ namespace Pawnshop.Application.EmployeesApplication.Commands.AddEmployee
         {
             var employeeId = await _employeesCommandService.AddEmployeeAsync(request, cancellationToken);
 
-            return new AddEmployeeResponse() 
-            { 
-                EmpoyeeId = employeeId 
+            return new AddEmployeeResponse()
+            {
+                EmpoyeeId = employeeId
             };
         }
     }

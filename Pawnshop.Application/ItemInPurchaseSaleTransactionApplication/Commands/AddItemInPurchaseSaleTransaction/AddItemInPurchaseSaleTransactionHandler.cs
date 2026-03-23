@@ -21,7 +21,7 @@ namespace Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Commands
         {
             var itemInPurchaseSaleTransactionId = await _itemInPurchaseSaleTransactionCommandService.AddItemInPurchaseSaleTransactionAsync(request, cancellationToken);
 
-            if(request.AddItemHistory)
+            if (request.AddItemHistory)
             {
                 var addItemHistoryEvent = new AddItemHistoryAndItemValuationEvent
                 (

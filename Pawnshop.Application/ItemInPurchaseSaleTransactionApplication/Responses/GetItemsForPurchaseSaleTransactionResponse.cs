@@ -1,5 +1,4 @@
-﻿using Pawnshop.Application.ItemDetailsApplication.Dto;
-using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Dto;
+﻿using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Dto;
 
 namespace Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Responses
 {

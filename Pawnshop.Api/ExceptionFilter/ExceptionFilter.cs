@@ -1,8 +1,8 @@
-﻿using System.Net;
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Pawnshop.Domain.Exceptions;
+using System.Net;
+using System.Text.Json;
 
 namespace Pawnshop.Api.ExceptionFilter;
 
@@ -14,7 +14,7 @@ public class ExceptionFilter : IExceptionFilter
     {
         _logger = logger;
     }
-    
+
     public void OnException(ExceptionContext context)
     {
         var statusCode = HttpStatusCode.InternalServerError;
@@ -45,17 +45,17 @@ public class ExceptionFilter : IExceptionFilter
                     error = notFoundException.ErrorMessage
                 });
                 break;
-            
+
             default:
                 _logger.LogError(context.Exception, "An internal server error occurred.");
-                result = JsonSerializer.Serialize(new 
-                { 
-                    error = "Something went wrong!", 
+                result = JsonSerializer.Serialize(new
+                {
+                    error = "Something went wrong!",
                     details = context.Exception.ToString()
                 });
                 break;
         }
-        
+
         context.HttpContext.Response.ContentType = "application/json";
         context.HttpContext.Response.StatusCode = (int)statusCode;
 

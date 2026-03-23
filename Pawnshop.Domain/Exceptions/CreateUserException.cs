@@ -15,6 +15,6 @@ public class CreateUserException : BaseException
         Errors = errors.GroupBy(x => x.Code, x => x.Description)
             .ToDictionary(x => x.Key, x => x.ToArray());
     }
-    
+
     public IDictionary<string, string[]> Errors { get; set; }
 }

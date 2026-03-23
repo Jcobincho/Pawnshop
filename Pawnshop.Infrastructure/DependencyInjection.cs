@@ -3,46 +3,49 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pawnshop.Application.ClientsApplication.Interfaces;
+using Pawnshop.Application.Common.Behaviors;
+using Pawnshop.Application.CompanyEmailsApplication.Interfaces;
+using Pawnshop.Application.CryptographyApplication.Interface;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
-using Pawnshop.Application.ItemDetailsApplication.Interfaces;
+using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
+using Pawnshop.Application.FileStorageApplication.PurchaseSaleTransactionAgreementStorage.Interfaces;
 using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
+using Pawnshop.Application.ItemDetailsApplication.Interfaces;
+using Pawnshop.Application.ItemHistoriesApplication.Interfaces;
+using Pawnshop.Application.ItemHistoriesApplication.Producers;
+using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Interfaces;
+using Pawnshop.Application.ItemValuationsApplication.Interfaces;
 using Pawnshop.Application.JsonWebTokenApplication.Interfaces;
+using Pawnshop.Application.PdfGeneratorApplication.Interfaces;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Producers;
 using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Application.WorkplacesApplication.Interfaces;
 using Pawnshop.Domain.Entities;
 using Pawnshop.Infrastructure.Persistance.Extensions;
 using Pawnshop.Infrastructure.Services.ClientsInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.CryptographyInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services;
-using Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.FileStorage.Services;
+using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.PurchaseSaleTransactionAgreementStorage.Services;
 using Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Producers;
+using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.ItemValuationsInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.JsonWebTokenInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.PdfGeneratorInfrastructure.Services;
+using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Producers;
+using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.UsersInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.WorkplacesInfrastructure.Services;
-using Pawnshop.Application.CompanyEmailsApplication.Interfaces;
-using Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services;
-using Pawnshop.Application.CryptographyApplication.Interface;
-using Pawnshop.Infrastructure.Services.CryptographyInfrastructure.Services;
-using Pawnshop.Application.ItemHistoriesApplication.Interfaces;
-using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services;
-using Pawnshop.Application.ItemValuationsApplication.Interfaces;
-using Pawnshop.Infrastructure.Services.ItemValuationsInfrastructure.Services;
-using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
-using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Services;
-using Pawnshop.Application.Common.Behaviors;
-using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Interfaces;
-using Pawnshop.Infrastructure.Services.ItemInPurchaseSaleTransactionInfrastructure.Services;
-using Pawnshop.Application.ItemHistoriesApplication.Producers;
-using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Producers;
-using Pawnshop.Application.PurchasesSaleTransactionApplication.Producers;
-using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Producers;
-using Pawnshop.Application.PdfGeneratorApplication.Interfaces;
-using Pawnshop.Infrastructure.Services.PdfGeneratorInfrastructure.Services;
-using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
-using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.FileStorage.Services;
-using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.PurchaseSaleTransactionAgreementStorage.Services;
-using Pawnshop.Application.FileStorageApplication.PurchaseSaleTransactionAgreementStorage.Interfaces;
+
+using Pawnshop.Application.NotificationApplication.Interfaces;
+using Pawnshop.Infrastructure.Services.NotificationInfrastructure.Services;
 
 namespace Pawnshop.Infrastructure;
 
@@ -56,6 +59,8 @@ public static class DependencyInjection
         services.AddFileStorageConfiguration(configuration);
         services.HandlebarsRegisterSettings();
 
+        services.AddSignalR();
+
 
         services.AddScoped<SignInManager<Users>>();
         services.AddScoped<UserManager<Users>>();
@@ -68,16 +73,19 @@ public static class DependencyInjection
             options.Password.RequireDigit = true;
             options.Password.RequireLowercase = true;
             options.Password.RequiredUniqueChars = 6;
-            
+
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMilliseconds(5);
-            
+
             options.User.RequireUniqueEmail = true;
             options.SignIn.RequireConfirmedEmail = false;
         });
-        
+
         services.AddHttpContextAccessor();
 
         // Interfaces Dependency Injection
+
+        // Notification services
+        services.AddScoped<INotificationService, NotificationService>();
 
         // MassTransit create item history with valuation
         services.AddScoped<IItemHistoryEventPublisher, ItemHistoryEventPublisher>();
@@ -148,6 +156,7 @@ public static class DependencyInjection
 
         // Pdf service
         services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
+        services.AddScoped<IReportGeneratorService, ReportGeneratorService>();
 
         // Register pipeline behavior for getting user id from claims
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UserIdPipelineBehavior<,>));

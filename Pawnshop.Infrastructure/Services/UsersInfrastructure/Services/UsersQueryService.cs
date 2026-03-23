@@ -4,11 +4,6 @@ using Pawnshop.Application.UsersApplication.Dto;
 using Pawnshop.Application.UsersApplication.Dto.DtoExtension;
 using Pawnshop.Application.UsersApplication.Interfaces;
 using Pawnshop.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.UsersInfrastructure.Services
 {
