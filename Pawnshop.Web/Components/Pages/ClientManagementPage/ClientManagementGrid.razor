@@ -1,5 +1,7 @@
 ﻿@using Pawnshop.Application.ClientsApplication.Dto
 @using Pawnshop.Application.Common.Pagination
+@using Pawnshop.Application.ClientsApplication.Queries.GetAllClients
+@using Pawnshop.Application.ClientsApplication.Responses
 @inject Pawnshop.Web.Services.ApiService.ApiService ApiService
 
 <MudDataGrid T="ClientDto"
@@ -22,29 +24,36 @@
 
 @code {
     [Parameter] public EventCallback<ClientDto> OnClientSelected { get; set; }
-    
+
     private MudDataGrid<ClientDto> _grid;
     private ClientDto selectedEmployee;
 
-    
     private async Task<GridData<ClientDto>> ServerReload(GridState<ClientDto> state)
     {
         try
         {
-            var page = state.Page + 1;
-            var pageSize = state.PageSize;
+            var url = "/Clients/get";
 
-            var url = $"/Clients/get?pageNumber={page}&pageSize={pageSize}";
-            var response = await ApiService.GetAsync<PagedResult<ClientDto>>(url);
+            var query = new GetAllClientsQuery
+            {
+                PaginationParameters = new PaginationParameters
+                {
+                    PageNumber = state.Page + 1,
+                    PageSize = state.PageSize
+                }
+            };
+
+            var response = await ApiService.GetAsync<GetAllClientsResponse>(url, query);
 
             return new GridData<ClientDto>
             {
-                TotalItems = response.TotalCount,
-                Items = response.Data
+                TotalItems = response.AllClientsList.TotalCount,
+                Items = response.AllClientsList.Data
             };
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return new GridData<ClientDto> { Items = new List<ClientDto>(), TotalItems = 0 };
         }
     }
