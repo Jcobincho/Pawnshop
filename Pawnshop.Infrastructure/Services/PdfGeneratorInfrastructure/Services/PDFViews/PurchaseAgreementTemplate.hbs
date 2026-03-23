@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umowa {{TypeOfTransaction}}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 150px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+            .items-table th,
+            .items-table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            .items-table th {
+                background-color: #f8f9fa;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .items-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+        .total-section {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .total-amount {
+            font-weight: bold;
+            font-size: 16px;
+            color: #27ae60;
+        }
+
+        .signatures {
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+
+        .signature-box {
+            text-align: center;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        .workplace-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>UMOWA {{TypeOfTransaction}}</h1>
+        <p>Symbol: <strong>{{Symbol}}</strong> | Data: <strong>{{formatDate TransactionDate}}</strong></p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Informacje o lombardzie</div>
+        <div class="workplace-info">
+            <div class="info-item">
+                <span class="info-label">Adres:</span>
+                {{Workplace.StreetAndBuildingNumber}}, {{Workplace.ZipCode}} {{Workplace.City}}
+            </div>
+            <div class="info-item">
+                <span class="info-label">Region:</span>
+                {{Workplace.Region}}, {{Workplace.Country}}
+            </div>
+        </div>
+    </div>
+
+    {{#if Client}}
+    <div class="section">
+        <div class="section-title">Dane klienta</div>
+        <div class="info-grid">
+            <div>
+                <div class="info-item">
+                    <span class="info-label">Imię:</span> {{Client.Name}}
+                </div>
+                {{#if Client.SecondName}}
+                <div class="info-item">
+                    <span class="info-label">Drugie imię:</span> {{Client.SecondName}}
+                </div>
+                {{/if}}
+                <div class="info-item">
+                    <span class="info-label">Nazwisko:</span> {{Client.Surname}}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Data urodzenia:</span> {{formatDate Client.BirthDate}}
+                </div>
+            </div>
+            <div>
+                <div class="info-item">
+                    <span class="info-label">PESEL:</span> {{Client.Pesel}}
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Nr dowodu:</span> {{Client.IdCardNumber}}
+                </div>
+                {{#if Client.TelephoneNumber}}
+                <div class="info-item">
+                    <span class="info-label">Telefon:</span> {{Client.TelephoneNumber}}
+                </div>
+                {{/if}}
+                {{#if Client.Email}}
+                <div class="info-item">
+                    <span class="info-label">Email:</span> {{Client.Email}}
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        {{#if Client.Description}}
+        <div class="info-item">
+            <span class="info-label">Uwagi:</span> {{Client.Description}}
+        </div>
+        {{/if}}
+    </div>
+    {{/if}}
+
+    <div class="section">
+        <div class="section-title">Lista przedmiotów</div>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Lp.</th>
+                    <th>Nazwa</th>
+                    <th>Kategoria</th>
+                    <th>Marka</th>
+                    <th>Model</th>
+                    <th>Nr seryjny</th>
+                    <th>Data dodania</th>
+                    <th>Cena (PLN)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each Items}}
+                <tr>
+                    <td>{{add @index 1}}</td>
+                    <td>{{Name}}</td>
+                    <td>{{ItemCategory.Name}}</td>
+                    <td>{{Brand}}</td>
+                    <td>{{Model}}</td>
+                    <td>{{SerialNumber}}</td>
+                    <td>{{formatDate AddedOn}}</td>
+                    <td style="text-align: right;">{{formatCurrency Price}}</td>
+                </tr>
+                {{#if Comments}}
+                <tr>
+                    <td colspan="8" style="font-style: italic; background-color: #fff3cd; padding: 5px;">
+                        <strong>Uwagi:</strong> {{Comments}}
+                    </td>
+                </tr>
+                {{/if}}
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div class="total-section">
+            <p><strong>Liczba przedmiotów:</strong> {{Items.length}}</p>
+            <p class="total-amount"><strong>ŁĄCZNA KWOTA: {{formatCurrency TotalPrice}} PLN</strong></p>
+        </div>
+    </div>
+
+    {{#if Description}}
+    <div class="section">
+        <div class="section-title">Opis transakcji</div>
+        <p>{{Description}}</p>
+    </div>
+    {{/if}}
+
+    <div class="signatures">
+        <div class="signature-box">
+            <p>Podpis klienta</p>
+        </div>
+        <div class="signature-box">
+            <p>Podpis pracownika</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Dokument wygenerowany automatycznie dnia {{formatDate "now"}}</p>
+        <p>ID Transakcji: {{PurchaseSaleTransactionId}}</p>
+    </div>
+
+    <script>
+        
+    </script>
+</body>
+</html>

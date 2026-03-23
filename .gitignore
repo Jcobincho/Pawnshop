@@ -75,3 +75,11 @@ ScaffoldingReadMe.txt
 # Other
 *.suo
 *.sln.docstates
+
+# Docker PostgreSQL volumes
+/data/
+/postgres-data/
+/pgdata/
+/data*/
+
+data/18/docker/

@@ -8,11 +8,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     ports:
       - 5432:5432
     restart: always
-    command: postgres -c 'listen_addresses=*'
+    #command: postgres -c 'listen_addresses=*'
 
   pgadmin:
     image: dpage/pgadmin4
@@ -52,6 +52,20 @@ services:
     depends_on:
       - db
 
+  minio:
+    image: minio/minio:latest
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+    command: server --console-address ":9001" --address ":9000" /data
+
 volumes:
   pgdata:
     external: false
+  minio_data:
+    driver: local

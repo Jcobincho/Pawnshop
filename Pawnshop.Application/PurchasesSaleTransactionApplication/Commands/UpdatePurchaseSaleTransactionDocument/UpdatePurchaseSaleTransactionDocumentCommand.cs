@@ -7,6 +7,9 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.Upda
 {
     public sealed class UpdatePurchaseSaleTransactionDocumentCommand : BaseCommand<UpdatePurchaseSaleTransactionDocumentResponse>
     {
+        [Required(ErrorMessage = "Symbol is required.")]
+        public string Symbol { get; set; }
+
         [Required(ErrorMessage = "Transaction ID is required.")]
         public Guid PurchaseSaleTransactionDocumentId { get; set; }
 

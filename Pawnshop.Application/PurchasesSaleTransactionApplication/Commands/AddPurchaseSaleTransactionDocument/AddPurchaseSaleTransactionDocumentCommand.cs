@@ -7,6 +7,9 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddP
 {
     public sealed class AddPurchaseSaleTransactionDocumentCommand : BaseCommand<AddPurchaseSaleTransactionDocumentResponse>
     {
+        [Required(ErrorMessage = "Symbol is required.")]
+        public string Symbol { get; set; }
+
         [Required(ErrorMessage = "Type of transaction is required.")]
         public TypeOfTransactionEnum TypeOfTransaction { get; set; }
 

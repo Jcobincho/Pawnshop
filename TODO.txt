@@ -1,0 +1,7 @@
+- do umów sale transaction dodać coś alla symbol który będzie unikalny dla każdej umowy
+- dodac pobieranie dokumentów purchase sale wraz z itemkami do generowania raportów oraz endpoint do wyświetlenia itemków dla transakcji
+- dodać generowanie raportów które po wygenerowaniu raportu zapisuje go do minio i wyswietla powiadomienie signalR które umożliwi pobranei
+- dodać endpoint który wyświetli i umożliwi pobranie umowy
+
+
+- do sprawdzenia getItemsForPurchaseSaleTransaction

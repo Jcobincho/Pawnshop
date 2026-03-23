@@ -14,7 +14,7 @@ namespace Pawnshop.Application.ClientsApplication.Queries.GetAllClients
         }
         public async Task<GetAllClientsResponse> Handle(GetAllClientsQuery request, CancellationToken cancellationToken)
         {
-            var clients = await _clientsQueryService.GetAllClientsAsDtoAsync(cancellationToken);
+            var clients = await _clientsQueryService.GetAllClientsAsDtoAsync(request, cancellationToken);
 
             return new GetAllClientsResponse
             {

@@ -1,9 +1,11 @@
-﻿using Pawnshop.Application.Common.Base;
+﻿using Pawnshop.Application.Common.Attributes;
+using Pawnshop.Application.Common.Base;
 
 namespace Pawnshop.Application.ClientsApplication.Dto
 {
     public class ClientDto : BaseDto
     {
+        [MapSource("Id")]
         public Guid ClientId { get; set; }
         public string Name { get; set; }
         public string SecondName { get; set; } = string.Empty;

@@ -12,5 +12,6 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces
         Task<PagedResult<SalesTransactionDto>> GetEverySalesTransactionsPagedAsDtoAsync(GetEverySalesTransactionQuery query,CancellationToken cancellationToken);
         Task<PagedResult<PurchasesTransactionDto>> GetPurchasesForClientPagedAsDtoAsync(GetPurchasesForClientQuery query, CancellationToken cancellationToken);
         Task<bool> IsPurchaseSaleTransactionExistAsync(Guid purchaseSaleTransactionId, CancellationToken cancellationToken);
+        Task<PurchaseSaleTransactionAgreementDto> GetPurchaseSaleTransactionInfoToAgreementAsync(Guid purchaseSaleTransactionId, CancellationToken cancellationToken);
     }
 }

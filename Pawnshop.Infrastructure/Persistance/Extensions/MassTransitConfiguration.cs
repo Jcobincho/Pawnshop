@@ -1,7 +1,9 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pawnshop.Application.PurchasesSaleTransactionApplication.Customers.GenerateAgreement;
 using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Consumers;
+using Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructure.Consumers;
 
 namespace Pawnshop.Infrastructure.Persistance.Extensions
 {
@@ -12,6 +14,7 @@ namespace Pawnshop.Infrastructure.Persistance.Extensions
             services.AddMassTransit(x =>
             {
                 x.AddConsumer<AddItemHistoryAndItemValuationConsumer>();
+                x.AddConsumer<GenerateAgreementCustomer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -24,6 +27,11 @@ namespace Pawnshop.Infrastructure.Persistance.Extensions
                     cfg.ReceiveEndpoint("item-history-and-item-valuation-queue", e =>
                     {
                         e.ConfigureConsumer<AddItemHistoryAndItemValuationConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("generate-agreement-queue", e =>
+                    {
+                        e.ConfigureConsumer<GenerateAgreementCustomer>(context);
                     });
                 });
             });

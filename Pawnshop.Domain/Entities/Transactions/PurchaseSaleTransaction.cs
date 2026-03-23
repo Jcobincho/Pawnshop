@@ -6,6 +6,7 @@ namespace Pawnshop.Domain.Entities.Transactions
 {
     public class PurchaseSaleTransaction : BaseEntity
     {
+        public string Symbol { get; set; }
         public TypeOfTransactionEnum TypeOfTransaction { get; set; }
         public DateTime TransactionDate { get; set; }
         public Guid? ClientId { get; set; }
@@ -13,6 +14,8 @@ namespace Pawnshop.Domain.Entities.Transactions
         public string Description { get; set; }
         public Guid WorkplaceId { get; set; }
         public Workplace Workplace { get; set; }
+
+        public List<ItemInPurchaseSaleTransaction> ItemsInPurchaseSaleTransaction { get; set; } = new List<ItemInPurchaseSaleTransaction>();
     }
 
     public class PurchaseSaleTransactionrConfiguration : IEntityTypeConfiguration<PurchaseSaleTransaction>
@@ -23,6 +26,11 @@ namespace Pawnshop.Domain.Entities.Transactions
                    .WithMany()
                    .HasForeignKey(u => u.ClientId)
                    .IsRequired(false);
+
+            builder.HasMany(t => t.ItemsInPurchaseSaleTransaction)
+                   .WithOne(i => i.PurchaseSaleTransaction)
+                   .HasForeignKey(i => i.PurchaseSaleTransactionId)
+                   .IsRequired();
         }
     }
 }

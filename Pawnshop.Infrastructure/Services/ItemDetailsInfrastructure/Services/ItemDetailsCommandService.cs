@@ -1,0 +1,86 @@
+﻿using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
+using Pawnshop.Application.ItemDetailsApplication.Commands.AddItemDetail;
+using Pawnshop.Application.ItemDetailsApplication.Commands.DeleteItemDetail;
+using Pawnshop.Application.ItemDetailsApplication.Commands.UpdateItemDetail;
+using Pawnshop.Application.ItemDetailsApplication.Interfaces;
+using Pawnshop.Domain.Entities.Item;
+using Pawnshop.Domain.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services
+{
+    internal sealed class ItemDetailsCommandService : IItemDetailsCommandService
+    {
+        private readonly DbContext _dbContext;
+        private readonly IItemCategoriesQueryService _itemCategoriesQueryService;
+        private readonly IItemDetailsQueryService _itemDetailsQueryService;
+
+        public ItemDetailsCommandService(DbContext dbContext, IItemCategoriesQueryService itemCategoriesQueryService, IItemDetailsQueryService itemDetailsQueryService)
+        {
+            _dbContext = dbContext;
+            _itemCategoriesQueryService = itemCategoriesQueryService;
+            _itemDetailsQueryService = itemDetailsQueryService;
+        }
+
+        public async Task<Guid> AddItemDetailAsync(AddItemDetailsCommand command, CancellationToken cancellationToken)
+        {
+            bool isCategoryExist = await _itemCategoriesQueryService.CategoryExistsAsync(command.ItemCategoryId, cancellationToken);
+
+            if (!isCategoryExist)
+            {
+                throw new NotFoundException("Category doesn't exist.");
+            }
+
+            var newItemDetail = new ItemDetail()
+            {
+                Name = command.Name,
+                ItemCategoryId = command.ItemCategoryId,
+                Brand = command.Brand,
+                Model = command.Model,
+                SerialNumber = command.SerialNumber,
+                AddedOn = command.AddedOn,
+                Comments = command.Comments,
+            };
+
+            await _dbContext.ItemsDetail.AddAsync(newItemDetail, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return newItemDetail.Id;
+        }
+
+        public async Task UpdateItemDetailAsync(UpdateItemDetailCommand command, CancellationToken cancellationToken)
+        {
+            bool isCategoryExist = await _itemCategoriesQueryService.CategoryExistsAsync(command.ItemCategoryId, cancellationToken);
+
+            if (!isCategoryExist)
+            {
+                throw new NotFoundException("Category doesn't exist.");
+            }
+
+            var item = await _itemDetailsQueryService.GetItemDetailByIdAsync(command.UpdateItemId, cancellationToken);
+
+            item.Name = command.Name;
+            item.ItemCategoryId = command.ItemCategoryId;
+            item.Brand = command.Brand;
+            item.Model = command.Model;
+            item.SerialNumber = command.SerialNumber;
+            item.AddedOn = command.AddedOn;
+            item.Comments = command.Comments;
+
+            _dbContext.ItemsDetail.Update(item);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeleteItemDetailAsync(DeleteItemDetailCommand command, CancellationToken cancellationToken)
+        {
+            var item = await _itemDetailsQueryService.GetItemDetailByIdAsync(command.ItemId, cancellationToken);
+
+            _dbContext.ItemsDetail.Remove(item);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
+}
