@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Identity;
 using Pawnshop.Api.ExceptionFilter;
 using Pawnshop.Api.Extensions;
 using Pawnshop.Application;
-using Pawnshop.Domain.Entities;
 using Pawnshop.Infrastructure;
+using Pawnshop.Infrastructure.Services.NotificationInfrastructure.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +20,6 @@ builder.Services
     .CorsExtension()
     .SwaggerExtension();
 
-
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,4 +33,5 @@ app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<NotificationHub>("/notifications");
 app.Run();

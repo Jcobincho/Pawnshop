@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pawnshop.Application.ClientsApplication.Dto;
-using Pawnshop.Application.ClientsApplication.Dto.DtoExtension;
 using Pawnshop.Application.ClientsApplication.Interfaces;
 using Pawnshop.Application.ClientsApplication.Queries.GetAllClients;
 using Pawnshop.Application.Common.Mapper;
@@ -35,7 +34,7 @@ namespace Pawnshop.Infrastructure.Services.ClientsInfrastructure.Services
 
             var totalCount = await baseQuery.CountAsync(cancellationToken);
 
-            var clients = await baseQuery.OrderBy(c => c.Surname) 
+            var clients = await baseQuery.OrderBy(c => c.Surname)
                                          .Skip((query.PaginationParameters.PageNumber - 1) * query.PaginationParameters.PageSize)
                                          .Take(query.PaginationParameters.PageSize)
                                          .MapTo<ClientDto>()
@@ -43,9 +42,9 @@ namespace Pawnshop.Infrastructure.Services.ClientsInfrastructure.Services
 
             return new PagedResult<ClientDto>
             (
-                clients, 
-                totalCount, 
-                query.PaginationParameters.PageNumber, 
+                clients,
+                totalCount,
+                query.PaginationParameters.PageNumber,
                 query.PaginationParameters.PageSize
             );
         }

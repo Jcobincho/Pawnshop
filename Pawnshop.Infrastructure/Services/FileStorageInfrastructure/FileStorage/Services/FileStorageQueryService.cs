@@ -1,10 +1,8 @@
-﻿using Amazon.S3.Model;
-using Amazon.S3;
-using Amazon.Util;
-using Pawnshop.Domain.FileStorage;
-using HandlebarsDotNet;
-using Pawnshop.Domain.Exceptions;
+﻿using Amazon.S3;
+using Amazon.S3.Model;
 using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
+using Pawnshop.Domain.Exceptions;
+using Pawnshop.Domain.FileStorage;
 
 namespace Pawnshop.Infrastructure.Services.FileStorageInfrastructure.FileStorage.Services
 {

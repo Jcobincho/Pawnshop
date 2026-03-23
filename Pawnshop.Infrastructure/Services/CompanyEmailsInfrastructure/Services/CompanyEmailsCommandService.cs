@@ -4,11 +4,6 @@ using Pawnshop.Application.CompanyEmailsApplication.Commands.UpdateCompanyEmail;
 using Pawnshop.Application.CompanyEmailsApplication.Interfaces;
 using Pawnshop.Application.CryptographyApplication.Interface;
 using Pawnshop.Domain.Entities.CompanyEmail;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services
 {

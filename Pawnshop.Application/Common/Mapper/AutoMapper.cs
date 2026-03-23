@@ -34,8 +34,8 @@ namespace Pawnshop.Application.Common.Mapper
             var func = GetCompiledMapperFunc(sourceType, destinationType);
 
             var selectMethod = typeof(Enumerable).GetMethods()
-                                                 .First(m => 
-                                                            m.Name == "Select" && 
+                                                 .First(m =>
+                                                            m.Name == "Select" &&
                                                             m.GetParameters().Length == 2
                                                        )
                                                  .MakeGenericMethod(sourceType, destinationType);
@@ -121,8 +121,8 @@ namespace Pawnshop.Application.Common.Mapper
                     var innerMap = (LambdaExpression)GetMappingExpression(sourceItemType, destItemType);
 
                     var selectMethod = typeof(Enumerable).GetMethods()
-                                                         .First(m => 
-                                                                     m.Name == "Select" && 
+                                                         .First(m =>
+                                                                     m.Name == "Select" &&
                                                                      m.GetParameters().Length == 2
                                                                )
                                                          .MakeGenericMethod(sourceItemType, destItemType);
@@ -181,13 +181,13 @@ namespace Pawnshop.Application.Common.Mapper
 
         private static bool IsCollection(Type type)
         {
-            return type.IsGenericType && 
+            return type.IsGenericType &&
                    (
                         type.GetGenericTypeDefinition() == typeof(List<>) ||
                         type.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
                         type.GetGenericTypeDefinition() == typeof(ICollection<>) ||
-                        type.GetInterfaces().Any(i => 
-                                                      i.IsGenericType && 
+                        type.GetInterfaces().Any(i =>
+                                                      i.IsGenericType &&
                                                       i.GetGenericTypeDefinition() == typeof(IEnumerable<>)
                                                 )
                    );
@@ -198,8 +198,8 @@ namespace Pawnshop.Application.Common.Mapper
             if (type.IsArray) return type.GetElementType();
             if (type.IsGenericType) return type.GetGenericArguments()[0];
             return type.GetInterfaces()
-                       .Where(i => 
-                                    i.IsGenericType && 
+                       .Where(i =>
+                                    i.IsGenericType &&
                                     i.GetGenericTypeDefinition() == typeof(IEnumerable<>)
                              )
                        .Select(i => i.GetGenericArguments()[0])

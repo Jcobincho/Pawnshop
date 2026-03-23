@@ -21,7 +21,7 @@ namespace Pawnshop.Infrastructure.Services.UserClaimsDataProvidesInfrastructure.
 
             var parseToGuid = Guid.TryParse(claims, out var userId);
 
-            if(!parseToGuid || userId == Guid.Empty) return Guid.Empty;
+            if (!parseToGuid || userId == Guid.Empty) return Guid.Empty;
 
             return userId;
         }

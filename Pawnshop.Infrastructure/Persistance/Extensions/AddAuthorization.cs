@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Pawnshop.Domain.AuthTokens;
 using Microsoft.IdentityModel.Tokens;
+using Pawnshop.Domain.AuthTokens;
 using System.Text;
 
 namespace Pawnshop.Infrastructure.Persistance.Extensions

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pawnshop.Application.ItemDetailsApplication.Dto;
 using Pawnshop.Application.ItemDetailsApplication.Interfaces;
 using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Dto;
 using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Dto.DtoExtension;

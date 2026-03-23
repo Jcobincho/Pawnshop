@@ -5,11 +5,6 @@ using Pawnshop.Application.ItemValuationsApplication.Commands.UpdateItemValuatio
 using Pawnshop.Application.ItemValuationsApplication.Interfaces;
 using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.ItemValuationsInfrastructure.Services
 {

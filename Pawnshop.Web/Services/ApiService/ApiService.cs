@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// Libraries
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
@@ -79,7 +80,7 @@ namespace Pawnshop.Web.Services.ApiService
                     {
                         await LogoutHandler();
                     }
-                    else if(sessionState.Expires > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                    else if (sessionState.Expires > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                     {
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.AccessToken);
                     }
@@ -87,17 +88,17 @@ namespace Pawnshop.Web.Services.ApiService
                     {
                         try
                         {
-                            var res = await PostAsync<RefreshTokenCommand,JsonWebToken>("/Users/refresh-token", new RefreshTokenCommand() { RefreshToken = sessionState.RefreshToken.Token });
+                            var res = await PostAsync<RefreshTokenCommand, JsonWebToken>("/Users/refresh-token", new RefreshTokenCommand() { RefreshToken = sessionState.RefreshToken.Token });
 
                             await ((AuthStateProviderService)_authStateProvider).MarkUserAsAuthenticated(res);
                             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", res.AccessToken);
                         }
-                        catch(ApiException)
+                        catch (ApiException)
                         {
                             await LogoutHandler();
                         }
                     }
-                    
+
                 }
                 else
                 {
@@ -115,7 +116,7 @@ namespace Pawnshop.Web.Services.ApiService
             var requestUri = BuildUriWithQuery(uri, queryParams);
             var request = new HttpRequestMessage(method, requestUri);
 
-            if(requireAuth)
+            if (requireAuth)
             {
                 await SetAuthorizeHeader(request);
             }
@@ -196,7 +197,7 @@ namespace Pawnshop.Web.Services.ApiService
                     }
                 }
             }
-            catch(JsonException)
+            catch (JsonException)
             {
                 errorMessages.Add("Invalid error response format.");
             }

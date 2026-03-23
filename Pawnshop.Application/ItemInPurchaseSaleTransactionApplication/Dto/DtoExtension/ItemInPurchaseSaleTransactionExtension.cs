@@ -1,7 +1,5 @@
 ﻿using Pawnshop.Application.ItemCategoriesApplication.Dto;
-using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Entities.Transactions;
-using System.Xml.Linq;
 
 namespace Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Dto.DtoExtension
 {

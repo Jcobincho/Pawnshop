@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using Microsoft.IdentityModel.JsonWebTokens
 @using Pawnshop.Application.UsersApplication.Commands.Logout
 @using Pawnshop.Application.UsersApplication.Responses
@@ -14,43 +14,49 @@
 
 @rendermode InteractiveServer
 
-<MudThemeProvider />
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_pawnshopTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
-
-    <AuthorizeView>
-        <Authorized>
+<AuthorizeView>
+    <Authorized>
+        <MudLayout>
             <MudAppBar Elevation="1" Dense="false">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+                <MudText Typo="Typo.h6" Class="ml-4">Pawnshop System</MudText>
                 <MudSpacer />
+                <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
+                               Color="Color.Inherit" 
+                               OnClick="@ToggleDarkMode" />
                 <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="@ApiService.LogoutHandler" />
             </MudAppBar>
-            <MudDrawer @bind-Open="@open" ClipMode="DrawerClipMode.Never" Elevation="1" Variant="@DrawerVariant.Responsive">
+
+            <MudDrawer @bind-Open="@open" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive">
                 <MudDrawerHeader>
-                    <MudText Typo="Typo.h6">Pawnshop</MudText>
+                    <div class="d-flex align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Color="Color.Primary" Class="mr-2"/>
+                        <MudText Typo="Typo.h6" Color="Color.Primary"><b>Lombard</b></MudText>
+                    </div>
                 </MudDrawerHeader>
                 <NavMenu />
             </MudDrawer>
-            <div class="p-2">
-                <MudMainContent>
-                    @Body
-                </MudMainContent>
-            </div>
-        </Authorized>
 
-        <NotAuthorized>
-            <MudMainContent>
+            <MudMainContent Class="pa-4 mt-16">
                 @Body
             </MudMainContent>
-        </NotAuthorized>
-    </AuthorizeView>
-    
-</MudLayout>
+        </MudLayout>
+    </Authorized>
 
-
+    <NotAuthorized>
+        <div style="position: absolute; right: 16px; top: 16px; z-index: 1000;">
+             <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
+                           Color="Color.Inherit" 
+                           OnClick="@ToggleDarkMode" />
+        </div>
+        @Body
+    </NotAuthorized>
+</AuthorizeView>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
@@ -60,11 +66,56 @@
 
 @code {
     private bool open = true;
+    private bool _isDarkMode = true;
 
     private void ToggleDrawer()
     {
         open = !open;
     }
+
+    private void ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
+    }
+
+    private readonly MudTheme _pawnshopTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#B8860B",
+            PrimaryContrastText = "#000000",
+            Secondary = "#2c2c2c",
+            AppbarBackground = "#B8860B",
+            AppbarText = "#000000",
+            Background = "#f8f9fa",
+            DrawerBackground = "#ffffff",
+            DrawerText = "#2c2c2c",
+            Surface = "#ffffff",
+            ActionDefault = "#5a5a5a"
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#D4AF37",
+            PrimaryContrastText = "#000000",
+            Secondary = "#1a1a1a",
+            AppbarBackground = "#1a1a1a",
+            Background = "#121212",
+            DrawerBackground = "#1a1a1a",
+            Surface = "#1e1e1e",
+            TextPrimary = "#ffffff",
+            TextSecondary = "rgba(255,255,255, 0.7)",
+            ActionDefault = "#d4af37",
+            HoverOpacity = 0.15,
+            TableHover = "rgba(212, 175, 55, 0.1)",
+            TableStriped = "rgba(255, 255, 255, 0.02)",
+            Divider = "rgba(212, 175, 55, 0.2)",
+            OverlayDark = "rgba(0,0,0,0.5)"
+        },
+        LayoutProperties = new LayoutProperties()
+        {
+            DefaultBorderRadius = "8px"
+        }
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -76,20 +127,15 @@
                 var authState = await AuthStateProvider.GetAuthenticationStateAsync();
                 var user = authState.User;
 
-                if (!user.Identity.IsAuthenticated)
+                if (!user.Identity.IsAuthenticated && NavigationManager.Uri != NavigationManager.BaseUri)
                 {
                     NavigationManager.NavigateTo("/");
                 }
-                else
-                {
-                    NavigationManager.NavigateTo("/Home");
-                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 NavigationManager.NavigateTo("/", true);
             }
         }
     }
-
 }

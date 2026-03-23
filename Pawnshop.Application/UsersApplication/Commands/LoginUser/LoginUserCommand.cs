@@ -1,11 +1,6 @@
 ﻿using Pawnshop.Application.Common.Base;
 using Pawnshop.Domain.AuthTokens;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Application.UsersApplication.Commands.LoginUser
 {

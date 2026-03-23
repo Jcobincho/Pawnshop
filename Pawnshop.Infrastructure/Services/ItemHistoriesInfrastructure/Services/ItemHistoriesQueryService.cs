@@ -5,11 +5,6 @@ using Pawnshop.Application.ItemHistoriesApplication.Interfaces;
 using Pawnshop.Application.ItemHistoriesApplication.Queries.GetItemHistoriesForItemDetail;
 using Pawnshop.Domain.Entities.Item;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Services
 {

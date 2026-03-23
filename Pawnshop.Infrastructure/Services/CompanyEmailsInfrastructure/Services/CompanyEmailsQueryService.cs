@@ -4,11 +4,6 @@ using Pawnshop.Application.CompanyEmailsApplication.Dto.DtoExtension;
 using Pawnshop.Application.CompanyEmailsApplication.Interfaces;
 using Pawnshop.Domain.Entities.CompanyEmail;
 using Pawnshop.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pawnshop.Infrastructure.Services.CompanyEmailsInfrastructure.Services
 {

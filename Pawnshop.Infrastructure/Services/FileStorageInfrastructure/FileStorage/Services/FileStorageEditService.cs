@@ -1,7 +1,5 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using HandlebarsDotNet;
-using Microsoft.AspNetCore.Http;
 using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
 using Pawnshop.Domain.Exceptions;
 using Pawnshop.Domain.FileStorage;

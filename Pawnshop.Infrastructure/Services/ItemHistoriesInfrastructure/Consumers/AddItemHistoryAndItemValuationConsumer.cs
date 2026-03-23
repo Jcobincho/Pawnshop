@@ -4,7 +4,6 @@ using Pawnshop.Application.ItemHistoriesApplication.Commands.AddItemHistory;
 using Pawnshop.Application.ItemHistoriesApplication.Consumers.AddItemHistoryAndItemValuation;
 using Pawnshop.Application.ItemValuationsApplication.Commands.AddItemValuation;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Interfaces;
-using Pawnshop.Domain.Entities;
 using Pawnshop.Domain.Enums;
 
 namespace Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Consumers

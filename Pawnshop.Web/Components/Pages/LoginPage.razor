@@ -1,99 +1,126 @@
-﻿@page "/"
+@page "/"
 
-@using Pawnshop.Application.UsersApplication.Commands.CreateUser
 @using Pawnshop.Application.UsersApplication.Commands.LoginUser
 @using Pawnshop.Domain.AuthTokens
 @using Pawnshop.Web.Exceptions
 @using Pawnshop.Web.Services.ApiService
 @using Pawnshop.Web.Services.AuthenticationService
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject HttpClient httpClient
 @inject ApiService ApiService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
-<PageTitle>Login page</PageTitle>
+<PageTitle>Pawnshop System - Login</PageTitle>
 
-<MudThemeProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+<style>
+    .login-wrapper {
+        min-height: 100vh;
+        background-color: var(--mud-palette-background);
+        transition: background-color 0.3s ease;
+    }
 
-<MudContainer Class="min-vh-100 d-flex align-items-center" MaxWidth="MaxWidth.Medium">
-    <MudCard Class="d-flex w-100" Elevation="25">
-        <div class="row g-0 w-100" style="height: 60vh;">
-            <MudCard Class="col-md-6 h-100 d-flex flex-column"
-                     Style="background: linear-gradient(to bottom, #1976d2 30%, #2196f3 70%)">
-                <MudCardContent Class="flex-grow-1 d-flex flex-column justify-content-center">
-                    <div class="text-center">
-                        <MudIcon Icon="@Icons.Custom.Brands.MudBlazor"
-                                 Size="Size.Large"
-                                 Color="Color.Inherit"
-                                 Style="font-size: 8rem; color: white;"
-                                 Class="mb-4" />
+    .pawnshop-auth-card {
+        border: 1px solid var(--mud-palette-primary-darken);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        overflow: hidden;
+        border-radius: 12px;
+    }
 
-                        <MudText Typo="Typo.h3" Class="white--text mb-2">Welcome to</MudText>
-                        <MudText Typo="Typo.h2" Class="white--text font-weight-bold">Pawnshop System</MudText>
-                    </div>
-                </MudCardContent>
-            </MudCard>
+    .brand-section {
+        background: linear-gradient(135deg, var(--mud-palette-primary) 0%, var(--mud-palette-primary-darken) 100%);
+        color: var(--mud-palette-primary-text);
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
 
-            <MudCard Class="col-md-6 h-100 d-flex flex-column">
-                <MudCardContent Class="flex-grow-1 d-flex flex-column justify-content-center">
-                    <div class="w-100 px-6">
-                        <div class="text-center mb-6">
-                            <MudText Typo="Typo.h4" Class="font-weight-bold">Login form</MudText>
-                        </div>
+    .form-section {
+        background-color: var(--mud-palette-surface);
+        padding: 3rem;
+    }
 
-                        <MudForm @bind-IsValid="@success" @bind-Errors="errors">
-                            <MudTextField @bind-Value="@loginData.Username"
-                                          T="string"
-                                          Label="Username"
-                                          Required="true"
-                                          RequiredError="User name is required."
-                                          Variant="Variant.Outlined"
-                                          FullWidth="true"
-                                          Margin="Margin.Dense"
-                                          Class="mb-6" />
+    .input-field {
+        margin-bottom: 1.5rem;
+    }
 
-                            <MudTextField @bind-Value="@loginData.Password"
-                                          T="string"
-                                          Label="Password"
-                                          Required="true"
-                                          RequiredError="Password is required."
-                                          Variant="Variant.Outlined"
-                                          InputType="InputType.Password"
-                                          FullWidth="true"
-                                          Margin="Margin.Dense"
-                                          Class="mb-8" />
+    .pawn-logo-anim {
+        font-size: 5rem;
+        animation: pulse 2s infinite;
+    }
 
-                            @if (apiExceptions != null)
+    @@keyframes pulse {
+        0% { transform: scale(1); opacity: 0.9; }
+        50% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.9; }
+    }
+</style>
+
+<div class="login-wrapper d-flex align-center justify-center">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudCard Class="pawnshop-auth-card d-flex flex-column flex-md-row" Elevation="0">
+            <!-- Branding Area -->
+            <div class="brand-section col-12 col-md-5">
+                <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Class="pawn-logo-anim mb-4" />
+                <MudText Typo="Typo.h3" Class="font-weight-bold">PAWNSHOP</MudText>
+                <MudText Typo="Typo.h6" Style="letter-spacing: 2px; text-transform: uppercase; opacity: 0.8;">Management System</MudText>
+                <div class="mt-8 mb-4" style="width: 50px; height: 3px; background-color: currentColor; border-radius: 2px;"></div>
+                <MudText Typo="Typo.body2" Align="Align.Center">Secure vault access for authorized personnel only.</MudText>
+            </div>
+
+            <!-- Login Area -->
+            <div class="form-section col-12 col-md-7">
+                <div class="d-flex flex-column h-100 justify-center">
+                    <MudText Typo="Typo.h4" Color="Color.Primary" Class="font-weight-bold mb-2">Sign In</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-8">Access your workplace terminal.</MudText>
+
+                    <MudForm @bind-IsValid="@success" @bind-Errors="errors">
+                        <MudTextField @bind-Value="@loginData.Username"
+                                      Label="Operator ID"
+                                      Variant="Variant.Outlined"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Person"
+                                      Required="true"
+                                      RequiredError="Username is required"
+                                      Class="input-field" />
+
+                        <MudTextField @bind-Value="@loginData.Password"
+                                      Label="Security Password"
+                                      Variant="Variant.Outlined"
+                                      InputType="InputType.Password"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Lock"
+                                      Required="true"
+                                      RequiredError="Password is required"
+                                      Class="input-field" />
+
+                        @if (apiExceptions != null)
+                        {
+                            foreach (var exception in apiExceptions)
                             {
-                                foreach (var exception in apiExceptions)
-                                {
-                                    <MudAlert Class="mb-1" Severity="Severity.Error" Variant="Variant.Filled">@exception</MudAlert>
-                                }
+                                <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-4" Dense="true">@exception</MudAlert>
                             }
+                        }
 
-                            <div class="d-flex justify-content-end">
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           Size="Size.Large"
-                                           ButtonType="ButtonType.Button"
-                                           Class="px-8 py-3" 
-                                           OnClick="@LoginHandle">
-                                    Sign In
-                                </MudButton>
-                            </div>
-
-                        </MudForm>
-                    </div>
-                </MudCardContent>
-            </MudCard>
-
-           
-        </div>
-    </MudCard>
-</MudContainer>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   FullWidth="true"
+                                   Class="mt-4 py-3 font-weight-bold"
+                                   Style="letter-spacing: 1px;"
+                                   OnClick="@LoginHandle">
+                            AUTHENTICATE
+                        </MudButton>
+                    </MudForm>
+                </div>
+            </div>
+        </MudCard>
+    </MudContainer>
+</div>
 
 @code {
     bool success;
@@ -102,6 +129,16 @@
     LoginUserCommand loginData = new LoginUserCommand();
     List<string> apiExceptions = null;
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/Home");
+        }
+    }
 
     private async Task LoginHandle()
     {
@@ -115,13 +152,13 @@
             }
             apiExceptions = null;
         }
-        catch(ApiException ex)
+        catch (ApiException ex)
         {
             apiExceptions = ex.ErrorMessages;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-
+            apiExceptions = new List<string> { "Connection to secure server failed." };
         }
     }
 }

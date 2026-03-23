@@ -21,7 +21,7 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
     {
         _userClaimsDataProviderService = userClaimsDataProviderService;
     }
-    
+
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Client> Clients { get; set; }
     public DbSet<Workplace> Workplaces { get; set; }
@@ -43,7 +43,7 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new UserConfiguration());
-
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DbContext).Assembly);
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -60,9 +60,9 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
             (
                 v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
-            ) 
-        {  
-        
+            )
+        {
+
         }
     }
 
@@ -84,9 +84,9 @@ public class DbContext : IdentityDbContext<Users, IdentityRole<Guid>, Guid, Iden
     {
         var entires = ChangeTracker.Entries().Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
-        foreach(var entry in entires)
+        foreach (var entry in entires)
         {
-            if(entry.Entity is BaseEntity entity)
+            if (entry.Entity is BaseEntity entity)
             {
                 var userId = _userClaimsDataProviderService.GetUserIdFromClaims();
                 entity.SetBaseEntity(userId);

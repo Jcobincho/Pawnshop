@@ -58,6 +58,6 @@ public static class UserRoles
             new(ItemDetailsDisplayAndModify)
         };
     }
-    
+
     public static List<IdentityRole<Guid>> GetRoles() => Roles;
 }

@@ -6,9 +6,9 @@ using Pawnshop.Domain.Exceptions;
 namespace Pawnshop.Api.Controllers
 {
     [ApiController]
-    public abstract class BaseController<TAddData, 
-                                         TPutData, 
-                                         TDeleteData, 
+    public abstract class BaseController<TAddData,
+                                         TPutData,
+                                         TDeleteData,
                                          TGetData> : ControllerBase where TAddData : BaseCommand
                                                                     where TPutData : BaseCommand
                                                                     where TDeleteData : BaseCommand

@@ -6,10 +6,10 @@ public static class AddSwaggerExtension
 {
     public static IServiceCollection SwaggerExtension(this IServiceCollection services)
     {
-        services.AddSwaggerGen( c => 
+        services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-        
+
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = "Wprowadź token JWT w polu 'Bearer {token}'",
@@ -19,7 +19,7 @@ public static class AddSwaggerExtension
                 Scheme = "bearer",
                 BearerFormat = "JWT"
             });
-        
+
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {

@@ -1,6 +1,5 @@
 ﻿using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.ItemDetailsApplication.Responses;
-using Pawnshop.Domain.Entities.Item;
 using System.ComponentModel.DataAnnotations;
 
 namespace Pawnshop.Application.ItemDetailsApplication.Commands.AddItemDetail
@@ -19,6 +18,6 @@ namespace Pawnshop.Application.ItemDetailsApplication.Commands.AddItemDetail
         [Required(ErrorMessage = "Added date is required.")]
         public DateTime AddedOn { get; set; }
         public string Comments { get; set; } = string.Empty;
-        public bool IsAvailable { get; set; } 
+        public bool IsAvailable { get; set; }
     }
 }

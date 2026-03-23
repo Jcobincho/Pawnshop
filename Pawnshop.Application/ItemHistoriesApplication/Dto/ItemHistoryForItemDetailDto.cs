@@ -1,6 +1,6 @@
-﻿using Pawnshop.Domain.Enums;
+﻿using Pawnshop.Application.Common.Base;
 using Pawnshop.Application.WorkplacesApplication.Dto;
-using Pawnshop.Application.Common.Base;
+using Pawnshop.Domain.Enums;
 
 namespace Pawnshop.Application.ItemHistoriesApplication.Dto
 {

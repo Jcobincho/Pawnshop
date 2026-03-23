@@ -34,7 +34,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
                 var transactionData = await _purchasesSaleTransactionQueryService.GetPurchaseSaleTransactionInfoToAgreementAsync(message.PurchasesSaleTransactionId, context.CancellationToken);
 
-                if(transactionData != null)
+                if (transactionData != null)
                 {
                     var pdfBytes = await _pdfGeneratorService.GeneratePdfAsync(transactionData, "PurchaseAgreementTemplate", context.CancellationToken); // 
 
@@ -57,7 +57,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
                     var resposne = await _mediator.Send(command, context.CancellationToken);
 
-                    if(resposne != null)
+                    if (resposne != null)
                     {
                         // powiadom uzytkownika
                     }

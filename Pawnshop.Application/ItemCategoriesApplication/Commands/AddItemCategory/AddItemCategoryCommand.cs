@@ -6,7 +6,7 @@ namespace Pawnshop.Application.ItemCategoriesApplication.Commands.AddItemCategor
 {
     public sealed class AddItemCategoryCommand : BaseCommand<AddItemCategoryResponse>
     {
-        [Required(ErrorMessage ="Category name is required.")]
+        [Required(ErrorMessage = "Category name is required.")]
         public string Name { get; set; }
         public string Description { get; set; } = string.Empty;
     }
