@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Pawnshop.Application.UsersApplication.Commands.Logout;
 using Pawnshop.Application.UsersApplication.Commands.RefreshToken;
 using Pawnshop.Domain.AuthTokens;
+using Pawnshop.Web.Components.Common;
 using Pawnshop.Web.Exceptions;
 using Pawnshop.Web.Services.AuthenticationService;
 using System.Net.Http.Headers;
@@ -28,9 +29,10 @@ namespace Pawnshop.Web.Services.ApiService
             _authStateProvider = authStateProvider;
         }
 
-        public async Task<TResponse> GetAsync<TResponse>(string uri, Dictionary<string, string> queryParams = null, bool requireAuth = true)
+        public async Task<TResponse> GetAsync<TResponse>(string uri, object queryParamsObj = null, bool requireAuth = true)
         {
-            return await SendAsync<TResponse>(HttpMethod.Get, uri, requireAuth, queryParams);
+            var dict = queryParamsObj?.ToQueryDictionary();
+            return await SendAsync<TResponse>(HttpMethod.Get, uri, requireAuth, dict);
         }
 
         public async Task<TResponse> PostAsync<TRequest, TResponse>(string uri, TRequest body, bool requireAuth = true)
