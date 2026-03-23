@@ -10,7 +10,13 @@
              RowClick="OnRowClicked"
              RowClassFunc="@((item, idx) => item == selectedEmployee ? "selected-row" : string.Empty)"
              FilterMode="DataGridFilterMode.Simple"
-             Striped="true">
+             Striped="true"
+             DragDropColumnReordering="true"
+             ColumnsPanelReordering="true"
+             Hideable="true"
+             Filterable="true"
+             Groupable="true"
+             ShowMenuIcon="true">
     <Columns>
         <PropertyColumn Property="x => x.Name" Title="Name" />
         <PropertyColumn Property="x => x.Surname" Title="Surname" />

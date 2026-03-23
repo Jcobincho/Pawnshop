@@ -69,3 +69,4 @@ volumes:
     external: false
   minio_data:
     driver: local
+

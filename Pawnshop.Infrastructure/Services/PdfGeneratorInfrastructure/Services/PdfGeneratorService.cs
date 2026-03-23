@@ -11,8 +11,8 @@ namespace Pawnshop.Infrastructure.Services.PdfGeneratorInfrastructure.Services
         {
             try
             {
-                var templatePath = Path.Combine("C:\\Users\\Jcob\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Services\\PdfGeneratorInfrastructure\\Services\\PDFViews", $"{templateName}.hbs");
-
+                var templatePath = Path.Combine("C:\\Users\\Jc0b\\Desktop\\Pawnshop\\Pawnshop.Infrastructure\\Services\\PdfGeneratorInfrastructure\\Services\\PDFViews", $"{templateName}.hbs");
+                //C:\Users\Jcob\Desktop\Pawnshop\Pawnshop.Infrastructure\PurchaseAgreementTemplate.hbs
                 var templateContext = await File.ReadAllTextAsync(templatePath, cancellationToken);
                 Handlebars.RegisterHelper("add", (writer, context, parameters) =>
                 {

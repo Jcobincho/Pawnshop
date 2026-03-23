@@ -156,7 +156,6 @@ public static class DependencyInjection
 
         // Pdf service
         services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
-        services.AddScoped<IReportGeneratorService, ReportGeneratorService>();
 
         // Register pipeline behavior for getting user id from claims
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UserIdPipelineBehavior<,>));

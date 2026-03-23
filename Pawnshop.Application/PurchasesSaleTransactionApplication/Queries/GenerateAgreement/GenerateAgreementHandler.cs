@@ -16,7 +16,7 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.Gener
 
         public async Task<GenerateAgreementResponse> Handle(GenerateAgreementQuery request, CancellationToken cancellationToken)
         {
-            var purchaseSaleTransactionEvent = new GenerateAgreementEvent(request.PurchasesSaleTransactionId);
+            var purchaseSaleTransactionEvent = new GenerateAgreementEvent(request.PurchasesSaleTransactionId, request.UserIdFromClaims);
 
             await _purchaseSaleTransactionEventPublisher.GenerateAgreementPublishAsync(purchaseSaleTransactionEvent, cancellationToken);
 

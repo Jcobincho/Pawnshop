@@ -2,7 +2,8 @@
 {
     public sealed record GenerateAgreementEvent
     (
-        Guid PurchasesSaleTransactionId
+        Guid PurchasesSaleTransactionId,
+        Guid UserId
     );
 
 }

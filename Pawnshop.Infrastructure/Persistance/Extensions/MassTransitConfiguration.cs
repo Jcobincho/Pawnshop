@@ -14,7 +14,6 @@ namespace Pawnshop.Infrastructure.Persistance.Extensions
             {
                 x.AddConsumer<AddItemHistoryAndItemValuationConsumer>();
                 x.AddConsumer<GenerateAgreementCustomer>();
-                x.AddConsumer<GenerateTransactionReportConsumer>();
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -34,10 +33,7 @@ namespace Pawnshop.Infrastructure.Persistance.Extensions
                         e.ConfigureConsumer<GenerateAgreementCustomer>(context);
                     });
 
-                    cfg.ReceiveEndpoint("generate-transaction-report-queue", e =>
-                    {
-                        e.ConfigureConsumer<GenerateTransactionReportConsumer>(context);
-                    });
+
                 });
             });
 

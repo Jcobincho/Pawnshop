@@ -7,8 +7,6 @@ using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GenerateA
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetEverySalesTransaction;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetPurchasesForClient;
 
-using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.GenerateTransactionReport;
-
 namespace Pawnshop.Api.Controllers
 {
     [Route("[controller]")]
@@ -39,16 +37,6 @@ namespace Pawnshop.Api.Controllers
             var response = await Sender.Send(query, cancellationToken);
 
             return Ok(response);
-        }
-
-        [HttpPost("generate-report")]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GenerateReport([FromBody] GenerateTransactionReportCommand command, CancellationToken cancellationToken)
-        {
-            await Sender.Send(command, cancellationToken);
-
-            return Accepted();
         }
     }
 }

@@ -16,7 +16,6 @@ public sealed class NotificationService : INotificationService
     public async Task NotifyReportReadyAsync(string userId, string reportUrl, string fileName, CancellationToken cancellationToken)
     {
         await _hubContext.Clients.User(userId).SendAsync("ReceiveReportReady", new { reportUrl, fileName }, cancellationToken);
-        // Fallback to group if user identifier is not matched correctly by SignalR
         await _hubContext.Clients.Group(userId).SendAsync("ReceiveReportReady", new { reportUrl, fileName }, cancellationToken);
     }
 
