@@ -2,40 +2,28 @@
 @using Pawnshop.Application.EmployeesApplication.Responses
 @using Pawnshop.Web.Exceptions
 @using Pawnshop.Web.Services.ApiService
+@using Pawnshop.Web.Components.Common
 
 @inject ApiService ApiService
 
-<MudDataGrid T="EmployeeDto"
-             Items="@(employeesFromApi?.AllEmployeesList ?? new List<EmployeeDto>())"
-             RowClick="OnRowClicked"
-             DragDropColumnReordering="true" 
-             ColumnsPanelReordering="true" 
-             ColumnResizeMode="ResizeMode.Column"
-             RowClassFunc="@( (employee, index) => employee == selectedEmployee ? "selected-row" : string.Empty )"
-             Hideable="true"
-             Filterable="true"
-             Groupable="true"
-             FilterMode="DataGridFilterMode.Simple" 
-             Striped="true"
-             ShowMenuIcon="true">
-
-    <Columns>
-        <PropertyColumn Property="x => x.EmployeeId" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="@(x => x.BirthDate.ToString("dd.MM.yyyy"))" Title="Birth date" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-    </Columns>
-    <PagerContent>
-        <MudDataGridPager T="EmployeeDto" />
-    </PagerContent>
-</MudDataGrid>
+<UniversalGrid TItem="EmployeeDto" 
+               Title="Lista Pracowników"
+               Items="@(employeesFromApi?.AllEmployeesList ?? new List<EmployeeDto>())"
+               OnItemSelected="HandleEmployeeSelected"
+               OnActionTriggered="HandleActionTriggered">
+    <GridColumns>
+        <PropertyColumn Property="@((EmployeeDto x) => x.EmployeeId)" Title="Employee id" Hidden="true" />
+        <PropertyColumn Property="@((EmployeeDto x) => x.Name)" Title="Name" />
+        <PropertyColumn Property="@((EmployeeDto x) => x.SecondName)" Title="Second name" Hidden="true" />
+        <PropertyColumn Property="@((EmployeeDto x) => x.Surname)" Title="Surname" />
+        <PropertyColumn Property="@((EmployeeDto x) => x.BirthDate)" Title="Birth date" Format="dd.MM.yyyy" />
+    </GridColumns>
+</UniversalGrid>
 
 @code {
-    [Parameter]
-    public EventCallback<EmployeeDto> OnEmployeeSelected { get; set; }
+    [Parameter] public EventCallback<EmployeeDto> OnEmployeeSelected { get; set; }
+    [Parameter] public EventCallback<UniversalCrudMenu.CrudAction> OnActionTriggered { get; set; }
 
-    private EmployeeDto selectedEmployee;
     public GetAllEmployeesResponse employeesFromApi = null;
     List<string> apiExceptions = null;
 
@@ -62,9 +50,13 @@
         }
     }
 
-    private async Task OnRowClicked(DataGridRowClickEventArgs<EmployeeDto> row)
+    private async Task HandleEmployeeSelected(EmployeeDto employee)
     {
-        selectedEmployee = row.Item;
-        await OnEmployeeSelected.InvokeAsync(selectedEmployee);
+        await OnEmployeeSelected.InvokeAsync(employee);
+    }
+
+    private async Task HandleActionTriggered(UniversalCrudMenu.CrudAction action)
+    {
+        await OnActionTriggered.InvokeAsync(action);
     }
 }

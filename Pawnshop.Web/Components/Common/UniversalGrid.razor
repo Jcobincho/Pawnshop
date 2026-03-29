@@ -1,0 +1,59 @@
+@typeparam TItem
+@attribute [CascadingTypeParameter(nameof(TItem))]
+
+@using MudBlazor
+@using Pawnshop.Web.Components.Common
+
+<MudDataGrid T="TItem"
+             Items="@Items" 
+             RowClick="OnRowClicked"
+             RowClassFunc="@((item, index) => item != null && item.Equals(SelectedItem) ? "selected-row" : string.Empty)"
+             DragDropColumnReordering="true" 
+             ColumnsPanelReordering="true"
+             ColumnResizeMode="ResizeMode.Column" 
+             MultiSelection="false"
+             Hideable="true" 
+             Filterable="true" 
+             Groupable="true" 
+             FilterMode="DataGridFilterMode.Simple" 
+             ShowMenuIcon="true"
+             Striped="true">
+    
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@Title</MudText>
+        <MudSpacer />
+        <UniversalCrudMenu IsItemSelected="@(SelectedItem != null)" OnActionSelected="HandleMenuAction" />
+    </ToolBarContent>
+
+    <Columns>
+        @GridColumns
+    </Columns>
+
+</MudDataGrid>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Dane";
+    [Parameter] public IEnumerable<TItem> Items { get; set; }
+    [Parameter] public RenderFragment GridColumns { get; set; }
+    [Parameter] public EventCallback<TItem> OnItemSelected { get; set; }
+    [Parameter] public EventCallback<UniversalCrudMenu.CrudAction> OnActionTriggered { get; set; }
+
+    public TItem SelectedItem { get; private set; }
+
+    private async Task OnRowClicked(DataGridRowClickEventArgs<TItem> row)
+    {
+        SelectedItem = row.Item;
+        if (OnItemSelected.HasDelegate)
+        {
+            await OnItemSelected.InvokeAsync(SelectedItem);
+        }
+    }
+
+    private async Task HandleMenuAction(UniversalCrudMenu.CrudAction action)
+    {
+        if (OnActionTriggered.HasDelegate)
+        {
+            await OnActionTriggered.InvokeAsync(action);
+        }
+    }
+}

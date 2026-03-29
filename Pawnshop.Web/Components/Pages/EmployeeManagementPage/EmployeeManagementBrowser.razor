@@ -3,15 +3,12 @@
 @using Pawnshop.Application.EmployeesApplication.Dto
 @using Pawnshop.Web.Components.Common
 
-<UniversalCrudMenu IsItemSelected="@(currentEmployee != null)" OnActionSelected="HandleCrudAction" />
-
-<EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" @ref="employeeGrid" />
+<EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" OnActionTriggered="HandleCrudAction" @ref="employeeGrid" />
 
 @if(showDetail)
 {
     <EmployeeManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentEmployee="currentEmployee" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
 }
-
 
 @code {
     private EmployeeDto currentEmployee = null;
@@ -22,6 +19,19 @@
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
         selectedAction = action;
+        
+        // Resetujemy obiekt przy dodawaniu nowego pracownika
+        if (action == UniversalCrudMenu.CrudAction.Add)
+        {
+            currentEmployee = new EmployeeDto
+            {
+                Name = string.Empty,
+                SecondName = string.Empty,
+                Surname = string.Empty,
+                BirthDate = DateTime.Today
+            };
+        }
+
         showDetail = true;
     }
 

@@ -2,48 +2,39 @@
 @using Pawnshop.Application.UsersApplication.Responses
 @using Pawnshop.Web.Exceptions
 @using Pawnshop.Web.Services.ApiService
+@using Pawnshop.Web.Components.Common
 
 @inject ApiService ApiService
 
-<MudDataGrid T="GetAllUsersDto"
-             Items="@(usersFromApi?.Users ?? new List<GetAllUsersDto>())" 
-             RowClassFunc="@( (user, index) => user == selectedUser ? "selected-row" : string.Empty)" 
-             RowClick="OnRowClicked"
-             DragDropColumnReordering="true" 
-             ColumnsPanelReordering="true"
-             ColumnResizeMode="ResizeMode.Column" 
-             MultiSelection="false"
-             Hideable="true" 
-             Filterable="true" 
-             Groupable="true" 
-             FilterMode="DataGridFilterMode.Simple" 
-             ShowMenuIcon="true"
-             Striped="true">
-    <Columns>
-        <PropertyColumn Property="x => x.UserId" Title="User id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true"/>
-        <PropertyColumn Property="x => x.UserName" Title="User name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Email" Title="Email" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Roles" Title="Roles" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true">
+<UniversalGrid TItem="GetAllUsersDto" 
+               Title="Lista Użytkowników"
+               Items="@(usersFromApi?.Users ?? new List<GetAllUsersDto>())"
+               OnItemSelected="HandleUserSelected"
+               OnActionTriggered="HandleActionTriggered">
+    <GridColumns>
+        <PropertyColumn Property="@((GetAllUsersDto x) => x.UserId)" Title="User id" Hidden="true" />
+        <PropertyColumn Property="@((GetAllUsersDto x) => x.UserName)" Title="User name" />
+        <PropertyColumn Property="@((GetAllUsersDto x) => x.Email)" Title="Email" />
+        
+        <PropertyColumn Property="@((GetAllUsersDto x) => x.Roles)" Title="Roles">
             <CellTemplate>
-                @string.Join(", ", context.Item.Roles)
+                @string.Join(", ", context.Item.Roles ?? new List<string>())
             </CellTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="@(x => x.Employee.EmployeeId)" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Employee.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Employee.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Employee.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="@(x => x.Employee.BirthDate.ToString("dd.MM.yyyy"))" Title="BirthDate" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-    </Columns>
-</MudDataGrid>
+        
+        <PropertyColumn Property="@((GetAllUsersDto x) => x.Employee.EmployeeId)" Title="Employee id" Hidden="true" />
+        <PropertyColumn Property="@((GetAllUsersDto x) => x.Employee.Name)" Title="Name" />
+        <PropertyColumn Property="@((GetAllUsersDto x) => x.Employee.SecondName)" Title="Second name" Hidden="true" />
+        <PropertyColumn Property="@((GetAllUsersDto x) => x.Employee.Surname)" Title="Surname" />
+    </GridColumns>
+</UniversalGrid>
 
 @code {
-    [Parameter]
-    public EventCallback<GetAllUsersDto> OnUserSelected { get; set; }
+    [Parameter] public EventCallback<GetAllUsersDto> OnUserSelected { get; set; }
+    [Parameter] public EventCallback<UniversalCrudMenu.CrudAction> OnActionTriggered { get; set; }
 
     List<string> apiExceptions = null;
     public GetAllUsersResponse usersFromApi = new GetAllUsersResponse();
-    private GetAllUsersDto selectedUser;
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,10 +59,13 @@
         }
     }
 
-    private async Task OnRowClicked(DataGridRowClickEventArgs<GetAllUsersDto> row)
+    private async Task HandleUserSelected(GetAllUsersDto user)
     {
-        selectedUser = row.Item;
-        await OnUserSelected.InvokeAsync(selectedUser);
+        await OnUserSelected.InvokeAsync(user);
+    }
+
+    private async Task HandleActionTriggered(UniversalCrudMenu.CrudAction action)
+    {
+        await OnActionTriggered.InvokeAsync(action);
     }
 }
-
