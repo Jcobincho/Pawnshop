@@ -10,7 +10,7 @@
 @using Pawnshop.Web.Exceptions
 @using Pawnshop.Web.Services.ApiService
 
-@inject ApiService ApiService;
+@inject ApiService ApiService
 
 <DetailModalOverlay>
     <MudCard Class="w-50" Style="max-height: 75vh; overflow: auto;">
@@ -84,7 +84,7 @@
                     <MudCard Class="w-100" Outlined="true">
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.h6">Employee detail</MudText>
+                                 <MudText Typo="Typo.h6">Employee detail</MudText>
                             </CardHeaderContent>
                         </MudCardHeader>
                         
@@ -140,7 +140,9 @@
             @if (showEmployeeGrid)
             {
                 <DetailModalOverlay OnClickOutside="@(()=> showEmployeeGrid = false)">
-                    <EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected"/>
+                    <div class="w-75 bg-white rounded shadow-lg overflow-hidden" @onclick:stopPropagation="true">
+                        <EmployeeManagementBrowser IsLookupMode="true" OnEmployeePicked="HandleEmployeePicked"/>
+                    </div>
                 </DetailModalOverlay>
             }
 
@@ -217,10 +219,11 @@
         StateHasChanged();
     }
 
-    private void HandleEmployeeSelected(EmployeeDto employee)
+    private void HandleEmployeePicked(EmployeeDto employee)
     {
         CurrentUser.Employee = employee;
         showEmployeeGrid = false;
+        StateHasChanged();
     }
 
     private async Task CrudAddHandler()
@@ -236,7 +239,6 @@
                 EmployeeId = CurrentUser.Employee.EmployeeId,
                 UserRoles = CurrentUser.Roles
             };
-
             CreateUserResponse createUserResponse = await ApiService.PostAsync<CreateUserCommand, CreateUserResponse>("/Users/add", newUser);
 
             await CrudCompleted();
@@ -261,7 +263,6 @@
                 EmployeeId = CurrentUser.Employee.EmployeeId,
                 UserRoles = CurrentUser.Roles
             };
-
             UpdateUserResponse updatedUserResponse = await ApiService.PutAsync<UpdateUserCommand, UpdateUserResponse>("/Users/update", updatedUser);
 
             await CrudCompleted();
@@ -280,7 +281,6 @@
             {
                 UserId = CurrentUser.UserId
             };
-
             DeleteUserResponse deleteUserResponse = await ApiService.DeleteAsync<DeleteUserCommand, DeleteUserResponse>("/Users/delete", deleteUser);
 
             await CrudCompleted();

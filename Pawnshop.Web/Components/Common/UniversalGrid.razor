@@ -22,7 +22,9 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">@Title</MudText>
         <MudSpacer />
-        <UniversalCrudMenu IsItemSelected="@(SelectedItem != null)" OnActionSelected="HandleMenuAction" />
+        <UniversalCrudMenu IsItemSelected="@(SelectedItem != null)" 
+                           ShowPickButton="@IsLookupMode" 
+                           OnActionSelected="HandleMenuAction" />
     </ToolBarContent>
 
     <Columns>
@@ -38,11 +40,15 @@
     [Parameter] public EventCallback<TItem> OnItemSelected { get; set; }
     [Parameter] public EventCallback<UniversalCrudMenu.CrudAction> OnActionTriggered { get; set; }
 
+    [Parameter] public bool IsLookupMode { get; set; } = false;
+    [Parameter] public EventCallback<TItem> OnItemPicked { get; set; }
+
     public TItem SelectedItem { get; private set; }
 
     private async Task OnRowClicked(DataGridRowClickEventArgs<TItem> row)
     {
         SelectedItem = row.Item;
+        
         if (OnItemSelected.HasDelegate)
         {
             await OnItemSelected.InvokeAsync(SelectedItem);
@@ -51,9 +57,19 @@
 
     private async Task HandleMenuAction(UniversalCrudMenu.CrudAction action)
     {
-        if (OnActionTriggered.HasDelegate)
+        if (action == UniversalCrudMenu.CrudAction.Pick)
         {
-            await OnActionTriggered.InvokeAsync(action);
+            if (OnItemPicked.HasDelegate && SelectedItem != null)
+            {
+                await OnItemPicked.InvokeAsync(SelectedItem);
+            }
+        }
+        else
+        {
+            if (OnActionTriggered.HasDelegate)
+            {
+                await OnActionTriggered.InvokeAsync(action);
+            }
         }
     }
 }

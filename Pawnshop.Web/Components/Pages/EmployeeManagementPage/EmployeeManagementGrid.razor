@@ -9,6 +9,8 @@
 <UniversalGrid TItem="EmployeeDto" 
                Title="Lista Pracowników"
                Items="@(employeesFromApi?.AllEmployeesList ?? new List<EmployeeDto>())"
+               IsLookupMode="@IsLookupMode"
+               OnItemPicked="HandleItemPicked"
                OnItemSelected="HandleEmployeeSelected"
                OnActionTriggered="HandleActionTriggered">
     <GridColumns>
@@ -23,6 +25,10 @@
 @code {
     [Parameter] public EventCallback<EmployeeDto> OnEmployeeSelected { get; set; }
     [Parameter] public EventCallback<UniversalCrudMenu.CrudAction> OnActionTriggered { get; set; }
+
+    // NOWE PARAMETRY DLA TRYBU SŁOWNIKOWEGO
+    [Parameter] public bool IsLookupMode { get; set; } = false;
+    [Parameter] public EventCallback<EmployeeDto> OnEmployeePicked { get; set; }
 
     public GetAllEmployeesResponse employeesFromApi = null;
     List<string> apiExceptions = null;
@@ -58,5 +64,10 @@
     private async Task HandleActionTriggered(UniversalCrudMenu.CrudAction action)
     {
         await OnActionTriggered.InvokeAsync(action);
+    }
+
+    private async Task HandleItemPicked(EmployeeDto employee)
+    {
+        await OnEmployeePicked.InvokeAsync(employee);
     }
 }

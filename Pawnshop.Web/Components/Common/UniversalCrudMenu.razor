@@ -1,6 +1,17 @@
 ﻿@using MudBlazor
 
 <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
+    
+    @if (ShowPickButton)
+    {
+        <MudButton StartIcon="@Icons.Material.Filled.Check" 
+                   Disabled="@(!IsItemSelected)" 
+                   Color="Color.Success"
+                   OnClick="@(() => OnAction(CrudAction.Pick))">
+            Pick
+        </MudButton>
+    }
+
     <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Disabled="@(!IsItemSelected)"
                OnClick="@(() => OnAction(CrudAction.View))">
         Details
@@ -24,11 +35,11 @@
 </MudButtonGroup>
 
 @code {
-    [Parameter]
-    public bool IsItemSelected { get; set; }
+    [Parameter] public bool IsItemSelected { get; set; }
+    
+    [Parameter] public bool ShowPickButton { get; set; } 
 
-    [Parameter]
-    public EventCallback<CrudAction> OnActionSelected { get; set; }
+    [Parameter] public EventCallback<CrudAction> OnActionSelected { get; set; }
 
     private async Task OnAction(CrudAction action)
     {
@@ -44,6 +55,7 @@
         Add,
         AddCopy,
         Update,
-        Delete
+        Delete,
+        Pick 
     }
 }

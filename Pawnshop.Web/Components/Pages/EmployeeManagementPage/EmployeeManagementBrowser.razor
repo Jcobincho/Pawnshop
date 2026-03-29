@@ -3,14 +3,24 @@
 @using Pawnshop.Application.EmployeesApplication.Dto
 @using Pawnshop.Web.Components.Common
 
-<EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" OnActionTriggered="HandleCrudAction" @ref="employeeGrid" />
+<EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" 
+                      OnActionTriggered="HandleCrudAction" 
+                      IsLookupMode="@IsLookupMode" 
+                      OnEmployeePicked="HandleItemPicked"
+                      @ref="employeeGrid" />
 
 @if(showDetail)
 {
-    <EmployeeManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentEmployee="currentEmployee" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
+    <EmployeeManagementDetail OnDetailCancel="HandleDetailCanceled" 
+                              CurrentEmployee="currentEmployee" 
+                              SelectedAction="selectedAction" 
+                              OnCrudCompleted="HandleCrudCompleted" />
 }
 
 @code {
+    [Parameter] public bool IsLookupMode { get; set; } = false;
+    [Parameter] public EventCallback<EmployeeDto> OnEmployeePicked { get; set; }
+
     private EmployeeDto currentEmployee = null;
     private bool showDetail = false;
     private UniversalCrudMenu.CrudAction selectedAction;
@@ -20,7 +30,6 @@
     {
         selectedAction = action;
         
-        // Resetujemy obiekt przy dodawaniu nowego pracownika
         if (action == UniversalCrudMenu.CrudAction.Add)
         {
             currentEmployee = new EmployeeDto
@@ -40,4 +49,12 @@
     private void HandleDetailCanceled() => showDetail = false;
 
     private async Task HandleCrudCompleted() => await employeeGrid.ReloadDataAsync();
+    
+    private async Task HandleItemPicked(EmployeeDto employee)
+    {
+        if (OnEmployeePicked.HasDelegate)
+        {
+            await OnEmployeePicked.InvokeAsync(employee);
+        }
+    }
 }
