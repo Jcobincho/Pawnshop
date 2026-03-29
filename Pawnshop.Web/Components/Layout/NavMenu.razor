@@ -1,53 +1,72 @@
-﻿@using Pawnshop.Domain.Roles
+@using Pawnshop.Domain.Roles
+@using Pawnshop.Web.Services
+@inject LanguageService Lang
+@implements IDisposable
 
 <MudNavMenu>
     <AuthorizeView>
         <Authorized>
-            <MudNavLink Href="/Home" 
-                        Match="NavLinkMatch.All" 
-                        Icon="@Icons.Material.Filled.Home">
-                Home
+            <MudNavLink Href="/Home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
+                @Lang.T("Strona główna", "Home")
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
-    
-    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.WorkplacesDisplay}, {UserRoles.WorkplacesDisplayAndModify}")">
+
+    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.TradingDisplay}, {UserRoles.TradingAndModify}")">
         <Authorized>
-            <MudNavLink Href="/Workplace-management-page"
-                        Match="NavLinkMatch.All"
+            <MudNavLink Href="/Trading-management-page" Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.ShoppingCart">
+                @Lang.T("Zarządzanie transakcjami", "Trading management")
+            </MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView
+        Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.WorkplacesDisplay}, {UserRoles.WorkplacesDisplayAndModify}")">
+        <Authorized>
+            <MudNavLink Href="/Workplace-management-page" Match="NavLinkMatch.All"
                         Icon="@Icons.Material.Filled.AddLocationAlt">
-                Workplace management
+                @Lang.T("Zarządzanie lombardami", "Workplace management")
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
 
     <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.ClientsDisplay}, {UserRoles.ClientsDisplayAndModify}")">
         <Authorized>
-            <MudNavLink Href="/Clients-management-page"
-                        Match="NavLinkMatch.All"
+            <MudNavLink Href="/Clients-management-page" Match="NavLinkMatch.All"
                         Icon="@Icons.Material.Filled.EmojiPeople">
-                Client management
+                @Lang.T("Zarządzanie klientami", "Client management")
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
 
-    <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.EmployeesDisplay}, {UserRoles.EmployeesDisplayAndModify}")">
+    <AuthorizeView
+        Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.EmployeesDisplay}, {UserRoles.EmployeesDisplayAndModify}")">
         <Authorized>
-            <MudNavLink Href="/Employee-management-page"
-                        Match="NavLinkMatch.All"
-                        Icon="@Icons.Material.Filled.Work">
-                Employee management
+            <MudNavLink Href="/Employee-management-page" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Work">
+                @Lang.T("Zarządzanie pracownikami", "Employee management")
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
-    
+
     <AuthorizeView Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.UsersDisplay}, {UserRoles.UsersDisplayAndModify}")">
         <Authorized>
-            <MudNavLink Href="/User-management-page"
-                        Match="NavLinkMatch.All"
+            <MudNavLink Href="/User-management-page" Match="NavLinkMatch.All"
                         Icon="@Icons.Material.Filled.ManageAccounts">
-                User management
+                @Lang.T("Zarządzanie użytkownikami", "User management")
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
 </MudNavMenu>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Lang.OnLanguageChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        Lang.OnLanguageChanged -= StateHasChanged;
+    }
+}

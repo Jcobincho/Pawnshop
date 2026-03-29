@@ -1,185 +1,109 @@
-﻿@using Pawnshop.Application.EmployeesApplication.Commands.AddEmployee
+@using Pawnshop.Application.EmployeesApplication.Commands.AddEmployee
 @using Pawnshop.Application.EmployeesApplication.Commands.DeleteEmployee
 @using Pawnshop.Application.EmployeesApplication.Commands.EditEmployee
 @using Pawnshop.Application.EmployeesApplication.Dto
 @using Pawnshop.Application.EmployeesApplication.Responses
 @using Pawnshop.Web.Components.Common
-@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services
 @using Pawnshop.Web.Services.ApiService
+@using MudBlazor
 
 @inject ApiService ApiService
+@inject ISnackbar Snackbar
+@inject LanguageService Lang
+@implements IDisposable
 
 <DetailModalOverlay>
-    <MudCard Class="w-50" Style="max-height: 75vh; overflow: auto;">
+    <MudCard Class="w-50" Style="max-height: 85vh; overflow: auto; border-radius: 12px;">
         <MudCardHeader>
             <CardHeaderContent>
-                <MudText Typo="Typo.h6">Employee detail</MudText>
-
-                @if (apiExceptions != null)
-                {
-                    foreach (var error in apiExceptions)
-                    {
-                        <MudAlert Severity="Severity.Error" Class="mt-2">@error</MudAlert>
-                    }
-                }
-
+                <MudText Typo="Typo.h5" Color="Color.Primary">
+                    <b>@Lang.EmployeeManagement - @(SelectedAction == UniversalCrudMenu.CrudAction.Add ? Lang.Add : (SelectedAction == UniversalCrudMenu.CrudAction.Update ? Lang.Update : Lang.Details))</b>
+                </MudText>
             </CardHeaderContent>
         </MudCardHeader>
+
         <MudCardContent>
-            <MudTextField @bind-Value="@(CurrentEmployee.Name)" 
-                          Label="Name" 
-                          Variant="Variant.Outlined" 
-                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
-
-            <MudTextField @bind-Value="CurrentEmployee.SecondName" 
-                          Label="Secondname" 
-                          Variant="Variant.Outlined" 
-                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
-
-            <MudTextField @bind-Value="CurrentEmployee.Surname" 
-                          Label="Surname" 
-                          Variant="Variant.Outlined" 
-                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
-
-            <MudDatePicker Label="Birth date"
-                           Editable="true"
-                           Date="@CurrentEmployee.BirthDate"
-                           DateChanged="@HandleBirthDateChanged"
-                           Mask="@(new DateMask("00.00.0000"))"
-                           DateFormat="dd.MM.yyyy"
-                           Placeholder="Birth date"
-                           Variant="Variant.Outlined" 
-                           ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete)" />
+            @if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                <MudText Typo="Typo.h6" Align="Align.Center">@Lang.ConfirmDelete</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-2">@CurrentEmployee?.Name @CurrentEmployee?.Surname</MudText>
+            }
+            else
+            {
+                <MudGrid>
+                    <MudItem md="6">
+                        <MudTextField @bind-Value="@Name" Label="@Lang.Name" Variant="Variant.Outlined" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" />
+                    </MudItem>
+                    <MudItem md="6">
+                        <MudTextField @bind-Value="@Surname" Label="@Lang.Surname" Variant="Variant.Outlined" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" />
+                    </MudItem>
+                    <MudItem md="12">
+                        <MudDatePicker @bind-Date="@BirthDate" Label="@Lang.BirthDate" Variant="Variant.Outlined" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" />
+                    </MudItem>
+                </MudGrid>
+            }
         </MudCardContent>
-        <MudCardActions Class="gap-2 justify-content-end">
 
-            @if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
+        <MudCardActions Class="d-flex justify-space-between px-4 pb-4">
+            <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="OnDetailCancel">@Lang.Cancel</MudButton>
+            @if (SelectedAction != UniversalCrudMenu.CrudAction.View)
             {
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudAddHandler">Add</MudButton>
+                <MudButton Variant="Variant.Filled" Color="@(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Color.Error : Color.Primary)" OnClick="HandleCrudAction">
+                    @(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Lang.Delete : Lang.Save)
+                </MudButton>
             }
-            else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
-            {
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudUpdateHandler">Update</MudButton>
-            }
-            else if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
-            {
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CrudDeleteHandler">Delete</MudButton>
-            }
-
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="HandleDetailCancel">Cancel</MudButton>
-
         </MudCardActions>
     </MudCard>
 </DetailModalOverlay>
 
-
-
 @code {
-    [Parameter]
-    public EmployeeDto CurrentEmployee { get; set; }
+    [Parameter] public EmployeeDto CurrentEmployee { get; set; }
+    [Parameter] public UniversalCrudMenu.CrudAction SelectedAction { get; set; }
+    [Parameter] public EventCallback OnDetailCancel { get; set; }
+    [Parameter] public EventCallback OnCrudCompleted { get; set; }
 
-    [Parameter]
-    public UniversalCrudMenu.CrudAction SelectedAction { get; set; }
+    private string Name { get; set; }
+    private string Surname { get; set; }
+    private DateTime? BirthDate { get; set; }
 
-    [Parameter]
-    public EventCallback OnCrudCompleted { get; set; }
-
-    [Parameter]
-    public EventCallback OnDetailCancel { get; set; }
-
-    private List<string> apiExceptions = null;
-
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
-        if (CurrentEmployee == null || SelectedAction == UniversalCrudMenu.CrudAction.Add)
+        Lang.OnLanguageChanged += StateHasChanged;
+        if (CurrentEmployee != null)
         {
-            CurrentEmployee = new EmployeeDto
-            {
-                Name = string.Empty,
-                SecondName = string.Empty,
-                Surname = string.Empty,
-                BirthDate = DateTime.Today 
-            };
+            Name = CurrentEmployee.Name;
+            Surname = CurrentEmployee.Surname;
+            BirthDate = CurrentEmployee.BirthDate;
         }
     }
 
-    private void HandleBirthDateChanged(DateTime? date)
-    {
-        CurrentEmployee.BirthDate = date ?? DateTime.Today;
-    }
-
-    private async Task HandleDetailCancel()
-    {
-        await OnDetailCancel.InvokeAsync();
-    }
-
-    private async Task CrudAddHandler()
+    private async Task HandleCrudAction()
     {
         try
         {
-            AddEmployeeCommand newEmployee = new AddEmployeeCommand()
+            if (SelectedAction == UniversalCrudMenu.CrudAction.Add)
             {
-                Name = CurrentEmployee.Name,
-                SecondName = CurrentEmployee.SecondName,
-                Surname = CurrentEmployee.Surname,
-                BirthDate = CurrentEmployee.BirthDate
-            };
-
-            AddEmployeeResponse addEmployeeResponse = await ApiService.PostAsync<AddEmployeeCommand, AddEmployeeResponse>("/Employees/add", newEmployee);
-
-            await CrudCompleted();
-        }
-        catch(ApiException ex)
-        {
-            apiExceptions = ex.ErrorMessages;
-        }
-    }
-
-    private async Task CrudUpdateHandler()
-    {
-        try
-        {
-            UpdateEmployeeCommand updatedEmployee = new UpdateEmployeeCommand()
+                await ApiService.PostAsync<AddEmployeeCommand, AddEmployeeResponse>("Employees/add", new AddEmployeeCommand { Name = Name, Surname = Surname, BirthDate = BirthDate ?? DateTime.Now });
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
             {
-                EmployeeId = CurrentEmployee.EmployeeId,
-                Name = CurrentEmployee.Name,
-                SecondName = CurrentEmployee.SecondName,
-                Surname = CurrentEmployee.Surname,
-                BirthDate = CurrentEmployee.BirthDate
-            };
-
-            UpdateEmployeeResponse updatedEmployeeResponse = await ApiService.PutAsync<UpdateEmployeeCommand, UpdateEmployeeResponse>("/Employees/update", updatedEmployee);
-
-            await CrudCompleted();
-        }
-        catch (ApiException ex)
-        {
-            apiExceptions = ex.ErrorMessages;
-        }
-    }
-
-    private async Task CrudDeleteHandler()
-    {
-        try
-        {
-            DeleteEmployeeCommand deleteEmployee = new DeleteEmployeeCommand()
+                await ApiService.PutAsync<UpdateEmployeeCommand, UpdateEmployeeResponse>("Employees/update", new UpdateEmployeeCommand { EmployeeId = CurrentEmployee.Id, Name = Name, Surname = Surname, BirthDate = BirthDate ?? DateTime.Now });
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
             {
-                EmployeeId = CurrentEmployee.EmployeeId
-            };
+                await ApiService.DeleteAsync<DeleteEmployeeCommand, DeleteEmployeeResponse>("Employees/delete", new DeleteEmployeeCommand { EmployeeId = CurrentEmployee.Id });
+            }
 
-            DeleteEmployeeResponse deleteEmployeeResponse = await ApiService.DeleteAsync<DeleteEmployeeCommand, DeleteEmployeeResponse>("/Employees/delete", deleteEmployee);
-
-            await CrudCompleted();
+            Snackbar.Add(Lang.SuccessSave, Severity.Success);
+            await OnCrudCompleted.InvokeAsync();
+            await OnDetailCancel.InvokeAsync();
         }
-        catch (ApiException ex)
+        catch (Exception ex)
         {
-            apiExceptions = ex.ErrorMessages;
+            Snackbar.Add($"{Lang.ErrorGeneric}: {ex.Message}", Severity.Error);
         }
     }
 
-    private async Task CrudCompleted()
-    {
-        await HandleDetailCancel();
-        await OnCrudCompleted.InvokeAsync();
-    }
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

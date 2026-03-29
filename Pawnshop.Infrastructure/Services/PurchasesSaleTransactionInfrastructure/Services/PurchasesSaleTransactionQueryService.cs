@@ -36,7 +36,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
         public async Task<PagedResult<SalesTransactionDto>> GetEverySalesTransactionsPagedAsDtoAsync(GetEverySalesTransactionQuery query, CancellationToken cancellationToken)
         {
-            var dbQuery = _dbContext.PurchasesSaleTransaction.Where(x => x.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Sale)
+            var dbQuery = _dbContext.PurchasesSaleTransaction
                                                              .Include(x => x.Workplace)
                                                              .OrderByDescending(x => x.TransactionDate);
 

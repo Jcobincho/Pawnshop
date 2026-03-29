@@ -1,0 +1,69 @@
+@using Pawnshop.Application.ItemCategoriesApplication.Dto
+@using Pawnshop.Application.ItemCategoriesApplication.Responses
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@inject ApiService ApiService
+@inject LanguageService Lang
+@implements IDisposable
+
+<MudTable Items="_categories" Hover="true" Breakpoint="Breakpoint.Sm" Loading="_loading" 
+          OnRowClick="@( (TableRowClickEventArgs<ItemCategoryDto> e) => OnRowClick(e.Item) )" 
+          T="ItemCategoryDto" RowClassFunc="@SelectedRowClassFunc">
+    <HeaderContent>
+        <MudTh>@Lang.Name</MudTh>
+        <MudTh>@Lang.Description</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@Lang.Name">@context.Name</MudTd>
+        <MudTd DataLabel="@Lang.Description">@context.Description</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter] public EventCallback<ItemCategoryDto> OnCategorySelected { get; set; }
+    
+    private List<ItemCategoryDto> _categories = new();
+    private bool _loading = true;
+    private ItemCategoryDto _selectedItem;
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadDataAsync();
+    }
+
+    public async Task ReloadDataAsync()
+    {
+        _loading = true;
+        try
+        {
+            var response = await ApiService.GetAsync<GetAllItemCategoriesResponse>("ItemCategories/get", null);
+            _categories = response?.AllItemCategoriesList ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Load categories error: {ex.Message}");
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnRowClick(ItemCategoryDto category)
+    {
+        _selectedItem = category;
+        OnCategorySelected.InvokeAsync(category);
+    }
+
+    private string SelectedRowClassFunc(ItemCategoryDto element, int rowNumber) => 
+        _selectedItem != null && _selectedItem.ItemCategoryId == element.ItemCategoryId ? "selected-row-highlight" : string.Empty;
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
+}
+
+<style>
+    .selected-row-highlight { background-color: rgba(212, 175, 55, 0.3) !important; }
+</style>

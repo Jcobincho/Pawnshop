@@ -1,10 +1,15 @@
-﻿@page "/Workplace-management-page"
+@page "/Workplace-management-page"
 @using Pawnshop.Application.WorkplacesApplication.Dto
 @using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@inject LanguageService Lang
+@implements IDisposable
+
+<MudText Typo="Typo.h4" Class="mb-4">@Lang.WorkplaceManagement</MudText>
 
 <UniversalCrudMenu IsItemSelected="@(currentWorkplace != null)" OnActionSelected="HandleCrudAction" />
 
-<WorkplaceManagementGrid OnClientSelected="HandleClientSelected" @ref="workplaceGrid" />
+<WorkplaceManagementGrid OnWorkplaceSelected="HandleWorkplaceSelected" @ref="workplaceGrid" />
 
 @if(showDetail)
 {
@@ -17,15 +22,23 @@
     private UniversalCrudMenu.CrudAction selectedAction;
     private WorkplaceManagementGrid workplaceGrid;
 
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
         selectedAction = action;
         showDetail = true;
     }
 
-    private void HandleClientSelected(WorkplaceDto selectedWorkplace) => currentWorkplace = selectedWorkplace;
+    private void HandleWorkplaceSelected(WorkplaceDto selectedWorkplace) => currentWorkplace = selectedWorkplace;
 
-    private void HandleDetailCanceled() => showDetail = false;
+    private void HandleDetailCanceled() 
+    {
+        showDetail = false;
+        currentWorkplace = null;
+    }
 
     private async Task HandleCrudCompleted() => await workplaceGrid.ReloadDataAsync();
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

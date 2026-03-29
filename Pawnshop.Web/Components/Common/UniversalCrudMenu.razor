@@ -1,34 +1,39 @@
-﻿@using MudBlazor
+@using MudBlazor
+@using Pawnshop.Web.Services
+@inject LanguageService Lang
+@implements IDisposable
 
 <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
     <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Disabled="@(!IsItemSelected)"
                OnClick="@(() => OnAction(CrudAction.View))">
-        Details
+        @Lang.Details
     </MudButton>
     <MudButton StartIcon="@Icons.Material.Filled.Add"
                OnClick="@(() => OnAction(CrudAction.Add))">
-        Add
+        @Lang.Add
     </MudButton>
     <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Disabled="@(!IsItemSelected)"
                OnClick="@(() => OnAction(CrudAction.AddCopy))">
-        Add copy
+        @Lang.AddCopy
     </MudButton>
     <MudButton StartIcon="@Icons.Material.Filled.Update" Disabled="@(!IsItemSelected)"
                OnClick="@(() => OnAction(CrudAction.Update))">
-        Update
+        @Lang.Update
     </MudButton>
     <MudButton StartIcon="@Icons.Material.Filled.Delete" Disabled="@(!IsItemSelected)"
                OnClick="@(() => OnAction(CrudAction.Delete))">
-        Delete
+        @Lang.Delete
     </MudButton>
 </MudButtonGroup>
 
 @code {
-    [Parameter]
-    public bool IsItemSelected { get; set; }
+    [Parameter] public bool IsItemSelected { get; set; }
+    [Parameter] public EventCallback<CrudAction> OnActionSelected { get; set; }
 
-    [Parameter]
-    public EventCallback<CrudAction> OnActionSelected { get; set; }
+    protected override void OnInitialized()
+    {
+        Lang.OnLanguageChanged += StateHasChanged;
+    }
 
     private async Task OnAction(CrudAction action)
     {
@@ -36,6 +41,11 @@
         {
             await OnActionSelected.InvokeAsync(action);
         }
+    }
+
+    public void Dispose()
+    {
+        Lang.OnLanguageChanged -= StateHasChanged;
     }
 
     public enum CrudAction

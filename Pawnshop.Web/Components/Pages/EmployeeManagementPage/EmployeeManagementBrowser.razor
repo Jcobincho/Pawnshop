@@ -1,7 +1,11 @@
-﻿@page "/Employee-management-page"
-
+@page "/Employee-management-page"
 @using Pawnshop.Application.EmployeesApplication.Dto
 @using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@inject LanguageService Lang
+@implements IDisposable
+
+<MudText Typo="Typo.h4" Class="mb-4">@Lang.EmployeeManagement</MudText>
 
 <UniversalCrudMenu IsItemSelected="@(currentEmployee != null)" OnActionSelected="HandleCrudAction" />
 
@@ -12,12 +16,13 @@
     <EmployeeManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentEmployee="currentEmployee" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
 }
 
-
 @code {
     private EmployeeDto currentEmployee = null;
     private bool showDetail = false;
     private UniversalCrudMenu.CrudAction selectedAction;
     private EmployeeManagementGrid employeeGrid;
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
 
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
@@ -27,7 +32,13 @@
 
     private void HandleEmployeeSelected(EmployeeDto selectedEmployee) => currentEmployee = selectedEmployee;
 
-    private void HandleDetailCanceled() => showDetail = false;
+    private void HandleDetailCanceled() 
+    {
+        showDetail = false;
+        currentEmployee = null;
+    }
 
     private async Task HandleCrudCompleted() => await employeeGrid.ReloadDataAsync();
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

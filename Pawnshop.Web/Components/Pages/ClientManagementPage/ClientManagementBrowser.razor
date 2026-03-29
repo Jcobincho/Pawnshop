@@ -1,6 +1,11 @@
-﻿@page "/Clients-management-page"
+@page "/Clients-management-page"
 @using Pawnshop.Application.ClientsApplication.Dto
 @using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@inject LanguageService Lang
+@implements IDisposable
+
+<MudText Typo="Typo.h4" Class="mb-4">@Lang.ClientManagement</MudText>
 
 <UniversalCrudMenu IsItemSelected="@(currentClient != null)" OnActionSelected="HandleCrudAction" />
 
@@ -17,6 +22,8 @@
     private UniversalCrudMenu.CrudAction selectedAction;
     private ClientManagementGrid clientGrid;
 
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
         selectedAction = action;
@@ -25,7 +32,13 @@
 
     private void HandleClientSelected(ClientDto selectedClient) => currentClient = selectedClient;
 
-    private void HandleDetailCanceled() => showDetail = false;
+    private void HandleDetailCanceled() 
+    {
+        showDetail = false;
+        currentClient = null;
+    }
 
     private async Task HandleCrudCompleted() => await clientGrid.ReloadDataAsync();
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

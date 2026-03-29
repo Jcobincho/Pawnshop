@@ -13,19 +13,25 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 builder.Services.AddAuthenticationCore();
+
+// Backend URL configuration
+var backendUrl = builder.Configuration["BackendUrl"] ?? "https://localhost:7287";
+if (!backendUrl.EndsWith("/")) backendUrl += "/";
+
 builder.Services.AddHttpClient<ApiService>(client =>
 {
-    client.BaseAddress = new(Environment.GetEnvironmentVariable("FrontendUrl") ?? "https+http://localhost:7287");
+    client.BaseAddress = new Uri(backendUrl);
 });
 
 builder.Services.AddScoped(sp =>
     new HttpClient
     {
-        BaseAddress = new Uri(builder.Configuration["FrontendUrl"] ?? "https://localhost:7287")
+        BaseAddress = new Uri(backendUrl)
     });
 
 
 builder.Services.AddScoped<ApiService>();
+builder.Services.AddScoped<Pawnshop.Web.Services.LanguageService>();
 builder.Services.AddScoped<AuthStateProviderService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProviderService>();
 

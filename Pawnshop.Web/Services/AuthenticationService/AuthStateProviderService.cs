@@ -53,6 +53,4 @@ namespace Pawnshop.Web.Services.AuthenticationService
             return new ClaimsIdentity(claims, "jwt");
         }
     }
-
-
 }

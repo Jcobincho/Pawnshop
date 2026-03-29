@@ -1,77 +1,62 @@
-﻿@using Pawnshop.Application.UsersApplication.Dto
+@using Pawnshop.Application.UsersApplication.Dto
 @using Pawnshop.Application.UsersApplication.Responses
-@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services
 @using Pawnshop.Web.Services.ApiService
-
+@using MudBlazor
 @inject ApiService ApiService
+@inject LanguageService Lang
+@implements IDisposable
 
-<MudDataGrid T="GetAllUsersDto"
-             Items="@(usersFromApi?.Users ?? new List<GetAllUsersDto>())" 
-             RowClassFunc="@( (user, index) => user == selectedUser ? "selected-row" : string.Empty)" 
-             RowClick="OnRowClicked"
-             DragDropColumnReordering="true" 
-             ColumnsPanelReordering="true"
-             ColumnResizeMode="ResizeMode.Column" 
-             MultiSelection="false"
-             Hideable="true" 
-             Filterable="true" 
-             Groupable="true" 
-             FilterMode="DataGridFilterMode.Simple" 
-             ShowMenuIcon="true"
-             Striped="true">
-    <Columns>
-        <PropertyColumn Property="x => x.UserId" Title="User id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true"/>
-        <PropertyColumn Property="x => x.UserName" Title="User name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Email" Title="Email" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Roles" Title="Roles" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true">
-            <CellTemplate>
-                @string.Join(", ", context.Item.Roles)
-            </CellTemplate>
-        </PropertyColumn>
-        <PropertyColumn Property="@(x => x.Employee.EmployeeId)" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Employee.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Employee.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Employee.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="@(x => x.Employee.BirthDate.ToString("dd.MM.yyyy"))" Title="BirthDate" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-    </Columns>
-</MudDataGrid>
+<MudTable Items="_users" Hover="true" Breakpoint="Breakpoint.Sm" Loading="_loading" 
+          OnRowClick="@( (TableRowClickEventArgs<GetAllUsersDto> e) => OnRowClick(e.Item) )" 
+          T="GetAllUsersDto" RowClassFunc="@SelectedRowClassFunc">
+    <HeaderContent>
+        <MudTh>@Lang.Username</MudTh>
+        <MudTh>@Lang.Email</MudTh>
+        <MudTh>@Lang.Role</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@Lang.Username">@context.UserName</MudTd>
+        <MudTd DataLabel="@Lang.Email">@context.Email</MudTd>
+        <MudTd DataLabel="@Lang.Role">@string.Join(", ", context.Roles)</MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
-    [Parameter]
-    public EventCallback<GetAllUsersDto> OnUserSelected { get; set; }
+    [Parameter] public EventCallback<GetAllUsersDto> OnUserSelected { get; set; }
+    
+    private List<GetAllUsersDto> _users = new();
+    private bool _loading = true;
+    private GetAllUsersDto _selectedItem;
 
-    List<string> apiExceptions = null;
-    public GetAllUsersResponse usersFromApi = new GetAllUsersResponse();
-    private GetAllUsersDto selectedUser;
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        await GetUsersFromApiAsync();
-        await InvokeAsync(StateHasChanged);
-    }
+    protected override async Task OnInitializedAsync() => await ReloadDataAsync();
 
     public async Task ReloadDataAsync()
     {
-        await GetUsersFromApiAsync();
-    }
-
-    private async Task GetUsersFromApiAsync()
-    {
+        _loading = true;
         try
         {
-            usersFromApi = await ApiService.GetAsync<GetAllUsersResponse>("/Users/get");
+            var response = await ApiService.GetAsync<GetAllUsersResponse>("Users/get", null);
+            _users = response?.Users ?? new();
         }
-        catch (ApiException ex)
-        {
-            apiExceptions = ex.ErrorMessages;
-        }
+        catch (Exception) { }
+        finally { _loading = false; StateHasChanged(); }
     }
 
-    private async Task OnRowClicked(DataGridRowClickEventArgs<GetAllUsersDto> row)
+    private void OnRowClick(GetAllUsersDto user)
     {
-        selectedUser = row.Item;
-        await OnUserSelected.InvokeAsync(selectedUser);
+        _selectedItem = user;
+        OnUserSelected.InvokeAsync(user);
     }
+
+    private string SelectedRowClassFunc(GetAllUsersDto element, int rowNumber) => 
+        _selectedItem != null && _selectedItem.Id == element.Id ? "selected-row-highlight" : string.Empty;
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }
 
+<style>
+    .selected-row-highlight { background-color: rgba(212, 175, 55, 0.3) !important; }
+</style>

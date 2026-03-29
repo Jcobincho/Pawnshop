@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Pawnshop.Application.ClientsApplication.Interfaces;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddPurchaseSaleTransactionDocument;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.DeletePurchaseSaleTransactionDocument;
@@ -62,7 +62,8 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
 
         public async Task UpdatePurchaseSaleTransactionAsync(UpdatePurchaseSaleTransactionDocumentCommand command, CancellationToken cancellationToken)
         {
-            await IsSymbolUniqueForTypeOfTransaction(command.Symbol, cancellationToken);
+            // Ignorujemy ID edytowanego dokumentu przy sprawdzaniu symbolu
+            await IsSymbolUniqueForTypeOfTransaction(command.Symbol, cancellationToken, command.PurchaseSaleTransactionDocumentId);
 
             var document = await _purchaseTransactionQueryService.GetPurchaseSaleTransactionByIdAsync(command.PurchaseSaleTransactionDocumentId, cancellationToken);
 
@@ -77,7 +78,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
             document.Description = command.Description;
             document.WorkplaceId = command.WorkplaceId;
 
-            if (command.TypeOfTransaction == Domain.Enums.TypeOfTransactionEnum.Purchase)
+            if (command.TypeOfTransaction == TypeOfTransactionEnum.Purchase)
             {
                 var isClientExist = await _clientsQueryService.IsClientExistAsync((Guid)command.ClientId, cancellationToken);
 
@@ -88,7 +89,7 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
             }
             else
             {
-                document.ClientId = Guid.Empty;
+                document.ClientId = null;
             }
 
             _dbContext.PurchasesSaleTransaction.Update(document);
@@ -103,11 +104,18 @@ namespace Pawnshop.Infrastructure.Services.PurchasesSaleTransactionInfrastructur
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task IsSymbolUniqueForTypeOfTransaction(string symbol, CancellationToken cancellationToken)
+        private async Task IsSymbolUniqueForTypeOfTransaction(string symbol, CancellationToken cancellationToken, Guid? excludeId = null)
         {
-            bool isSymbolUniqueForTypeOfTransaction = await _dbContext.PurchasesSaleTransaction.AnyAsync(x => x.Symbol == symbol, cancellationToken);
+            var query = _dbContext.PurchasesSaleTransaction.Where(x => x.Symbol == symbol);
+            
+            if (excludeId.HasValue)
+            {
+                query = query.Where(x => x.Id != excludeId.Value);
+            }
 
-            if (isSymbolUniqueForTypeOfTransaction)
+            bool isSymbolTaken = await query.AnyAsync(cancellationToken);
+
+            if (isSymbolTaken)
             {
                 throw new BadRequestException("The symbol must be unique within the transaction type area.");
             }

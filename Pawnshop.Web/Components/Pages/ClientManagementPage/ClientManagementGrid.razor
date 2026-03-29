@@ -1,77 +1,64 @@
-﻿@using Pawnshop.Application.ClientsApplication.Dto
-@using Pawnshop.Application.Common.Pagination
-@using Pawnshop.Application.ClientsApplication.Queries.GetAllClients
+@using Pawnshop.Application.ClientsApplication.Dto
 @using Pawnshop.Application.ClientsApplication.Responses
-@inject Pawnshop.Web.Services.ApiService.ApiService ApiService
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@using MudBlazor
+@inject ApiService ApiService
+@inject LanguageService Lang
+@implements IDisposable
 
-<MudDataGrid T="ClientDto"
-             ServerData="ServerReload"
-             @ref="_grid"
-             RowClick="OnRowClicked"
-             RowClassFunc="@((item, idx) => item == selectedEmployee ? "selected-row" : string.Empty)"
-             FilterMode="DataGridFilterMode.Simple"
-             Striped="true"
-             DragDropColumnReordering="true"
-             ColumnsPanelReordering="true"
-             Hideable="true"
-             Filterable="true"
-             Groupable="true"
-             ShowMenuIcon="true">
-    <Columns>
-        <PropertyColumn Property="x => x.Name" Title="Name" />
-        <PropertyColumn Property="x => x.Surname" Title="Surname" />
-        <PropertyColumn Property="x => x.Pesel" Title="PESEL" />
-        <PropertyColumn Property="x => x.IdCardNumber" Title="ID Card" />
-    </Columns>
-    <PagerContent>
-        <MudDataGridPager T="ClientDto" />
-    </PagerContent>
-</MudDataGrid>
+<MudTable Items="_clients" Hover="true" Breakpoint="Breakpoint.Sm" Loading="_loading" 
+          OnRowClick="@( (TableRowClickEventArgs<ClientDto> e) => OnRowClick(e.Item) )" 
+          T="ClientDto" RowClassFunc="@SelectedRowClassFunc">
+    <HeaderContent>
+        <MudTh>@Lang.Name</MudTh>
+        <MudTh>@Lang.Surname</MudTh>
+        <MudTh>@Lang.Pesel</MudTh>
+        <MudTh>@Lang.Email</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@Lang.Name">@context.Name</MudTd>
+        <MudTd DataLabel="@Lang.Surname">@context.Surname</MudTd>
+        <MudTd DataLabel="@Lang.Pesel">@context.Pesel</MudTd>
+        <MudTd DataLabel="@Lang.Email">@context.Email</MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
     [Parameter] public EventCallback<ClientDto> OnClientSelected { get; set; }
+    
+    private List<ClientDto> _clients = new();
+    private bool _loading = true;
+    private ClientDto _selectedItem;
 
-    private MudDataGrid<ClientDto> _grid;
-    private ClientDto selectedEmployee;
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
 
-    private async Task<GridData<ClientDto>> ServerReload(GridState<ClientDto> state)
-    {
-        try
-        {
-            var url = "/Clients/get";
-
-            var query = new GetAllClientsQuery
-            {
-                PaginationParameters = new PaginationParameters
-                {
-                    PageNumber = state.Page + 1,
-                    PageSize = state.PageSize
-                }
-            };
-
-            var response = await ApiService.GetAsync<GetAllClientsResponse>(url, query);
-
-            return new GridData<ClientDto>
-            {
-                TotalItems = response.AllClientsList.TotalCount,
-                Items = response.AllClientsList.Data
-            };
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return new GridData<ClientDto> { Items = new List<ClientDto>(), TotalItems = 0 };
-        }
-    }
+    protected override async Task OnInitializedAsync() => await ReloadDataAsync();
 
     public async Task ReloadDataAsync()
     {
-        await _grid.ReloadServerData();
+        _loading = true;
+        try
+        {
+            var response = await ApiService.GetAsync<GetAllClientsResponse>("Clients/get", new { PaginationParameters = new { PageNumber = 1, PageSize = 100 } });
+            _clients = response?.AllClientsList?.Data ?? new();
+        }
+        catch (Exception) { }
+        finally { _loading = false; StateHasChanged(); }
     }
 
-    private async Task OnRowClicked(DataGridRowClickEventArgs<ClientDto> row)
+    private void OnRowClick(ClientDto client)
     {
-        selectedEmployee = row.Item;
-        await OnClientSelected.InvokeAsync(selectedEmployee);
+        _selectedItem = client;
+        OnClientSelected.InvokeAsync(client);
     }
+
+    private string SelectedRowClassFunc(ClientDto element, int rowNumber) => 
+        _selectedItem != null && _selectedItem.Id == element.Id ? "selected-row-highlight" : string.Empty;
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }
+
+<style>
+    .selected-row-highlight { background-color: rgba(212, 175, 55, 0.3) !important; }
+</style>

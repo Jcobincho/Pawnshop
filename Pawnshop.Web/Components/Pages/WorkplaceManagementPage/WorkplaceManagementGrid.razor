@@ -1,74 +1,62 @@
-﻿@using Pawnshop.Application.ClientsApplication.Dto
-@using Pawnshop.Application.ClientsApplication.Responses
 @using Pawnshop.Application.WorkplacesApplication.Dto
 @using Pawnshop.Application.WorkplacesApplication.Responses
-@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services
 @using Pawnshop.Web.Services.ApiService
-
+@using MudBlazor
 @inject ApiService ApiService
+@inject LanguageService Lang
+@implements IDisposable
 
-<MudDataGrid T="WorkplaceDto"
-             Items="@(workplacesFromApi?.AllWorkplacesList ?? new List<WorkplaceDto>())"
-             RowClick="OnRowClicked"
-             DragDropColumnReordering="true"
-             ColumnsPanelReordering="true"
-             ColumnResizeMode="ResizeMode.Column"
-             RowClassFunc="@( (workplace, intex) => workplace == selectedWorkplace ? "selected-row" : string.Empty )"
-             Hideable="true"
-             Filterable="true"
-             Groupable="true"
-             FilterMode="DataGridFilterMode.Simple"
-             Striped="true"
-             ShowMenuIcon="true">
-
-    <Columns>
-        <PropertyColumn Property="x => x.WorkplaceId" Title="Workplace id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Country" Title="Country" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Region" Title="Region" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.StreetAndBuildingNumber" Title="Street/building number" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.ZipCode" Title="Zip code" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.City" Title="City" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-    </Columns>
-
-    <PagerContent>
-        <MudDataGridPager T="WorkplaceDto" />
-    </PagerContent>
-</MudDataGrid>
+<MudTable Items="_workplaces" Hover="true" Breakpoint="Breakpoint.Sm" Loading="_loading" 
+          OnRowClick="@( (TableRowClickEventArgs<WorkplaceDto> e) => OnRowClick(e.Item) )" 
+          T="WorkplaceDto" RowClassFunc="@SelectedRowClassFunc">
+    <HeaderContent>
+        <MudTh>@Lang.Country</MudTh>
+        <MudTh>@Lang.City</MudTh>
+        <MudTh>@Lang.Street</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@Lang.Country">@context.Country</MudTd>
+        <MudTd DataLabel="@Lang.City">@context.City</MudTd>
+        <MudTd DataLabel="@Lang.Street">@context.StreetAndBuildingNumber</MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
-    [Parameter]
-    public EventCallback<WorkplaceDto> OnClientSelected { get; set; }
+    [Parameter] public EventCallback<WorkplaceDto> OnWorkplaceSelected { get; set; }
+    
+    private List<WorkplaceDto> _workplaces = new();
+    private bool _loading = true;
+    private WorkplaceDto _selectedItem;
 
-    private WorkplaceDto selectedWorkplace;
-    public GetAllWorkplacesResponse workplacesFromApi = null;
-    List<string> apiExceptions = null;
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await GetWorkplacesFromApiAsync();
-    }
+    protected override async Task OnInitializedAsync() => await ReloadDataAsync();
 
     public async Task ReloadDataAsync()
     {
-        await GetWorkplacesFromApiAsync();
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task GetWorkplacesFromApiAsync()
-    {
+        _loading = true;
         try
         {
-            workplacesFromApi = await ApiService.GetAsync<GetAllWorkplacesResponse>("/Workplaces/get");
+            var response = await ApiService.GetAsync<GetAllWorkplacesResponse>("Workplaces/get", null);
+            _workplaces = response?.AllWorkplacesList ?? new();
         }
-        catch (ApiException ex)
-        {
-            apiExceptions = ex.ErrorMessages;
-        }
+        catch (Exception) { }
+        finally { _loading = false; StateHasChanged(); }
     }
 
-    private async Task OnRowClicked(DataGridRowClickEventArgs<WorkplaceDto> row)
+    private void OnRowClick(WorkplaceDto workplace)
     {
-        selectedWorkplace = row.Item;
-        await OnClientSelected.InvokeAsync(selectedWorkplace);
+        _selectedItem = workplace;
+        OnWorkplaceSelected.InvokeAsync(workplace);
     }
+
+    private string SelectedRowClassFunc(WorkplaceDto element, int rowNumber) => 
+        _selectedItem != null && _selectedItem.Id == element.Id ? "selected-row-highlight" : string.Empty;
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }
+
+<style>
+    .selected-row-highlight { background-color: rgba(212, 175, 55, 0.3) !important; }
+</style>

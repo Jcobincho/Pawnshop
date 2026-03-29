@@ -1,17 +1,21 @@
-﻿@page "/Home"
+@page "/Home"
 @using Pawnshop.Application.UsersApplication.Commands.Logout
 @using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services
 @using Pawnshop.Web.Services.ApiService
-
+@inject LanguageService Lang
 @inject ApiService apiService
+@implements IDisposable
 
-<h3>Home</h3>
+<MudText Typo="Typo.h3">@Lang.Home</MudText>
 
-<MudButton ButtonType="ButtonType.Button" OnClick="@ClickHandle">CLICK</MudButton>
+<MudPaper Class="pa-8 mt-4">
+    <MudText Typo="Typo.h5">@Lang.Welcome</MudText>
+    <MudText Typo="Typo.body1" Class="mt-2">@Lang.T("Zarządzaj swoim lombardem efektywnie.", "Manage your pawnshop effectively.")</MudText>
+</MudPaper>
 
 @code {
-    private async void ClickHandle()
-    {
-
-    }
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+    
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

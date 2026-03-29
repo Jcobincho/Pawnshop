@@ -2,6 +2,7 @@
 @using Microsoft.IdentityModel.JsonWebTokens
 @using Pawnshop.Application.UsersApplication.Commands.Logout
 @using Pawnshop.Application.UsersApplication.Responses
+@using Pawnshop.Web.Services
 @using Pawnshop.Web.Services.ApiService
 @using Pawnshop.Web.Services.AuthenticationService
 
@@ -11,6 +12,8 @@
 @inject AuthStateProviderService AuthStateProviderService
 @inject ApiService ApiService
 @inject ProtectedLocalStorage localStorage
+@inject LanguageService Lang
+@implements IDisposable
 
 @rendermode InteractiveServer
 
@@ -24,8 +27,13 @@
         <MudLayout>
             <MudAppBar Elevation="1" Dense="false">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
-                <MudText Typo="Typo.h6" Class="ml-4">Pawnshop System</MudText>
+                <MudText Typo="Typo.h6" Class="ml-4">@Lang.AppTitle</MudText>
                 <MudSpacer />
+                
+                <MudButton Color="Color.Inherit" StartIcon="@Icons.Material.Filled.Language" OnClick="@ToggleLang" Class="mr-4">
+                    @(Lang.IsPolish ? "PL" : "EN")
+                </MudButton>
+
                 <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
                                Color="Color.Inherit" 
                                OnClick="@ToggleDarkMode" />
@@ -36,7 +44,7 @@
                 <MudDrawerHeader>
                     <div class="d-flex align-center">
                         <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Color="Color.Primary" Class="mr-2"/>
-                        <MudText Typo="Typo.h6" Color="Color.Primary"><b>Lombard</b></MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Primary"><b>@Lang.T("Lombard", "Pawnshop")</b></MudText>
                     </div>
                 </MudDrawerHeader>
                 <NavMenu />
@@ -49,7 +57,10 @@
     </Authorized>
 
     <NotAuthorized>
-        <div style="position: absolute; right: 16px; top: 16px; z-index: 1000;">
+        <div style="position: absolute; right: 16px; top: 16px; z-index: 1000;" class="d-flex gap-2">
+             <MudButton Color="Color.Inherit" StartIcon="@Icons.Material.Filled.Language" OnClick="@ToggleLang">
+                @(Lang.IsPolish ? "PL" : "EN")
+             </MudButton>
              <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" 
                            Color="Color.Inherit" 
                            OnClick="@ToggleDarkMode" />
@@ -66,50 +77,58 @@
 
 @code {
     private bool open = true;
-    private bool _isDarkMode = true;
+    private bool _isDarkMode = false; // ZMIENIONE NA FALSE (Light Mode jako domyślny)
 
-    private void ToggleDrawer()
+    protected override void OnInitialized()
     {
-        open = !open;
+        Lang.OnLanguageChanged += StateHasChanged;
     }
 
-    private void ToggleDarkMode()
+    private void ToggleDrawer() => open = !open;
+    private void ToggleDarkMode() => _isDarkMode = !_isDarkMode;
+    private void ToggleLang() => Lang.ToggleLanguage();
+
+    public void Dispose()
     {
-        _isDarkMode = !_isDarkMode;
+        Lang.OnLanguageChanged -= StateHasChanged;
     }
 
     private readonly MudTheme _pawnshopTheme = new MudTheme()
     {
         PaletteLight = new PaletteLight()
         {
-            Primary = "#B8860B",
+            Primary = "#D4AF37", // Gold
             PrimaryContrastText = "#000000",
-            Secondary = "#2c2c2c",
-            AppbarBackground = "#B8860B",
+            Secondary = "#006400", // Dark Green
+            SecondaryContrastText = "#ffffff",
+            AppbarBackground = "#D4AF37",
             AppbarText = "#000000",
-            Background = "#f8f9fa",
+            Background = "#fdfdfd",
             DrawerBackground = "#ffffff",
-            DrawerText = "#2c2c2c",
+            DrawerText = "#1a1a1a",
             Surface = "#ffffff",
-            ActionDefault = "#5a5a5a"
+            ActionDefault = "#5a5a5a",
+            Success = "#008000"
         },
         PaletteDark = new PaletteDark()
         {
-            Primary = "#D4AF37",
+            Primary = "#D4AF37", // Gold
             PrimaryContrastText = "#000000",
-            Secondary = "#1a1a1a",
+            Secondary = "#006400", // Dark Green
+            SecondaryContrastText = "#ffffff",
             AppbarBackground = "#1a1a1a",
-            Background = "#121212",
+            Background = "#0f0f0f",
             DrawerBackground = "#1a1a1a",
             Surface = "#1e1e1e",
             TextPrimary = "#ffffff",
             TextSecondary = "rgba(255,255,255, 0.7)",
-            ActionDefault = "#d4af37",
+            ActionDefault = "#D4AF37",
             HoverOpacity = 0.15,
             TableHover = "rgba(212, 175, 55, 0.1)",
             TableStriped = "rgba(255, 255, 255, 0.02)",
             Divider = "rgba(212, 175, 55, 0.2)",
-            OverlayDark = "rgba(0,0,0,0.5)"
+            OverlayDark = "rgba(0,0,0,0.5)",
+            Success = "#00FF00"
         },
         LayoutProperties = new LayoutProperties()
         {

@@ -1,23 +1,28 @@
-﻿@page "/User-management-page"
-
+@page "/User-management-page"
 @using Pawnshop.Application.UsersApplication.Dto
 @using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@inject LanguageService Lang
+@implements IDisposable
 
-<UniversalCrudMenu IsItemSelected="@(currenUser != null)" OnActionSelected="HandleCrudAction" />
+<MudText Typo="Typo.h4" Class="mb-4">@Lang.UserManagement</MudText>
+
+<UniversalCrudMenu IsItemSelected="@(currentUser != null)" OnActionSelected="HandleCrudAction" />
 
 <UserManagementGrid OnUserSelected="HandleUserSelected" @ref="userGrid" />
 
 @if(showDetail)
 {
-    <UserManagementDetail CurrentUser="currenUser" SelectedAction="selectedAction" OnDetailCanceled="HandleDetailCanceled" OnCrudCompleted="HandlerCrudCompleted" />
+    <UserManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentUser="currentUser" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
 }
 
-
 @code {
-    private GetAllUsersDto currenUser = null;
+    private GetAllUsersDto currentUser = null;
     private bool showDetail = false;
     private UniversalCrudMenu.CrudAction selectedAction;
     private UserManagementGrid userGrid;
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
 
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
@@ -25,9 +30,15 @@
         showDetail = true;
     }
 
-    private void HandleUserSelected(GetAllUsersDto selectedUser) => currenUser = selectedUser;
+    private void HandleUserSelected(GetAllUsersDto selectedUser) => currentUser = selectedUser;
 
-    private void HandleDetailCanceled() => showDetail = false;
+    private void HandleDetailCanceled() 
+    {
+        showDetail = false;
+        currentUser = null;
+    }
 
-    private async Task HandlerCrudCompleted() => await userGrid.ReloadDataAsync();
+    private async Task HandleCrudCompleted() => await userGrid.ReloadDataAsync();
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

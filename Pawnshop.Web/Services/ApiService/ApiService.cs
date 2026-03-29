@@ -105,10 +105,41 @@ namespace Pawnshop.Web.Services.ApiService
                     _navigationManager.NavigateTo("/");
                 }
             }
+            catch (Microsoft.AspNetCore.Components.NavigationException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 _navigationManager.NavigateTo("/");
             }
+        }
+
+        public async Task<byte[]> DownloadFileAsync<TRequest>(string uri, TRequest body, bool requireAuth = true)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+
+            if (requireAuth)
+            {
+                await SetAuthorizeHeader(request);
+            }
+
+            if (body != null)
+            {
+                var jsonContent = JsonSerializer.Serialize(body);
+                request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            }
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                var errorMessages = ParseErrorMessages(errorContent, response.StatusCode);
+                throw new ApiException(errorMessages, response.StatusCode);
+            }
+
+            return await response.Content.ReadAsByteArrayAsync();
         }
 
         private async Task<T> SendAsync<T>(HttpMethod method, string uri, bool requireAuth, Dictionary<string, string> queryParams = null, object body = null)
@@ -132,7 +163,7 @@ namespace Pawnshop.Web.Services.ApiService
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                var errorMessages = ParseErrorMessages(errorContent);
+                var errorMessages = ParseErrorMessages(errorContent, response.StatusCode);
                 throw new ApiException(errorMessages, response.StatusCode);
             }
 
@@ -152,9 +183,15 @@ namespace Pawnshop.Web.Services.ApiService
             return $"{uri}?{queryString}";
         }
 
-        private List<string> ParseErrorMessages(string errorContent)
+        private List<string> ParseErrorMessages(string errorContent, System.Net.HttpStatusCode statusCode)
         {
             var errorMessages = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(errorContent))
+            {
+                errorMessages.Add($"Status: {statusCode} (No response body)");
+                return errorMessages;
+            }
 
             AddErrorToList(errorContent, errorMessages, "errors");
 
@@ -165,7 +202,7 @@ namespace Pawnshop.Web.Services.ApiService
 
             if (!errorMessages.Any())
             {
-                errorMessages.Add("Unknown error occurred.");
+                errorMessages.Add($"Status: {statusCode}. Content: {errorContent}");
             }
 
             return errorMessages;
@@ -199,7 +236,7 @@ namespace Pawnshop.Web.Services.ApiService
             }
             catch (JsonException)
             {
-                errorMessages.Add("Invalid error response format.");
+                errorMessages.Add($"Invalid JSON response. Raw content: {errorContent}");
             }
         }
     }

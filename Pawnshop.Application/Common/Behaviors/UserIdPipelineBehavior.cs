@@ -5,7 +5,7 @@ using Pawnshop.Application.UserClaimsDataProviderApplication.Interfaces;
 namespace Pawnshop.Application.Common.Behaviors
 {
     public class UserIdPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : BaseCommand
+        where TRequest : notnull
     {
         private readonly IUserClaimsDataProviderService _userClaimsService;
 
@@ -16,7 +16,15 @@ namespace Pawnshop.Application.Common.Behaviors
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            request.UserIdFromClaims = _userClaimsService.GetUserIdFromClaims();
+            if (request is BaseCommand command)
+            {
+                command.UserIdFromClaims = _userClaimsService.GetUserIdFromClaims();
+            }
+            else if (request is BaseQuery query)
+            {
+                query.UserIdFromClaims = _userClaimsService.GetUserIdFromClaims();
+            }
+
             return await next();
         }
     }

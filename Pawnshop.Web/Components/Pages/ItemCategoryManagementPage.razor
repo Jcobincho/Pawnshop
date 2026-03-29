@@ -1,0 +1,101 @@
+@page "/Item-category-management-page"
+@using Pawnshop.Application.ItemCategoriesApplication.Commands.AddItemCategory
+@using Pawnshop.Application.ItemCategoriesApplication.Responses
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@using MudBlazor
+@inject ApiService ApiService
+@inject ISnackbar _snackbar
+@inject LanguageService Lang
+@implements IDisposable
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">@Lang.Categories</MudText>
+
+    <MudPaper Class="pa-4 mb-4">
+        <MudText Typo="Typo.h6">@Lang.T("Dodaj nową kategorię", "Add new category")</MudText>
+        <MudGrid>
+            <MudItem xs="12" md="5">
+                <MudTextField @bind-Value="_newCategory.Name" Label="@Lang.Name" Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" md="5">
+                <MudTextField @bind-Value="_newCategory.Description" Label="@Lang.Description" Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" md="2" Class="d-flex align-center">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddCategory" FullWidth="true">@Lang.Add
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudTable Items="_categories" Hover="true" Breakpoint="Breakpoint.Sm" Loading="_loading"
+              LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh>ID</MudTh>
+            <MudTh>@Lang.Name</MudTh>
+            <MudTh>@Lang.Description</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.ItemCategoryId</MudTd>
+            <MudTd DataLabel="@Lang.Name">@context.Name</MudTd>
+            <MudTd DataLabel="@Lang.Description">@context.Description</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+@code
+{
+    private List<Pawnshop.Application.ItemCategoriesApplication.Dto.ItemCategoryDto> _categories = new();
+    private AddItemCategoryCommand _newCategory = new();
+    private bool _loading = true;
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        _loading = true;
+        try
+        {
+            var response = await ApiService.GetAsync<GetAllItemCategoriesResponse>("ItemCategories/get", null);
+            _categories = response?.AllItemCategoriesList ?? new();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"{Lang.T("Błąd podczas ładowania kategorii", "Error loading categories")}: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task AddCategory()
+    {
+        if (string.IsNullOrWhiteSpace(_newCategory.Name))
+        {
+            _snackbar.Add(Lang.T("Nazwa kategorii jest wymagana!", "Category name is required!"), Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            await ApiService.PostAsync<AddItemCategoryCommand, AddItemCategoryResponse>("ItemCategories/add", _newCategory);
+            _snackbar.Add(Lang.SuccessSave, Severity.Success);
+            _newCategory = new();
+            await LoadCategories();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"{Lang.T("Błąd podczas dodawania kategorii", "Error adding category")}: {ex.Message}", Severity.Error);
+        }
+    }
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
+}

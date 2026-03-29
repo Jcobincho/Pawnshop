@@ -13,6 +13,7 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtens
         {
             return new SalesTransactionDto
             {
+                Id = purchaseSaleTransaction.Id,
                 Symbol = purchaseSaleTransaction.Symbol,
                 TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction,
                 TransactionDate = purchaseSaleTransaction.TransactionDate,
@@ -29,6 +30,7 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtens
         {
             return new PurchasesTransactionDto
             {
+                Id = purchaseSaleTransaction.Id,
                 Symbol = purchaseSaleTransaction.Symbol,
                 TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction,
                 TransactionDate = purchaseSaleTransaction.TransactionDate,
