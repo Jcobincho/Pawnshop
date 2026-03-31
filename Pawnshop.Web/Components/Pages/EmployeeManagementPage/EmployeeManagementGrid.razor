@@ -7,19 +7,26 @@
 @inject LanguageService Lang
 @implements IDisposable
 
-<MudTable Items="_employees" Hover="true" Breakpoint="Breakpoint.Sm" Loading="_loading" 
+<MudTable Items="_employees" Hover="true" Breakpoint="Breakpoint.Md" Loading="_loading" 
           OnRowClick="@( (TableRowClickEventArgs<EmployeeDto> e) => OnRowClick(e.Item) )" 
-          T="EmployeeDto" RowClassFunc="@SelectedRowClassFunc">
+          T="EmployeeDto" RowClassFunc="@SelectedRowClassFunc" Elevation="0">
     <HeaderContent>
-        <MudTh>@Lang.Name</MudTh>
-        <MudTh>@Lang.Surname</MudTh>
-        <MudTh>@Lang.BirthDate</MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EmployeeDto, object>(x=>x.Name)">@Lang.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EmployeeDto, object>(x=>x.Surname)">@Lang.Surname</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EmployeeDto, object>(x=>x.BirthDate)">@Lang.BirthDate</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="@Lang.Name">@context.Name</MudTd>
-        <MudTd DataLabel="@Lang.Surname">@context.Surname</MudTd>
-        <MudTd DataLabel="@Lang.BirthDate">@context.BirthDate.ToShortDateString()</MudTd>
+        <MudTd DataLabel="@Lang.Surname">
+            <MudText Color="Color.Primary" Style="font-weight: 600;">@context.Surname</MudText>
+        </MudTd>
+        <MudTd DataLabel="@Lang.BirthDate">
+            <MudText Class="currency-font">@context.BirthDate.ToString("yyyy-MM-dd")</MudText>
+        </MudTd>
     </RowTemplate>
+    <NoRecordsContent>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">@Lang.T("Brak pracowników do wyświetlenia.", "No employees to display.")</MudAlert>
+    </NoRecordsContent>
 </MudTable>
 
 @code {
@@ -52,11 +59,18 @@
     }
 
     private string SelectedRowClassFunc(EmployeeDto element, int rowNumber) => 
-        _selectedItem != null && _selectedItem.Id == element.Id ? "selected-row-highlight" : string.Empty;
+        _selectedItem != null && _selectedItem.Id == element.Id ? "selected-row-premium" : string.Empty;
 
     public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }
 
 <style>
-    .selected-row-highlight { background-color: rgba(212, 175, 55, 0.3) !important; }
+    .selected-row-premium {
+        background-color: rgba(197, 160, 89, 0.1) !important;
+        border-left: 4px solid var(--mud-palette-primary) !important;
+    }
+    
+    .mud-table-row:hover {
+        background-color: rgba(197, 160, 89, 0.05) !important;
+    }
 </style>

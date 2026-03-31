@@ -14,42 +14,63 @@
 @implements IDisposable
 
 <DetailModalOverlay>
-    <MudCard Class="w-50" Style="max-height: 85vh; overflow: auto; border-radius: 12px;">
-        <MudCardHeader>
+    <MudCard Class="w-50 border-gold-glow" Style="max-height: 90vh; overflow: auto; border-radius: 20px;">
+        <MudCardHeader Class="pa-6" Style="border-bottom: 1px solid rgba(197, 160, 89, 0.1);">
             <CardHeaderContent>
-                <MudText Typo="Typo.h5" Color="Color.Primary">
-                    <b>@Lang.EmployeeManagement - @(SelectedAction == UniversalCrudMenu.CrudAction.Add ? Lang.Add : (SelectedAction == UniversalCrudMenu.CrudAction.Update ? Lang.Update : Lang.Details))</b>
+                <MudText Typo="Typo.h5" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase;">
+                    @Lang.EmployeeManagement
+                </MudText>
+                <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">
+                    @(SelectedAction == UniversalCrudMenu.CrudAction.Add ? Lang.Add : 
+                      (SelectedAction == UniversalCrudMenu.CrudAction.Update ? Lang.Update : 
+                      (SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Lang.Delete : 
+                      (SelectedAction == UniversalCrudMenu.CrudAction.AddCopy ? Lang.T("Kopiuj", "Copy") : Lang.Details))))
                 </MudText>
             </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="OnDetailCancel" Color="Color.Default" />
+            </CardHeaderActions>
         </MudCardHeader>
 
-        <MudCardContent>
+        <MudCardContent Class="pa-8">
             @if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
             {
-                <MudText Typo="Typo.h6" Align="Align.Center">@Lang.ConfirmDelete</MudText>
-                <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-2">@CurrentEmployee?.Name @CurrentEmployee?.Surname</MudText>
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-6" Style="border-radius: 12px;">@Lang.ConfirmDelete</MudAlert>
+                <div class="d-flex flex-column align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Badge" Color="Color.Error" Size="Size.Large" Class="mb-4" />
+                    <MudText Typo="Typo.h6" Align="Align.Center">@CurrentEmployee?.Name @CurrentEmployee?.Surname</MudText>
+                </div>
             }
             else
             {
                 <MudGrid>
-                    <MudItem md="6">
-                        <MudTextField @bind-Value="@Name" Label="@Lang.Name" Variant="Variant.Outlined" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" />
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="@Name" Label="@Lang.Name" Variant="Variant.Outlined" 
+                                      Required="true" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" Style="font-family: 'Outfit', sans-serif;" />
                     </MudItem>
-                    <MudItem md="6">
-                        <MudTextField @bind-Value="@Surname" Label="@Lang.Surname" Variant="Variant.Outlined" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" />
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="@Surname" Label="@Lang.Surname" Variant="Variant.Outlined" 
+                                      Required="true" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" Style="font-family: 'Outfit', sans-serif;" />
                     </MudItem>
-                    <MudItem md="12">
-                        <MudDatePicker @bind-Date="@BirthDate" Label="@Lang.BirthDate" Variant="Variant.Outlined" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" />
+                    <MudItem xs="12">
+                        <MudDatePicker @bind-Date="@BirthDate" Label="@Lang.BirthDate" Variant="Variant.Outlined" 
+                                       Required="true" ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" Class="currency-font" />
                     </MudItem>
                 </MudGrid>
             }
         </MudCardContent>
 
-        <MudCardActions Class="d-flex justify-space-between px-4 pb-4">
-            <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="OnDetailCancel">@Lang.Cancel</MudButton>
+        <MudCardActions Class="pa-6 d-flex justify-space-between" Style="background-color: rgba(0,0,0,0.05);">
+            <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="OnDetailCancel"
+                       Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+                @Lang.Cancel
+            </MudButton>
             @if (SelectedAction != UniversalCrudMenu.CrudAction.View)
             {
-                <MudButton Variant="Variant.Filled" Color="@(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Color.Error : Color.Primary)" OnClick="HandleCrudAction">
+                <MudButton Variant="Variant.Filled" 
+                           Color="@(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Color.Error : Color.Primary)" 
+                           OnClick="HandleCrudAction"
+                           Style="font-family: 'Outfit', sans-serif; font-weight: 600; min-width: 120px;">
                     @(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Lang.Delete : Lang.Save)
                 </MudButton>
             }
@@ -72,7 +93,7 @@
         Lang.OnLanguageChanged += StateHasChanged;
         if (CurrentEmployee != null)
         {
-            Name = CurrentEmployee.Name;
+            Name = SelectedAction == UniversalCrudMenu.CrudAction.AddCopy ? CurrentEmployee.Name + " (Copy)" : CurrentEmployee.Name;
             Surname = CurrentEmployee.Surname;
             BirthDate = CurrentEmployee.BirthDate;
         }
@@ -82,7 +103,7 @@
     {
         try
         {
-            if (SelectedAction == UniversalCrudMenu.CrudAction.Add)
+            if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
             {
                 await ApiService.PostAsync<AddEmployeeCommand, AddEmployeeResponse>("Employees/add", new AddEmployeeCommand { Name = Name, Surname = Surname, BirthDate = BirthDate ?? DateTime.Now });
             }
@@ -95,7 +116,7 @@
                 await ApiService.DeleteAsync<DeleteEmployeeCommand, DeleteEmployeeResponse>("Employees/delete", new DeleteEmployeeCommand { EmployeeId = CurrentEmployee.Id });
             }
 
-            Snackbar.Add(Lang.SuccessSave, Severity.Success);
+            Snackbar.Add(Lang.T("Zapisano pomyślnie.", "Saved successfully."), Severity.Success);
             await OnCrudCompleted.InvokeAsync();
             await OnDetailCancel.InvokeAsync();
         }

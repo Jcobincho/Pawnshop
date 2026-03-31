@@ -32,6 +32,7 @@ builder.Services.AddScoped(sp =>
 
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<Pawnshop.Web.Services.LanguageService>();
+builder.Services.AddTransient<MudBlazor.MudLocalizer, Pawnshop.Web.Services.MudBlazorLocalizer>();
 builder.Services.AddScoped<AuthStateProviderService>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProviderService>();
 

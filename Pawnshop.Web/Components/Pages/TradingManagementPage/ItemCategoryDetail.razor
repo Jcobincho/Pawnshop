@@ -1,0 +1,137 @@
+@using Pawnshop.Application.ItemCategoriesApplication.Commands.AddItemCategory
+@using Pawnshop.Application.ItemCategoriesApplication.Commands.DeleteItemCategory
+@using Pawnshop.Application.ItemCategoriesApplication.Commands.UpdateItemCategory
+@using Pawnshop.Application.ItemCategoriesApplication.Dto
+@using Pawnshop.Application.ItemCategoriesApplication.Responses
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@using MudBlazor
+
+@inject ApiService ApiService
+@inject ISnackbar Snackbar
+@inject LanguageService Lang
+@implements IDisposable
+
+<DetailModalOverlay>
+    <MudCard Class="w-50 border-gold-glow" Style="max-height: 90vh; overflow: auto; border-radius: 20px;">
+        <MudCardHeader Class="pa-6" Style="border-bottom: 1px solid rgba(197, 160, 89, 0.1);">
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5"
+                         Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase;">
+                    @Lang.Categories
+                </MudText>
+                <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">
+                    @(SelectedAction == UniversalCrudMenu.CrudAction.Add ? Lang.Add :
+                      (SelectedAction == UniversalCrudMenu.CrudAction.Update ? Lang.Update :
+                      (SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Lang.Delete : Lang.Details)))
+                </MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="OnDetailCancel" Color="Color.Default" />
+            </CardHeaderActions>
+        </MudCardHeader>
+
+        <MudCardContent Class="pa-8">
+            @if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-6" Style="border-radius: 12px;">
+                    @Lang.ConfirmDelete</MudAlert>
+                    <div class="d-flex flex-column align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.Category" Color="Color.Error" Size="Size.Large" Class="mb-4" />
+                        <MudText Typo="Typo.h6" Align="Align.Center">@CurrentCategory?.Name</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">@CurrentCategory?.Description</MudText>
+                    </div>
+                }
+            else
+                {
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="@Name" Label="@Lang.Name" Variant="Variant.Outlined"
+                                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)"
+                                          Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="@Description" Label="@Lang.Description" Variant="Variant.Outlined"
+                                          ReadOnly="@(SelectedAction == UniversalCrudMenu.CrudAction.View)" Lines="3"
+                                          Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                    </MudGrid>
+                }
+            </MudCardContent>
+
+            <MudCardActions Class="pa-6 d-flex justify-space-between" Style="background-color: rgba(0,0,0,0.05);">
+                <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="OnDetailCancel"
+                           Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+                    @Lang.Cancel
+                </MudButton>
+                @if (SelectedAction != UniversalCrudMenu.CrudAction.View)
+                {
+                    <MudButton Variant="Variant.Filled"
+                               Color="@(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Color.Error : Color.Primary)"
+                               OnClick="HandleCrudAction"
+                               Style="font-family: 'Outfit', sans-serif; font-weight: 600; min-width: 120px;">
+                        @(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Lang.Delete : Lang.Save)
+                    </MudButton>
+                }
+            </MudCardActions>
+        </MudCard>
+    </DetailModalOverlay>
+
+@code
+{
+    [Parameter] public ItemCategoryDto CurrentCategory { get; set; }
+    [Parameter] public UniversalCrudMenu.CrudAction SelectedAction { get; set; }
+    [Parameter] public EventCallback OnDetailCancel { get; set; }
+    [Parameter] public EventCallback OnCrudCompleted { get; set; }
+
+    private string Name { get; set; }
+    private string Description { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Lang.OnLanguageChanged += StateHasChanged;
+        if (CurrentCategory != null)
+        {
+            Name = SelectedAction == UniversalCrudMenu.CrudAction.AddCopy ? CurrentCategory.Name + " (Kopia/Copy)" :
+CurrentCategory.Name;
+            Description = CurrentCategory.Description;
+        }
+    }
+
+    private async Task HandleCrudAction()
+    {
+        try
+        {
+            if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
+            {
+                await ApiService.PostAsync<AddItemCategoryCommand, AddItemCategoryResponse>("ItemCategories/add", new
+AddItemCategoryCommand
+                { Name = Name, Description = Description });
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
+            {
+                await ApiService.PutAsync<UpdateItemCategoryCommand, UpdateItemCategoryResponse>("ItemCategories/update", new
+UpdateItemCategoryCommand
+                { ItemCategoryId = CurrentCategory.ItemCategoryId, Name = Name, Description = Description });
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                await ApiService.DeleteAsync<DeleteItemCategoryCommand, object>("ItemCategories/delete", new DeleteItemCategoryCommand
+                {
+                    CategoryId = CurrentCategory.ItemCategoryId
+                });
+            }
+
+            Snackbar.Add(Lang.SuccessSave, Severity.Success);
+            await OnCrudCompleted.InvokeAsync();
+            await OnDetailCancel.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"{Lang.ErrorGeneric}: {ex.Message}", Severity.Error);
+        }
+    }
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
+}

@@ -1,6 +1,8 @@
 @page "/Item-category-management-page"
-@using Pawnshop.Application.ItemCategoriesApplication.Commands.AddItemCategory
+@using Pawnshop.Application.ItemCategoriesApplication.Dto
 @using Pawnshop.Application.ItemCategoriesApplication.Responses
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Components.Pages.TradingManagementPage
 @using Pawnshop.Web.Services
 @using Pawnshop.Web.Services.ApiService
 @using MudBlazor
@@ -9,92 +11,64 @@
 @inject LanguageService Lang
 @implements IDisposable
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
-    <MudText Typo="Typo.h4" Class="mb-4">@Lang.Categories</MudText>
+<div class="d-flex align-center mb-6">
+    <MudText Typo="Typo.h4" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase; letter-spacing: 1px;">
+        @Lang.Categories
+    </MudText>
+</div>
 
-    <MudPaper Class="pa-4 mb-4">
-        <MudText Typo="Typo.h6">@Lang.T("Dodaj nową kategorię", "Add new category")</MudText>
-        <MudGrid>
-            <MudItem xs="12" md="5">
-                <MudTextField @bind-Value="_newCategory.Name" Label="@Lang.Name" Variant="Variant.Outlined"
-                              Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" md="5">
-                <MudTextField @bind-Value="_newCategory.Description" Label="@Lang.Description" Variant="Variant.Outlined"
-                              Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" md="2" Class="d-flex align-center">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddCategory" FullWidth="true">@Lang.Add
-                </MudButton>
-            </MudItem>
-        </MudGrid>
-    </MudPaper>
+<MudPaper Class="pa-4" Elevation="4" Style="border-radius: 16px;">
+    <UniversalGrid TItem="ItemCategoryDto" 
+                   Title="@Lang.Categories"
+                   Items="_categories"
+                   OnItemSelected="HandleCategorySelected"
+                   OnActionTriggered="HandleCrudAction">
+        <GridColumns>
+            <PropertyColumn T="ItemCategoryDto" TProperty="string" Property="x => x.Name" Title="@Lang.Name" />
+            <PropertyColumn T="ItemCategoryDto" TProperty="string" Property="x => x.Description" Title="@Lang.Description" />
+        </GridColumns>
+    </UniversalGrid>
+</MudPaper>
 
-    <MudTable Items="_categories" Hover="true" Breakpoint="Breakpoint.Sm" Loading="_loading"
-              LoadingProgressColor="Color.Info">
-        <HeaderContent>
-            <MudTh>ID</MudTh>
-            <MudTh>@Lang.Name</MudTh>
-            <MudTh>@Lang.Description</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="ID">@context.ItemCategoryId</MudTd>
-            <MudTd DataLabel="@Lang.Name">@context.Name</MudTd>
-            <MudTd DataLabel="@Lang.Description">@context.Description</MudTd>
-        </RowTemplate>
-    </MudTable>
-</MudContainer>
+@if (_showDetail)
+{
+    <ItemCategoryDetail CurrentCategory="_selectedCategory"
+                        SelectedAction="_selectedAction"
+                        OnDetailCancel="() => _showDetail = false"
+                        OnCrudCompleted="LoadCategories" />
+}
 
 @code
 {
-    private List<Pawnshop.Application.ItemCategoriesApplication.Dto.ItemCategoryDto> _categories = new();
-    private AddItemCategoryCommand _newCategory = new();
-    private bool _loading = true;
+    private List<ItemCategoryDto> _categories = new();
+    private ItemCategoryDto _selectedCategory = null;
+    private bool _showDetail = false;
+    private UniversalCrudMenu.CrudAction _selectedAction;
 
     protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadCategories();
-    }
+    protected override async Task OnInitializedAsync() => await LoadCategories();
 
     private async Task LoadCategories()
     {
-        _loading = true;
         try
         {
             var response = await ApiService.GetAsync<GetAllItemCategoriesResponse>("ItemCategories/get", null);
             _categories = response?.AllItemCategoriesList ?? new();
         }
-        catch (Exception ex)
-        {
-            _snackbar.Add($"{Lang.T("Błąd podczas ładowania kategorii", "Error loading categories")}: {ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            _loading = false;
-        }
+        catch (Exception) { }
     }
 
-    private async Task AddCategory()
-    {
-        if (string.IsNullOrWhiteSpace(_newCategory.Name))
-        {
-            _snackbar.Add(Lang.T("Nazwa kategorii jest wymagana!", "Category name is required!"), Severity.Warning);
-            return;
-        }
+    private void HandleCategorySelected(ItemCategoryDto category) => _selectedCategory = category;
 
-        try
+    private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
+    {
+        _selectedAction = action;
+        if (action == UniversalCrudMenu.CrudAction.Add)
         {
-            await ApiService.PostAsync<AddItemCategoryCommand, AddItemCategoryResponse>("ItemCategories/add", _newCategory);
-            _snackbar.Add(Lang.SuccessSave, Severity.Success);
-            _newCategory = new();
-            await LoadCategories();
+            _selectedCategory = null;
         }
-        catch (Exception ex)
-        {
-            _snackbar.Add($"{Lang.T("Błąd podczas dodawania kategorii", "Error adding category")}: {ex.Message}", Severity.Error);
-        }
+        _showDetail = true;
     }
 
     public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;

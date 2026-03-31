@@ -7,19 +7,31 @@
 @inject LanguageService Lang
 @implements IDisposable
 
-<MudTable Items="_users" Hover="true" Breakpoint="Breakpoint.Sm" Loading="_loading" 
+<MudTable Items="_users" Hover="true" Breakpoint="Breakpoint.Md" Loading="_loading" 
           OnRowClick="@( (TableRowClickEventArgs<GetAllUsersDto> e) => OnRowClick(e.Item) )" 
-          T="GetAllUsersDto" RowClassFunc="@SelectedRowClassFunc">
+          T="GetAllUsersDto" RowClassFunc="@SelectedRowClassFunc" Elevation="0">
     <HeaderContent>
-        <MudTh>@Lang.Username</MudTh>
-        <MudTh>@Lang.Email</MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<GetAllUsersDto, object>(x=>x.UserName)">@Lang.Username</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<GetAllUsersDto, object>(x=>x.Email)">@Lang.Email</MudTableSortLabel></MudTh>
         <MudTh>@Lang.Role</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="@Lang.Username">@context.UserName</MudTd>
+        <MudTd DataLabel="@Lang.Username">
+            <MudText Color="Color.Primary" Style="font-weight: 600;">@context.UserName</MudText>
+        </MudTd>
         <MudTd DataLabel="@Lang.Email">@context.Email</MudTd>
-        <MudTd DataLabel="@Lang.Role">@string.Join(", ", context.Roles)</MudTd>
+        <MudTd DataLabel="@Lang.Role">
+            <div class="d-flex flex-wrap gap-1">
+                @foreach (var role in context.Roles)
+                {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Info" Class="currency-font">@role</MudChip>
+                }
+            </div>
+        </MudTd>
     </RowTemplate>
+    <NoRecordsContent>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">@Lang.T("Brak użytkowników do wyświetlenia.", "No users to display.")</MudAlert>
+    </NoRecordsContent>
 </MudTable>
 
 @code {
@@ -52,11 +64,18 @@
     }
 
     private string SelectedRowClassFunc(GetAllUsersDto element, int rowNumber) => 
-        _selectedItem != null && _selectedItem.Id == element.Id ? "selected-row-highlight" : string.Empty;
+        _selectedItem != null && _selectedItem.Id == element.Id ? "selected-row-premium" : string.Empty;
 
     public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }
 
 <style>
-    .selected-row-highlight { background-color: rgba(212, 175, 55, 0.3) !important; }
+    .selected-row-premium {
+        background-color: rgba(197, 160, 89, 0.1) !important;
+        border-left: 4px solid var(--mud-palette-primary) !important;
+    }
+    
+    .mud-table-row:hover {
+        background-color: rgba(197, 160, 89, 0.05) !important;
+    }
 </style>

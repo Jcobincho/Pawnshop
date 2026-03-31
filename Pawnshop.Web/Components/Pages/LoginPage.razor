@@ -15,38 +15,90 @@
 @inject LanguageService Lang
 @implements IDisposable
 
-<div class="d-flex align-center justify-center"
-     style="height: 100vh; background-color: var(--mud-palette-background-grey);">
-    <MudPaper Elevation="4" Class="pa-8" Style="width: 400px; border-radius: 16px;">
-        <div class="d-flex flex-column align-center mb-6">
-            <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Color="Color.Primary" Style="font-size: 4rem;" />
-            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mt-2"><b>@Lang.AppTitle</b></MudText>
-            <MudText Typo="Typo.subtitle1" Color="Color.Secondary">@Lang.Welcome</MudText>
+<div class="d-flex align-center justify-center login-container" style="height: 100vh; background-color: var(--mud-palette-background);">
+    <MudPaper Elevation="25" Class="pa-10 login-card border-gold-glow" 
+              Style="width: 450px; border-radius: 24px; background-color: var(--mud-palette-surface); backdrop-filter: blur(10px);">
+        <div class="d-flex flex-column align-center mb-10">
+            <div class="logo-glow mb-4">
+                <MudIcon Icon="@Icons.Material.Filled.Store" Color="Color.Primary" Style="font-size: 5rem;" />
+            </div>
+            <MudText Typo="Typo.h3" Style="font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -1px; color: var(--mud-palette-primary); text-transform: uppercase;">
+                @Lang.AppTitle
+            </MudText>
+            <MudText Typo="Typo.subtitle1" Class="uppercase-label mt-1" Style="color: var(--mud-palette-text-secondary);">
+                @Lang.T("System Zarządzania Lombardem", "Pawnshop Management System")
+            </MudText>
         </div>
 
         <EditForm Model="@_loginModel" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator />
-            <MudTextField @bind-Value="_loginModel.Username" Label="@Lang.Username" Variant="Variant.Outlined"
-                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" Class="mb-4" />
-            <MudTextField @bind-Value="_loginModel.Password" Label="@Lang.Password" Variant="Variant.Outlined"
-                          InputType="@_passwordInput" Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon"
-                          OnAdornmentClick="TogglePasswordVisibility" Class="mb-6" />
+            
+            <MudText Typo="Typo.caption" Class="uppercase-label mb-2 d-block" Color="Color.Primary">@Lang.Username</MudText>
+            <MudTextField @bind-Value="_loginModel.Username" 
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Person" 
+                          Class="mb-6"
+                          Style="font-family: 'Outfit', sans-serif;" />
 
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true"
-                       Size="Size.Large" Disabled="_isLoading">
+            <MudText Typo="Typo.caption" Class="uppercase-label mb-2 d-block" Color="Color.Primary">@Lang.Password</MudText>
+            <MudTextField @bind-Value="_loginModel.Password" 
+                          Variant="Variant.Outlined"
+                          InputType="@_passwordInput" 
+                          Adornment="Adornment.End" 
+                          AdornmentIcon="@_passwordInputIcon"
+                          OnAdornmentClick="TogglePasswordVisibility" 
+                          Class="mb-8"
+                          Style="font-family: 'Outfit', sans-serif;" />
+
+            <MudButton ButtonType="ButtonType.Submit" 
+                       Variant="Variant.Filled" 
+                       Color="Color.Primary" 
+                       FullWidth="true"
+                       Size="Size.Large" 
+                       Disabled="_isLoading"
+                       Style="height: 60px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 8px 16px rgba(197, 160, 89, 0.2);">
                 @if (_isLoading)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                    <MudText Class="ms-2">@Lang.T("Logowanie...", "Logging in...")</MudText>
+                    <MudText Class="ms-2" Style="font-family: 'Outfit', sans-serif;">@Lang.T("AUTORYZACJA...", "AUTHORIZING...")</MudText>
                 }
                 else
                 {
-                    <MudText>@Lang.Login</MudText>
+                    <MudText Style="font-family: 'Outfit', sans-serif;">@Lang.Login.ToUpper()</MudText>
                 }
             </MudButton>
         </EditForm>
+
+        <div class="mt-8 d-flex justify-center">
+            <MudText Typo="Typo.caption" Style="color: var(--mud-palette-text-disabled); font-family: 'Outfit', sans-serif;">
+                &copy; 2026 @Lang.AppTitle. @Lang.T("WSZELKIE PRAWA ZASTRZEŻONE.", "ALL RIGHTS RESERVED.")
+            </MudText>
+        </div>
     </MudPaper>
 </div>
+
+<style>
+    .login-container {
+        /* Subtelny gradient zależny od trybu */
+        background: radial-gradient(circle at center, var(--mud-palette-surface) 0%, var(--mud-palette-background) 100%);
+    }
+
+    .login-card {
+        border: 1px solid var(--mud-palette-lines-default) !important;
+    }
+
+    .logo-glow {
+        filter: drop-shadow(0 0 15px rgba(197, 160, 89, 0.3));
+    }
+
+    .uppercase-label {
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+</style>
 
 @code
 {
@@ -80,14 +132,17 @@
         try
         {
             var response = await ApiService.PostAsync<LoginUserCommand, JsonWebToken>("Users/login", _loginModel, false);
-            await ((AuthStateProviderService)AuthStateProvider).MarkUserAsAuthenticated(response);
-            NavigationManager.NavigateTo("/Home");
+            if (response != null)
+            {
+                await ((AuthStateProviderService)AuthStateProvider).MarkUserAsAuthenticated(response);
+                NavigationManager.NavigateTo("/Home");
+            }
         }
         catch (ApiException ex)
         {
             Snackbar.Add(string.Join(", ", ex.ErrorMessages), Severity.Error);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Snackbar.Add(Lang.T("Błąd logowania. Spróbuj ponownie.", "Login failed. Please try again."), Severity.Error);
         }

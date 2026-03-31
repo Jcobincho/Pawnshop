@@ -1,4 +1,4 @@
-@using Pawnshop.Domain.Roles
+﻿@using Pawnshop.Domain.Roles
 @using Pawnshop.Web.Services
 @inject LanguageService Lang
 @implements IDisposable
@@ -7,7 +7,7 @@
     <AuthorizeView>
         <Authorized>
             <MudNavLink Href="/Home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
-                @Lang.T("Strona główna", "Home")
+                @Lang.Home
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
@@ -16,7 +16,7 @@
         <Authorized>
             <MudNavLink Href="/Trading-management-page" Match="NavLinkMatch.All"
                         Icon="@Icons.Material.Filled.ShoppingCart">
-                @Lang.T("Zarządzanie transakcjami", "Trading management")
+                @Lang.TradingManagement
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
@@ -26,7 +26,7 @@
         <Authorized>
             <MudNavLink Href="/Workplace-management-page" Match="NavLinkMatch.All"
                         Icon="@Icons.Material.Filled.AddLocationAlt">
-                @Lang.T("Zarządzanie lombardami", "Workplace management")
+                @Lang.WorkplaceManagement
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
@@ -35,7 +35,7 @@
         <Authorized>
             <MudNavLink Href="/Clients-management-page" Match="NavLinkMatch.All"
                         Icon="@Icons.Material.Filled.EmojiPeople">
-                @Lang.T("Zarządzanie klientami", "Client management")
+                @Lang.ClientManagement
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
@@ -44,7 +44,7 @@
         Roles="@($"{UserRoles.HeadAdmin}, {UserRoles.EmployeesDisplay}, {UserRoles.EmployeesDisplayAndModify}")">
         <Authorized>
             <MudNavLink Href="/Employee-management-page" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Work">
-                @Lang.T("Zarządzanie pracownikami", "Employee management")
+                @Lang.EmployeeManagement
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
@@ -53,13 +53,14 @@
         <Authorized>
             <MudNavLink Href="/User-management-page" Match="NavLinkMatch.All"
                         Icon="@Icons.Material.Filled.ManageAccounts">
-                @Lang.T("Zarządzanie użytkownikami", "User management")
+                @Lang.UserManagement
             </MudNavLink>
         </Authorized>
     </AuthorizeView>
 </MudNavMenu>
 
-@code {
+@code
+{
     protected override void OnInitialized()
     {
         Lang.OnLanguageChanged += StateHasChanged;

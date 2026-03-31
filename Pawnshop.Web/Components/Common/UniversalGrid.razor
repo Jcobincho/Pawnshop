@@ -1,0 +1,138 @@
+@typeparam TItem
+@attribute [CascadingTypeParameter(nameof(TItem))]
+
+@using MudBlazor
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@inject LanguageService Lang
+@implements IDisposable
+
+<MudDataGrid T="TItem"
+             Items="@Items" 
+             RowClick="OnRowClicked"
+             QuickFilter="@FilterFunc"
+             DragDropColumnReordering="true" 
+             ColumnsPanelReordering="true"
+             ColumnResizeMode="ResizeMode.Column" 
+             MultiSelection="false"
+             Hideable="true" 
+             Filterable="true" 
+             Groupable="true" 
+             FilterMode="DataGridFilterMode.Simple" 
+             ShowMenuIcon="true"
+             Striped="true"
+             Elevation="0"
+             Class="border-gold-soft">
+    
+    <ToolBarContent>
+        <MudText Typo="Typo.h6" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase;">@Title</MudText>
+        <MudSpacer />
+        
+        <MudTextField @bind-Value="_searchString" 
+                      Placeholder="@Lang.T("Szukaj...", "Search...")" 
+                      Adornment="Adornment.Start" 
+                      AdornmentIcon="@Icons.Material.Filled.Search" 
+                      IconSize="Size.Medium" 
+                      Class="mt-0 mr-4" 
+                      Clearable="true"
+                      Immediate="true"></MudTextField>
+
+        @if (!IsLookupMode)
+        {
+            <UniversalCrudMenu SelectedItemsCount="@(SelectedItem != null ? 1 : 0)" 
+                               ShowPickButton="@IsLookupMode" 
+                               OnActionSelected="HandleMenuAction" />
+        }
+    </ToolBarContent>
+
+    <Columns>
+        @GridColumns
+    </Columns>
+
+    <NoRecordsContent>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">@Lang.T("Brak danych do wyświetlenia.", "No data to display.")</MudAlert>
+    </NoRecordsContent>
+
+    <PagerContent>
+        <MudDataGridPager T="TItem" />
+    </PagerContent>
+</MudDataGrid>
+
+<style>
+    .selected-row-premium {
+        background-color: rgba(197, 160, 89, 0.1) !important;
+        border-left: 4px solid var(--mud-palette-primary) !important;
+    }
+    
+    .mud-table-row:hover {
+        background-color: rgba(197, 160, 89, 0.05) !important;
+    }
+</style>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Dane";
+    [Parameter] public IEnumerable<TItem> Items { get; set; }
+    [Parameter] public RenderFragment GridColumns { get; set; }
+    [Parameter] public EventCallback<TItem> OnItemSelected { get; set; }
+    [Parameter] public EventCallback<UniversalCrudMenu.CrudAction> OnActionTriggered { get; set; }
+
+    [Parameter] public bool IsLookupMode { get; set; } = false;
+    [Parameter] public EventCallback<TItem> OnItemPicked { get; set; }
+
+    public TItem SelectedItem { get; private set; }
+    private string _searchString;
+
+    private bool FilterFunc(TItem item)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+        
+        var props = typeof(TItem).GetProperties();
+        foreach (var prop in props)
+        {
+            try 
+            {
+                var val = prop.GetValue(item)?.ToString();
+                if (val != null && val.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            catch { continue; }
+        }
+        return false;
+    }
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    private async Task OnRowClicked(DataGridRowClickEventArgs<TItem> row)
+    {
+        SelectedItem = row.Item;
+        
+        if (IsLookupMode && OnItemPicked.HasDelegate)
+        {
+            await OnItemPicked.InvokeAsync(SelectedItem);
+        }
+        else if (OnItemSelected.HasDelegate)
+        {
+            await OnItemSelected.InvokeAsync(SelectedItem);
+        }
+    }
+
+    private async Task HandleMenuAction(UniversalCrudMenu.CrudAction action)
+    {
+        if (action == UniversalCrudMenu.CrudAction.Pick)
+        {
+            if (OnItemPicked.HasDelegate && SelectedItem != null)
+            {
+                await OnItemPicked.InvokeAsync(SelectedItem);
+            }
+        }
+        else
+        {
+            if (OnActionTriggered.HasDelegate)
+            {
+                await OnActionTriggered.InvokeAsync(action);
+            }
+        }
+    }
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
+}

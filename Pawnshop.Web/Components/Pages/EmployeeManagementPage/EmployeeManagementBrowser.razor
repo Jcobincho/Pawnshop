@@ -1,28 +1,67 @@
 @page "/Employee-management-page"
 @using Pawnshop.Application.EmployeesApplication.Dto
+@using Pawnshop.Application.EmployeesApplication.Responses
 @using Pawnshop.Web.Components.Common
 @using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
 @inject LanguageService Lang
+@inject ApiService apiService
 @implements IDisposable
 
-<MudText Typo="Typo.h4" Class="mb-4">@Lang.EmployeeManagement</MudText>
+<div class="d-flex align-center mb-6">
+    <MudText Typo="Typo.h4" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase; letter-spacing: 1px;">
+        @Lang.EmployeeManagement
+    </MudText>
+</div>
 
-<UniversalCrudMenu IsItemSelected="@(currentEmployee != null)" OnActionSelected="HandleCrudAction" />
+<MudPaper Class="pa-4" Elevation="4" Style="border-radius: 16px;">
+    <UniversalGrid TItem="EmployeeDto" 
+                   Title="@Lang.EmployeeManagement"
+                   Items="_employees"
+                   OnItemSelected="HandleEmployeeSelected"
+                   OnActionTriggered="HandleCrudAction">
+        <GridColumns>
+            <PropertyColumn T="EmployeeDto" TProperty="string" Property="x => x.Name" Title="@Lang.Name" />
+            <PropertyColumn T="EmployeeDto" TProperty="string" Property="x => x.Surname" Title="@Lang.Surname">
+                <CellTemplate>
+                    <MudText Color="Color.Primary" Style="font-weight: 600;">@context.Item.Surname</MudText>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn T="EmployeeDto" TProperty="DateTime" Property="x => x.BirthDate" Title="@Lang.BirthDate">
+                <CellTemplate>
+                    <MudText Class="currency-font">@context.Item.BirthDate.ToString("yyyy-MM-dd")</MudText>
+                </CellTemplate>
+            </PropertyColumn>
+        </GridColumns>
+    </UniversalGrid>
+</MudPaper>
 
-<EmployeeManagementGrid OnEmployeeSelected="HandleEmployeeSelected" @ref="employeeGrid" />
-
-@if(showDetail)
+@if (showDetail)
 {
-    <EmployeeManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentEmployee="currentEmployee" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
+    <EmployeeManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentEmployee="currentEmployee"
+                              SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
 }
 
-@code {
+@code
+{
     private EmployeeDto currentEmployee = null;
     private bool showDetail = false;
     private UniversalCrudMenu.CrudAction selectedAction;
-    private EmployeeManagementGrid employeeGrid;
+    private List<EmployeeDto> _employees = new();
 
     protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    protected override async Task OnInitializedAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            var response = await apiService.GetAsync<GetAllEmployeesResponse>("Employees/get", null);
+            _employees = response?.AllEmployeesList ?? new();
+        }
+        catch (Exception) { }
+    }
 
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
@@ -32,13 +71,13 @@
 
     private void HandleEmployeeSelected(EmployeeDto selectedEmployee) => currentEmployee = selectedEmployee;
 
-    private void HandleDetailCanceled() 
+    private void HandleDetailCanceled()
     {
         showDetail = false;
         currentEmployee = null;
     }
 
-    private async Task HandleCrudCompleted() => await employeeGrid.ReloadDataAsync();
+    private async Task HandleCrudCompleted() => await LoadDataAsync();
 
     public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }
