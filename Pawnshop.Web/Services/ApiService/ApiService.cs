@@ -29,39 +29,44 @@ namespace Pawnshop.Web.Services.ApiService
             _authStateProvider = authStateProvider;
         }
 
-        public async Task<TResponse> GetAsync<TResponse>(string uri, object queryParamsObj = null, bool requireAuth = true)
+        public async Task<TResponse?> GetAsync<TResponse>(string uri, object? queryParamsObj = null, bool requireAuth = true)
         {
             var dict = queryParamsObj?.ToQueryDictionary();
             return await SendAsync<TResponse>(HttpMethod.Get, uri, requireAuth, dict);
         }
 
-        public async Task<TResponse> PostAsync<TRequest, TResponse>(string uri, TRequest body, bool requireAuth = true)
+        public async Task<TResponse?> PostAsync<TRequest, TResponse>(string uri, TRequest? body, bool requireAuth = true)
         {
             return await SendAsync<TResponse>(HttpMethod.Post, uri, requireAuth, null, body);
         }
 
-        public async Task<TResponse> PutAsync<TRequest, TResponse>(string uri, TRequest body, bool requireAuth = true)
+        public async Task<TResponse?> PutAsync<TRequest, TResponse>(string uri, TRequest? body, bool requireAuth = true)
         {
             return await SendAsync<TResponse>(HttpMethod.Put, uri, requireAuth, null, body);
         }
 
-        public async Task<TResponse> DeleteAsync<TRequest, TResponse>(string uri, TRequest body, bool requireAuth = true)
+        public async Task<TResponse?> DeleteAsync<TRequest, TResponse>(string uri, TRequest? body, bool requireAuth = true)
         {
             return await SendAsync<TResponse>(HttpMethod.Delete, uri, requireAuth, null, body);
         }
 
         public async Task LogoutHandler()
         {
-            var sessionState = (await _localStorage.GetAsync<JsonWebToken>("sessionState")).Value;
+            var sessionStateValue = (await _localStorage.GetAsync<JsonWebToken>("sessionState"));
+            var sessionState = sessionStateValue.Success ? sessionStateValue.Value : null;
+            
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "/Users/logout");
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.AccessToken);
-                var jsonContent = JsonSerializer.Serialize(new LogoutCommand() { RefreshToken = sessionState.RefreshToken.Token });
-                request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-                await _httpClient.SendAsync(request);
+                if (sessionState != null && !string.IsNullOrEmpty(sessionState.AccessToken))
+                {
+                    var request = new HttpRequestMessage(HttpMethod.Post, "/Users/logout");
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.AccessToken);
+                    var jsonContent = JsonSerializer.Serialize(new LogoutCommand() { RefreshToken = sessionState.RefreshToken?.Token ?? string.Empty });
+                    request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                    await _httpClient.SendAsync(request);
+                }
             }
-            catch (Exception ex) { }
+            catch (Exception) { }
             finally
             {
                 await ((AuthStateProviderService)_authStateProvider).MarkUserAsLoggedOut();
@@ -73,10 +78,12 @@ namespace Pawnshop.Web.Services.ApiService
         {
             try
             {
-                var sessionState = (await _localStorage.GetAsync<JsonWebToken>("sessionState")).Value;
+                var sessionStateValue = (await _localStorage.GetAsync<JsonWebToken>("sessionState"));
+                var sessionState = sessionStateValue.Success ? sessionStateValue.Value : null;
+
                 if (sessionState != null && !string.IsNullOrEmpty(sessionState.AccessToken))
                 {
-                    if (sessionState.Expires < DateTimeOffset.UtcNow.ToUnixTimeSeconds() && sessionState.RefreshToken.Expires < DateTime.UtcNow)
+                    if (sessionState.Expires < DateTimeOffset.UtcNow.ToUnixTimeSeconds() && sessionState.RefreshToken?.Expires < DateTime.UtcNow)
                     {
                         await LogoutHandler();
                     }
@@ -84,14 +91,17 @@ namespace Pawnshop.Web.Services.ApiService
                     {
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.AccessToken);
                     }
-                    else if (sessionState.Expires < DateTimeOffset.UtcNow.ToUnixTimeSeconds() && sessionState.RefreshToken.Expires > DateTime.UtcNow)
+                    else if (sessionState.Expires < DateTimeOffset.UtcNow.ToUnixTimeSeconds() && sessionState.RefreshToken?.Expires > DateTime.UtcNow)
                     {
                         try
                         {
                             var res = await PostAsync<RefreshTokenCommand, JsonWebToken>("/Users/refresh-token", new RefreshTokenCommand() { RefreshToken = sessionState.RefreshToken.Token });
 
-                            await ((AuthStateProviderService)_authStateProvider).MarkUserAsAuthenticated(res);
-                            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", res.AccessToken);
+                            if (res != null)
+                            {
+                                await ((AuthStateProviderService)_authStateProvider).MarkUserAsAuthenticated(res);
+                                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", res.AccessToken);
+                            }
                         }
                         catch (ApiException)
                         {
@@ -105,13 +115,44 @@ namespace Pawnshop.Web.Services.ApiService
                     _navigationManager.NavigateTo("/");
                 }
             }
-            catch (Exception ex)
+            catch (Microsoft.AspNetCore.Components.NavigationException)
+            {
+                throw;
+            }
+            catch (Exception)
             {
                 _navigationManager.NavigateTo("/");
             }
         }
 
-        private async Task<T> SendAsync<T>(HttpMethod method, string uri, bool requireAuth, Dictionary<string, string> queryParams = null, object body = null)
+        public async Task<byte[]> DownloadFileAsync<TRequest>(string uri, TRequest? body, bool requireAuth = true)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+
+            if (requireAuth)
+            {
+                await SetAuthorizeHeader(request);
+            }
+
+            if (body != null)
+            {
+                var jsonContent = JsonSerializer.Serialize(body);
+                request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            }
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                var errorMessages = ParseErrorMessages(errorContent, response.StatusCode);
+                throw new ApiException(errorMessages, response.StatusCode);
+            }
+
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+
+        private async Task<T?> SendAsync<T>(HttpMethod method, string uri, bool requireAuth, Dictionary<string, string>? queryParams = null, object? body = null)
         {
             var requestUri = BuildUriWithQuery(uri, queryParams);
             var request = new HttpRequestMessage(method, requestUri);
@@ -132,7 +173,7 @@ namespace Pawnshop.Web.Services.ApiService
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                var errorMessages = ParseErrorMessages(errorContent);
+                var errorMessages = ParseErrorMessages(errorContent, response.StatusCode);
                 throw new ApiException(errorMessages, response.StatusCode);
             }
 
@@ -141,7 +182,7 @@ namespace Pawnshop.Web.Services.ApiService
             return await response.Content.ReadFromJsonAsync<T>();
         }
 
-        private string BuildUriWithQuery(string uri, Dictionary<string, string> queryParams)
+        private string BuildUriWithQuery(string uri, Dictionary<string, string>? queryParams)
         {
             if (queryParams == null || !queryParams.Any())
                 return uri;
@@ -152,9 +193,15 @@ namespace Pawnshop.Web.Services.ApiService
             return $"{uri}?{queryString}";
         }
 
-        private List<string> ParseErrorMessages(string errorContent)
+        private List<string> ParseErrorMessages(string errorContent, System.Net.HttpStatusCode statusCode)
         {
             var errorMessages = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(errorContent))
+            {
+                errorMessages.Add($"Status: {statusCode} (No response body)");
+                return errorMessages;
+            }
 
             AddErrorToList(errorContent, errorMessages, "errors");
 
@@ -165,7 +212,7 @@ namespace Pawnshop.Web.Services.ApiService
 
             if (!errorMessages.Any())
             {
-                errorMessages.Add("Unknown error occurred.");
+                errorMessages.Add($"Status: {statusCode}. Content: {errorContent}");
             }
 
             return errorMessages;
@@ -199,7 +246,7 @@ namespace Pawnshop.Web.Services.ApiService
             }
             catch (JsonException)
             {
-                errorMessages.Add("Invalid error response format.");
+                errorMessages.Add($"Invalid JSON response. Raw content: {errorContent}");
             }
         }
     }

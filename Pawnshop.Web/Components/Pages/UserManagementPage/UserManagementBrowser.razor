@@ -1,23 +1,72 @@
-﻿@page "/User-management-page"
-
+@page "/User-management-page"
 @using Pawnshop.Application.UsersApplication.Dto
+@using Pawnshop.Application.UsersApplication.Responses
 @using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@inject LanguageService Lang
+@inject ApiService apiService
+@implements IDisposable
 
-<UniversalCrudMenu IsItemSelected="@(currenUser != null)" OnActionSelected="HandleCrudAction" />
+<div class="d-flex align-center mb-6">
+    <MudText Typo="Typo.h4" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase; letter-spacing: 1px;">
+        @Lang.UserManagement
+    </MudText>
+</div>
 
-<UserManagementGrid OnUserSelected="HandleUserSelected" @ref="userGrid" />
+<MudPaper Class="pa-4" Elevation="4" Style="border-radius: 16px;">
+    <UniversalGrid TItem="GetAllUsersDto" 
+                   Title="@Lang.UserManagement"
+                   Items="_users"
+                   OnItemSelected="HandleUserSelected"
+                   OnActionTriggered="HandleCrudAction">
+        <GridColumns>
+            <PropertyColumn T="GetAllUsersDto" TProperty="string" Property="x => x.UserName" Title="@Lang.Username">
+                <CellTemplate>
+                    <MudText Color="Color.Primary" Style="font-weight: 600;">@context.Item.UserName</MudText>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn T="GetAllUsersDto" TProperty="string" Property="x => x.Email" Title="@Lang.Email" />
+            <PropertyColumn T="GetAllUsersDto" TProperty="List<string>" Property="x => x.Roles" Title="@Lang.Role">
+                <CellTemplate>
+                    <div class="d-flex flex-wrap gap-1">
+                        @foreach (var role in context.Item.Roles)
+                        {
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Info" Class="currency-font">@role</MudChip>
+                        }
+                    </div>
+                </CellTemplate>
+            </PropertyColumn>
+        </GridColumns>
+    </UniversalGrid>
+</MudPaper>
 
-@if(showDetail)
+@if (showDetail)
 {
-    <UserManagementDetail CurrentUser="currenUser" SelectedAction="selectedAction" OnDetailCanceled="HandleDetailCanceled" OnCrudCompleted="HandlerCrudCompleted" />
+    <UserManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentUser="currentUser" SelectedAction="selectedAction"
+                          OnCrudCompleted="HandleCrudCompleted" />
 }
 
-
-@code {
-    private GetAllUsersDto currenUser = null;
+@code
+{
+    private GetAllUsersDto currentUser = null;
     private bool showDetail = false;
     private UniversalCrudMenu.CrudAction selectedAction;
-    private UserManagementGrid userGrid;
+    private List<GetAllUsersDto> _users = new();
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    protected override async Task OnInitializedAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            var response = await apiService.GetAsync<GetAllUsersResponse>("Users/get", null);
+            _users = response?.Users ?? new();
+        }
+        catch (Exception) { }
+    }
 
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
@@ -25,9 +74,15 @@
         showDetail = true;
     }
 
-    private void HandleUserSelected(GetAllUsersDto selectedUser) => currenUser = selectedUser;
+    private void HandleUserSelected(GetAllUsersDto selectedUser) => currentUser = selectedUser;
 
-    private void HandleDetailCanceled() => showDetail = false;
+    private void HandleDetailCanceled()
+    {
+        showDetail = false;
+        currentUser = null;
+    }
 
-    private async Task HandlerCrudCompleted() => await userGrid.ReloadDataAsync();
+    private async Task HandleCrudCompleted() => await LoadDataAsync();
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

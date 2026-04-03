@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="Pawnshop.Web.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
 
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 
     <HeadOutlet />
@@ -20,6 +22,24 @@
     <Routes @rendermode="InteractiveServer"/>
     <script src="_framework/blazor.web.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+            const arrayBuffer = await contentStreamReference.arrayBuffer();
+            const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const anchorElement = document.createElement('a');
+            anchorElement.href = url;
+            anchorElement.download = fileName ?? '';
+            anchorElement.click();
+            anchorElement.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+        window.createBlobUrl = async (contentStreamReference) => {
+            const arrayBuffer = await contentStreamReference.arrayBuffer();
+            const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+            return URL.createObjectURL(blob);
+        }
+    </script>
 </body>
 
 </html>

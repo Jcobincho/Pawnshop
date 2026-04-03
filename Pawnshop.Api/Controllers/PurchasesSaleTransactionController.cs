@@ -7,6 +7,7 @@ using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GenerateA
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetEverySalesTransaction;
 using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GetPurchasesForClient;
 
+
 namespace Pawnshop.Api.Controllers
 {
     [Route("[controller]")]
@@ -29,14 +30,15 @@ namespace Pawnshop.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet("generate-agreement")]
+        [HttpPost("generate-agreement")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GeneratePurchaseSaleTransactionAgreement([FromQuery] GenerateAgreementQuery query, CancellationToken cancellationToken)
+        public async Task<IActionResult> GeneratePurchaseSaleTransactionAgreement([FromBody] GenerateAgreementQuery query, CancellationToken cancellationToken)
         {
             var response = await Sender.Send(query, cancellationToken);
 
-            return Ok(response);
+            // Zwracamy czysty plik binarny (PDF)
+            return File(response.PdfBytes, "application/pdf", $"Umowa_{DateTime.Now:yyyyMMdd}.pdf");
         }
     }
 }

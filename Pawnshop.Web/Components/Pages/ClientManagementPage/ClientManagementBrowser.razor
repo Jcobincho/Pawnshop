@@ -1,21 +1,64 @@
-﻿@page "/Clients-management-page"
+@page "/Clients-management-page"
 @using Pawnshop.Application.ClientsApplication.Dto
+@using Pawnshop.Application.ClientsApplication.Responses
 @using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@inject LanguageService Lang
+@inject ApiService apiService
+@implements IDisposable
 
-<UniversalCrudMenu IsItemSelected="@(currentClient != null)" OnActionSelected="HandleCrudAction" />
+<div class="d-flex align-center mb-6">
+    <MudText Typo="Typo.h4" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase; letter-spacing: 1px;">
+        @Lang.ClientManagement
+    </MudText>
+</div>
 
-<ClientManagementGrid OnClientSelected="HandleClientSelected" @ref="clientGrid" />
+<MudPaper Class="pa-4" Elevation="4" Style="border-radius: 16px;">
+    <UniversalGrid TItem="ClientDto" 
+                   Title="@Lang.ClientManagement"
+                   Items="_clients"
+                   OnItemSelected="HandleClientSelected"
+                   OnActionTriggered="HandleCrudAction">
+        <GridColumns>
+            <PropertyColumn T="ClientDto" TProperty="string" Property="x => x.Name" Title="@Lang.Name" />
+            <PropertyColumn T="ClientDto" TProperty="string" Property="x => x.Surname" Title="@Lang.Surname" />
+            <PropertyColumn T="ClientDto" TProperty="string" Property="x => x.Pesel" Title="@Lang.Pesel">
+                <CellTemplate>
+                    <MudText Class="currency-font">@context.Item.Pesel</MudText>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn T="ClientDto" TProperty="string" Property="x => x.Email" Title="@Lang.Email" />
+        </GridColumns>
+    </UniversalGrid>
+</MudPaper>
 
-@if(showDetail)
+@if (showDetail)
 {
-    <ClientManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentClient="currentClient" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
+    <ClientManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentClient="currentClient"
+                            SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
 }
 
-@code {
+@code
+{
     private ClientDto currentClient = null;
     private bool showDetail = false;
     private UniversalCrudMenu.CrudAction selectedAction;
-    private ClientManagementGrid clientGrid;
+    private List<ClientDto> _clients = new();
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    protected override async Task OnInitializedAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            var response = await apiService.GetAsync<GetAllClientsResponse>("Clients/get", new { PaginationParameters = new { PageNumber = 1, PageSize = 100 } });
+            _clients = response?.AllClientsList?.Data ?? new();
+        }
+        catch (Exception) { }
+    }
 
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
@@ -25,7 +68,13 @@
 
     private void HandleClientSelected(ClientDto selectedClient) => currentClient = selectedClient;
 
-    private void HandleDetailCanceled() => showDetail = false;
+    private void HandleDetailCanceled()
+    {
+        showDetail = false;
+        currentClient = null;
+    }
 
-    private async Task HandleCrudCompleted() => await clientGrid.ReloadDataAsync();
+    private async Task HandleCrudCompleted() => await LoadDataAsync();
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

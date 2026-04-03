@@ -1,7 +1,16 @@
-﻿namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Responses
+﻿// namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Responses
+// {
+//     public sealed class GenerateAgreementResponse
+//     {
+//         public string Message { get; set; } = "Generate in progress.";
+//     }
+// }
+
+
+namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GenerateAgreement
 {
-    public sealed class GenerateAgreementResponse
+    public class GenerateAgreementResponse
     {
-        public string Message { get; set; } = "Generate in progress.";
+        public byte[] PdfBytes { get; set; }
     }
 }

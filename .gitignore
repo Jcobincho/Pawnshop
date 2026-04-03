@@ -83,3 +83,4 @@ ScaffoldingReadMe.txt
 /data*/
 
 data/18/docker/
+\n# MacOS junk\n.DS_Store\n**/.DS_Store\n\n# Local secrets\n.env

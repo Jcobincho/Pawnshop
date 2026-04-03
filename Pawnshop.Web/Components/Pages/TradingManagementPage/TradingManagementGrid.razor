@@ -1,0 +1,114 @@
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Responses
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GenerateAgreement
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@using MudBlazor
+@inject ApiService ApiService
+@inject IJSRuntime JS
+@inject ISnackbar _snackbar
+@inject LanguageService Lang
+@implements IDisposable
+
+<MudTable T="SalesTransactionDto" Items="_transactions" Hover="true" Breakpoint="Breakpoint.Md" Loading="_loading"
+          MultiSelection="true" SelectOnRowClick="true" SelectedItemsChanged="OnSelectedItemsChanged"
+          RowClassFunc="@SelectedRowClassFunc" Comparer="_comparer" Elevation="0">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<SalesTransactionDto, object>(x=>x.Symbol)">@Lang.Symbol</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<SalesTransactionDto, object>(x=>x.TransactionDate)">@Lang.T("Data", "Date")</MudTableSortLabel></MudTh>
+        <MudTh>@Lang.Description</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@Lang.Symbol">
+            <MudText Color="Color.Primary" Class="currency-font">@context.Symbol</MudText>
+        </MudTd>
+        <MudTd DataLabel="Data">@context.TransactionDate.ToString("yyyy-MM-dd HH:mm")</MudTd>
+        <MudTd DataLabel="@Lang.Description">
+            <MudText Typo="Typo.body2" Style="opacity: 0.8;">@context.Description</MudText>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">@Lang.T("Brak transakcji do wyświetlenia.", "No transactions to display.")</MudAlert>
+    </NoRecordsContent>
+</MudTable>
+
+@code
+{
+    [Parameter] public EventCallback<IEnumerable<SalesTransactionDto>> OnSelectionChanged { get; set; }
+    
+    private List<SalesTransactionDto> _transactions = new();
+    private bool _loading = true;
+    private HashSet<SalesTransactionDto> _selectedItems = new();
+
+    private IEqualityComparer<SalesTransactionDto> _comparer = new TransactionComparer();
+
+    protected override void OnInitialized()
+    {
+        Lang.OnLanguageChanged += StateHasChanged;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadDataAsync();
+    }
+
+    public async Task ReloadDataAsync()
+    {
+        _loading = true;
+        _selectedItems.Clear();
+        await OnSelectionChanged.InvokeAsync(_selectedItems);
+        
+        try
+        {
+            var response = await ApiService.GetAsync<GetEverySalesTransactionResponse>("PurchasesSaleTransaction/get", new
+            {
+                PaginationParameters = new { PageNumber = 1, PageSize = 100 }
+            });
+            _transactions = response?.SalesTransactionPagedList?.Data ?? new();
+        }
+        catch (Exception) { }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnSelectedItemsChanged(HashSet<SalesTransactionDto> items)
+    {
+        _selectedItems = items;
+        OnSelectionChanged.InvokeAsync(items);
+    }
+
+    private string SelectedRowClassFunc(SalesTransactionDto element, int rowNumber)
+    {
+        if (_selectedItems.Any(x => x.Id == element.Id))
+            return "selected-row-premium";
+        return string.Empty;
+    }
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
+
+    private class TransactionComparer : IEqualityComparer<SalesTransactionDto>
+    {
+        public bool Equals(SalesTransactionDto? x, SalesTransactionDto? y)
+        {
+            if (ReferenceEquals(x, y)) return true;
+            if (x is null || y is null) return false;
+            return x.Id == y.Id;
+        }
+
+        public int GetHashCode(SalesTransactionDto obj) => obj.Id.GetHashCode();
+    }
+}
+
+<style>
+    .selected-row-premium {
+        background-color: rgba(197, 160, 89, 0.1) !important;
+        border-left: 4px solid var(--mud-palette-primary) !important;
+    }
+    
+    .mud-table-row:hover {
+        background-color: rgba(197, 160, 89, 0.05) !important;
+    }
+</style>

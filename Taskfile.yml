@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 tasks:
   run:
@@ -20,7 +20,7 @@ tasks:
   watch:
     desc: Run the Web project with Hot Reload (local development)
     cmds:
-      - dotnet watch run --project Pawnshop.Web/Pawnshop.Web.csproj
+      - dotnet watch run --project Pawnshop.Web/Pawnshop.Web.csproj --launch-profile https
 
   db-update:
     desc: Apply Entity Framework migrations to the database
@@ -32,3 +32,8 @@ tasks:
     cmds:
       - powershell -Command "Get-ChildItem -Recurse -Include bin,obj | Remove-Item -Recurse -Force"
     platforms: [windows]
+  clean-mac:
+    desc: Remove bin and obj folders on macOS
+    cmds:
+      - find . -type d \( -name "bin" -o -name "obj" \) -exec rm -rf {} +
+    platforms: [darwin]

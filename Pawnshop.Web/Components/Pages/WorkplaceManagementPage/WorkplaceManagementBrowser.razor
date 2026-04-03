@@ -1,21 +1,67 @@
-﻿@page "/Workplace-management-page"
+@page "/Workplace-management-page"
 @using Pawnshop.Application.WorkplacesApplication.Dto
+@using Pawnshop.Application.WorkplacesApplication.Responses
 @using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@inject LanguageService Lang
+@inject ApiService apiService
+@implements IDisposable
 
-<UniversalCrudMenu IsItemSelected="@(currentWorkplace != null)" OnActionSelected="HandleCrudAction" />
+<div class="d-flex align-center mb-6">
+    <MudText Typo="Typo.h4" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase; letter-spacing: 1px;">
+        @Lang.WorkplaceManagement
+    </MudText>
+</div>
 
-<WorkplaceManagementGrid OnClientSelected="HandleClientSelected" @ref="workplaceGrid" />
+<MudPaper Class="pa-4" Elevation="4" Style="border-radius: 16px;">
+    <UniversalGrid TItem="WorkplaceDto" 
+                   Title="@Lang.WorkplaceManagement"
+                   Items="_workplaces"
+                   OnItemSelected="HandleWorkplaceSelected"
+                   OnActionTriggered="HandleCrudAction">
+        <GridColumns>
+            <PropertyColumn T="WorkplaceDto" TProperty="string" Property="x => x.Country" Title="@Lang.Country" />
+            <PropertyColumn T="WorkplaceDto" TProperty="string" Property="x => x.City" Title="@Lang.City">
+                <CellTemplate>
+                    <MudText Color="Color.Primary" Style="font-weight: 600;">@context.Item.City</MudText>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn T="WorkplaceDto" TProperty="string" Property="x => x.StreetAndBuildingNumber" Title="@Lang.Street">
+                <CellTemplate>
+                    <MudText Class="currency-font">@context.Item.StreetAndBuildingNumber</MudText>
+                </CellTemplate>
+            </PropertyColumn>
+        </GridColumns>
+    </UniversalGrid>
+</MudPaper>
 
-@if(showDetail)
+@if (showDetail)
 {
-    <WorkplaceManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentWorkplace="currentWorkplace" SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
+    <WorkplaceManagementDetail OnDetailCancel="HandleDetailCanceled" CurrentWorkplace="currentWorkplace"
+                               SelectedAction="selectedAction" OnCrudCompleted="HandleCrudCompleted" />
 }
 
-@code {
+@code
+{
     private WorkplaceDto currentWorkplace = null;
     private bool showDetail = false;
     private UniversalCrudMenu.CrudAction selectedAction;
-    private WorkplaceManagementGrid workplaceGrid;
+    private List<WorkplaceDto> _workplaces = new();
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    protected override async Task OnInitializedAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            var response = await apiService.GetAsync<GetAllWorkplacesResponse>("Workplaces/get", null);
+            _workplaces = response?.AllWorkplacesList ?? new();
+        }
+        catch (Exception) { }
+    }
 
     private void HandleCrudAction(UniversalCrudMenu.CrudAction action)
     {
@@ -23,9 +69,15 @@
         showDetail = true;
     }
 
-    private void HandleClientSelected(WorkplaceDto selectedWorkplace) => currentWorkplace = selectedWorkplace;
+    private void HandleWorkplaceSelected(WorkplaceDto selectedWorkplace) => currentWorkplace = selectedWorkplace;
 
-    private void HandleDetailCanceled() => showDetail = false;
+    private void HandleDetailCanceled()
+    {
+        showDetail = false;
+        currentWorkplace = null;
+    }
 
-    private async Task HandleCrudCompleted() => await workplaceGrid.ReloadDataAsync();
+    private async Task HandleCrudCompleted() => await LoadDataAsync();
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

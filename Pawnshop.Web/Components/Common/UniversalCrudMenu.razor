@@ -1,34 +1,54 @@
 ﻿@using MudBlazor
+@using Pawnshop.Web.Services
+@inject LanguageService Lang
+@implements IDisposable
 
-<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
-    <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Disabled="@(!IsItemSelected)"
-               OnClick="@(() => OnAction(CrudAction.View))">
-        Details
+<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled" OverrideStyles="false"
+                Style="font-family: 'Outfit', sans-serif;">
+    @if (ShowPickButton)
+    {
+        <MudButton StartIcon="@Icons.Material.Filled.Check" Disabled="@(SelectedItemsCount != 1)" IconClass="mr-3"
+                   Class="px-4" Color="Color.Success" OnClick="@(() => OnAction(CrudAction.Pick))"
+                   Style="font-family: 'Outfit', sans-serif; font-weight: 600;">
+            @Lang.T("Wybierz", "Pick")
+        </MudButton>
+    }
+
+    <MudButton StartIcon="@Icons.Material.Filled.RemoveRedEye" Disabled="@(SelectedItemsCount != 1)" IconClass="mr-3"
+               Class="px-4" OnClick="@(() => OnAction(CrudAction.View))"
+               Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+        @Lang.Details
     </MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.Add"
-               OnClick="@(() => OnAction(CrudAction.Add))">
-        Add
+
+    <MudButton StartIcon="@Icons.Material.Filled.Add" OnClick="@(() => OnAction(CrudAction.Add))" IconClass="mr-3"
+               Class="px-4" Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+        @Lang.Add
     </MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Disabled="@(!IsItemSelected)"
-               OnClick="@(() => OnAction(CrudAction.AddCopy))">
-        Add copy
+
+    <MudButton StartIcon="@Icons.Material.Filled.ContentCopy" Disabled="@(SelectedItemsCount != 1)" IconClass="mr-3"
+               Class="px-4" OnClick="@(() => OnAction(CrudAction.AddCopy))"
+               Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+        @Lang.AddCopy
     </MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.Update" Disabled="@(!IsItemSelected)"
-               OnClick="@(() => OnAction(CrudAction.Update))">
-        Update
+
+    <MudButton StartIcon="@Icons.Material.Filled.Update" Disabled="@(SelectedItemsCount != 1)" IconClass="mr-3"
+               Class="px-4" OnClick="@(() => OnAction(CrudAction.Update))"
+               Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+        @Lang.Update
     </MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.Delete" Disabled="@(!IsItemSelected)"
-               OnClick="@(() => OnAction(CrudAction.Delete))">
-        Delete
+
+    <MudButton StartIcon="@Icons.Material.Filled.Delete" Disabled="@(SelectedItemsCount == 0)" IconClass="mr-3"
+               Class="px-4" OnClick="@(() => OnAction(CrudAction.Delete))"
+               Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+        @Lang.Delete
     </MudButton>
 </MudButtonGroup>
 
-@code {
-    [Parameter]
-    public bool IsItemSelected { get; set; }
-
-    [Parameter]
-    public EventCallback<CrudAction> OnActionSelected { get; set; }
+@code
+{
+    [Parameter] public int SelectedItemsCount { get; set; }
+    [Parameter] public bool ShowPickButton { get; set; }
+    [Parameter] public EventCallback<CrudAction> OnActionSelected { get; set; }
 
     private async Task OnAction(CrudAction action)
     {
@@ -38,12 +58,18 @@
         }
     }
 
+    public void Dispose()
+    {
+        Lang.OnLanguageChanged -= StateHasChanged;
+    }
+
     public enum CrudAction
     {
         View,
         Add,
         AddCopy,
         Update,
-        Delete
+        Delete,
+        Pick
     }
 }

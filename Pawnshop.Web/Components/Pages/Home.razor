@@ -1,17 +1,131 @@
-﻿@page "/Home"
-@using Pawnshop.Application.UsersApplication.Commands.Logout
-@using Pawnshop.Web.Exceptions
-@using Pawnshop.Web.Services.ApiService
+@page "/Home"
+@using Pawnshop.Web.Services
+@using MudBlazor
+@inject LanguageService Lang
+@implements IDisposable
 
-@inject ApiService apiService
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-6 border-gold-glow" Style="border-radius: 16px;">
+        @Lang.T("Makieta funkcjonalna (MOCKUP)", "Functional mockup (MOCKUP)")
+    </MudAlert>
+    <MudGrid>
+        @* NAGŁÓWEK I STATUS SYSTEMU *@
+        <MudItem xs="12" Class="d-flex align-center justify-space-between mb-4">
+            <div>
+                <MudText Typo="Typo.h4" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary);">
+                    @Lang.AppTitle <span style="color: var(--mud-palette-text-primary); font-weight: 300;">OVERVIEW</span>
+                </MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">System Status: <MudIcon Icon="@Icons.Material.Filled.Shield" Color="Color.Success" Size="Size.Small" /> SECURE</MudText>
+            </div>
+            <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large">
+                <MudButton StartIcon="@Icons.Material.Filled.AddCard">@Lang.T("Nowy Zastaw", "New Pledge")</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.History">@Lang.T("Historia", "History")</MudButton>
+            </MudButtonGroup>
+        </MudItem>
 
-<h3>Home</h3>
+        @* KLUCZOWE KPI - ZŁOTE KARTY PODSUMOWANIA *@
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="4" Class="pa-6 d-flex flex-column align-center justify-center border-gold-glow">
+                <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Color="Color.Primary" Size="Size.Large" Class="mb-2" />
+                <MudText Typo="Typo.h4" Class="currency-font">245.800 PLN</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary uppercase-label">@Lang.T("Aktywne Pożyczki", "Active Loans")</MudText>
+            </MudPaper>
+        </MudItem>
 
-<MudButton ButtonType="ButtonType.Button" OnClick="@ClickHandle">CLICK</MudButton>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="4" Class="pa-6 d-flex flex-column align-center justify-center">
+                <MudIcon Icon="@Icons.Material.Filled.MonitorWeight" Color="Color.Primary" Size="Size.Large" Class="mb-2" />
+                <MudText Typo="Typo.h4" Class="currency-font">1.240,5 g</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary uppercase-label">@Lang.T("Zmagazynowane Złoto (Au)", "Gold in Storage (Au)")</MudText>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="4" Class="pa-6 d-flex flex-column align-center justify-center">
+                <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Color="Color.Success" Size="Size.Large" Class="mb-2" />
+                <MudText Typo="Typo.h4" Class="currency-font">+12.4%</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary uppercase-label">@Lang.T("Przychód (30 dni)", "Revenue (30 days)")</MudText>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="4" Class="pa-6 d-flex flex-column align-center justify-center">
+                <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Size="Size.Large" Class="mb-2" />
+                <MudText Typo="Typo.h4" Class="currency-font">18</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary uppercase-label">@Lang.T("Terminy Wygaśnięcia", "Expirations")</MudText>
+            </MudPaper>
+        </MudItem>
+
+        @* WYKRESY I ANALITYKA *@
+        <MudItem xs="12" md="8">
+            <MudPaper Elevation="4" Class="pa-6" Style="min-height: 400px;">
+                <MudText Typo="Typo.h6" Class="mb-4">@Lang.T("Przepływ Kapitału (Kwartalny)", "Capital Flow (Quarterly)")</MudText>
+                <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@Labels" Width="100%" Height="300px" ChartOptions="@_options" />
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudPaper Elevation="4" Class="pa-6" Style="min-height: 400px;">
+                <MudText Typo="Typo.h6" Class="mb-4">@Lang.T("Dywersyfikacja Zabezpieczeń", "Collateral Diversification")</MudText>
+                <MudChart ChartType="ChartType.Donut" InputData="@_donutData" InputLabels="@_donutLabels" Width="100%" Height="250px" />
+                <div class="d-flex justify-center mt-4">
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">Dominacja: Kruszce (65%)</MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
+
+        @* OSTATNIE TRANSAKCJE *@
+        <MudItem xs="12">
+            <MudTable Items="@_recentTransactions" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="4" Class="border-gold-soft">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">@Lang.T("Ostatnie Operacje", "Recent Operations")</MudText>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="_searchString" Placeholder="@Lang.T("Szukaj...", "Search...")" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>ID Kontraktu</MudTh>
+                    <MudTh>Klient</MudTh>
+                    <MudTh>Typ Przedmiotu</MudTh>
+                    <MudTh>Wycena</MudTh>
+                    <MudTh>Status</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="ID"><MudText Color="Color.Primary" Class="currency-font">L-2026-0392</MudText></MudTd>
+                    <MudTd DataLabel="Klient">Jan Kowalski (VIP)</MudTd>
+                    <MudTd DataLabel="Typ">Złoty Zegarek Omega</MudTd>
+                    <MudTd DataLabel="Wycena"><MudText Class="currency-font">14.500 PLN</MudText></MudTd>
+                    <MudTd DataLabel="Status">
+                        <MudChip T="string" Color="Color.Success" Size="Size.Small" Variant="Variant.Text">AKTYWNY</MudChip>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+<style>
+    .border-gold-soft {
+        border-top: 3px solid var(--mud-palette-primary) !important;
+    }
+</style>
 
 @code {
-    private async void ClickHandle()
+    private string _searchString = "";
+    private ChartOptions _options = new ChartOptions { InterpolationOption = InterpolationOption.NaturalSpline };
+    
+    public List<ChartSeries> Series = new List<ChartSeries>
     {
+        new ChartSeries { Name = "Pożyczki", Data = new double[] { 65, 80, 72, 94, 110, 125 } },
+        new ChartSeries { Name = "Wykupy", Data = new double[] { 40, 55, 48, 70, 85, 95 } }
+    };
+    public string[] Labels = { "Sty", "Lut", "Mar", "Kwi", "Maj", "Cze" };
 
-    }
+    private double[] _donutData = { 65, 20, 10, 5 };
+    private string[] _donutLabels = { "Złoto", "Elektronika", "Zegarki", "Inne" };
+
+    private List<string> _recentTransactions = new List<string> { "item1", "item2", "item3" }; // Mock
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+    
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }

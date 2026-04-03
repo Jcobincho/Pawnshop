@@ -1,70 +1,76 @@
-﻿@using Pawnshop.Application.EmployeesApplication.Dto
+@using Pawnshop.Application.EmployeesApplication.Dto
 @using Pawnshop.Application.EmployeesApplication.Responses
-@using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services
 @using Pawnshop.Web.Services.ApiService
-
+@using MudBlazor
 @inject ApiService ApiService
+@inject LanguageService Lang
+@implements IDisposable
 
-<MudDataGrid T="EmployeeDto"
-             Items="@(employeesFromApi?.AllEmployeesList ?? new List<EmployeeDto>())"
-             RowClick="OnRowClicked"
-             DragDropColumnReordering="true" 
-             ColumnsPanelReordering="true" 
-             ColumnResizeMode="ResizeMode.Column"
-             RowClassFunc="@( (employee, index) => employee == selectedEmployee ? "selected-row" : string.Empty )"
-             Hideable="true"
-             Filterable="true"
-             Groupable="true"
-             FilterMode="DataGridFilterMode.Simple" 
-             Striped="true"
-             ShowMenuIcon="true">
-
-    <Columns>
-        <PropertyColumn Property="x => x.EmployeeId" Title="Employee id" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Name" Title="Name" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.SecondName" Title="Second name" Hidden="true" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="x => x.Surname" Title="Surname" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-        <PropertyColumn Property="@(x => x.BirthDate.ToString("dd.MM.yyyy"))" Title="Birth date" Hidden="false" DragAndDropEnabled="true" Groupable="true" Sortable="true" Filterable="true" />
-    </Columns>
-    <PagerContent>
-        <MudDataGridPager T="EmployeeDto" />
-    </PagerContent>
-</MudDataGrid>
+<MudTable Items="_employees" Hover="true" Breakpoint="Breakpoint.Md" Loading="_loading" 
+          OnRowClick="@( (TableRowClickEventArgs<EmployeeDto> e) => OnRowClick(e.Item) )" 
+          T="EmployeeDto" RowClassFunc="@SelectedRowClassFunc" Elevation="0">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<EmployeeDto, object>(x=>x.Name)">@Lang.Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EmployeeDto, object>(x=>x.Surname)">@Lang.Surname</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EmployeeDto, object>(x=>x.BirthDate)">@Lang.BirthDate</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@Lang.Name">@context.Name</MudTd>
+        <MudTd DataLabel="@Lang.Surname">
+            <MudText Color="Color.Primary" Style="font-weight: 600;">@context.Surname</MudText>
+        </MudTd>
+        <MudTd DataLabel="@Lang.BirthDate">
+            <MudText Class="currency-font">@context.BirthDate.ToString("yyyy-MM-dd")</MudText>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-4">@Lang.T("Brak pracowników do wyświetlenia.", "No employees to display.")</MudAlert>
+    </NoRecordsContent>
+</MudTable>
 
 @code {
-    [Parameter]
-    public EventCallback<EmployeeDto> OnEmployeeSelected { get; set; }
+    [Parameter] public EventCallback<EmployeeDto> OnEmployeeSelected { get; set; }
+    
+    private List<EmployeeDto> _employees = new();
+    private bool _loading = true;
+    private EmployeeDto _selectedItem;
 
-    private EmployeeDto selectedEmployee;
-    public GetAllEmployeesResponse employeesFromApi = null;
-    List<string> apiExceptions = null;
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await GetEmployeeFromApiAsync();
-    }
+    protected override async Task OnInitializedAsync() => await ReloadDataAsync();
 
     public async Task ReloadDataAsync()
     {
-        await GetEmployeeFromApiAsync();
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task GetEmployeeFromApiAsync()
-    {
+        _loading = true;
         try
         {
-            employeesFromApi = await ApiService.GetAsync<GetAllEmployeesResponse>("/Employees/get");
+            var response = await ApiService.GetAsync<GetAllEmployeesResponse>("Employees/get", null);
+            _employees = response?.AllEmployeesList ?? new();
         }
-        catch (ApiException ex)
-        {
-            apiExceptions = ex.ErrorMessages;
-        }
+        catch (Exception) { }
+        finally { _loading = false; StateHasChanged(); }
     }
 
-    private async Task OnRowClicked(DataGridRowClickEventArgs<EmployeeDto> row)
+    private void OnRowClick(EmployeeDto employee)
     {
-        selectedEmployee = row.Item;
-        await OnEmployeeSelected.InvokeAsync(selectedEmployee);
+        _selectedItem = employee;
+        OnEmployeeSelected.InvokeAsync(employee);
     }
+
+    private string SelectedRowClassFunc(EmployeeDto element, int rowNumber) => 
+        _selectedItem != null && _selectedItem.Id == element.Id ? "selected-row-premium" : string.Empty;
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
 }
+
+<style>
+    .selected-row-premium {
+        background-color: rgba(197, 160, 89, 0.1) !important;
+        border-left: 4px solid var(--mud-palette-primary) !important;
+    }
+    
+    .mud-table-row:hover {
+        background-color: rgba(197, 160, 89, 0.05) !important;
+    }
+</style>

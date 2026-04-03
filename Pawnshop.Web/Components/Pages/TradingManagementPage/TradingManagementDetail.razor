@@ -1,0 +1,521 @@
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.AddPurchaseSaleTransactionDocument
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.DeletePurchaseSaleTransactionDocument
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.UpdatePurchaseSaleTransactionDocument
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Responses
+@using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Commands.AddItemInPurchaseSaleTransaction
+@using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Responses
+@using Pawnshop.Application.ItemDetailsApplication.Commands.AddItemDetail
+@using Pawnshop.Application.ItemDetailsApplication.Responses
+@using Pawnshop.Application.ItemCategoriesApplication.Dto
+@using Pawnshop.Application.ItemCategoriesApplication.Responses
+@using Pawnshop.Application.ClientsApplication.Dto
+@using Pawnshop.Application.ClientsApplication.Responses
+@using Pawnshop.Application.WorkplacesApplication.Dto
+@using Pawnshop.Application.WorkplacesApplication.Responses
+@using Pawnshop.Domain.Enums
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@using MudBlazor
+@using Pawnshop.Web.Components.Pages.ClientManagementPage
+
+@inject ApiService apiService
+@inject ISnackbar Snackbar
+@inject LanguageService Lang
+@implements IDisposable
+
+<DetailModalOverlay>
+    <MudCard Class="w-50 border-gold-glow" Style="max-height: 90vh; overflow: auto; border-radius: 20px;">
+        <MudCardHeader Class="pa-6" Style="border-bottom: 1px solid rgba(197, 160, 89, 0.1);">
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase;">
+                    @Lang.TradingManagement
+                </MudText>
+                <MudText Typo="Typo.subtitle2" Class="mud-text-secondary">
+                    @(SelectedAction == UniversalCrudMenu.CrudAction.Add ? Lang.Add : 
+                      (SelectedAction == UniversalCrudMenu.CrudAction.Update ? Lang.Update : 
+                      (SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Lang.Delete : 
+                      (SelectedAction == UniversalCrudMenu.CrudAction.AddCopy ? Lang.T("Kopiuj", "Copy") : Lang.Details))))
+                </MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="CancelAction" Color="Color.Default" />
+            </CardHeaderActions>
+        </MudCardHeader>
+
+        <MudCardContent Class="pa-8">
+            @if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-6" Style="border-radius: 12px;">@Lang.ConfirmDelete</MudAlert>
+                
+                @if (SelectedTransactionsToProcess != null && SelectedTransactionsToProcess.Count > 1)
+                {
+                    <MudText Typo="Typo.h6" Align="Align.Center">@Lang.T($"Czy na pewno chcesz usunąć {SelectedTransactionsToProcess.Count} transakcji?", $"Are you sure you want to delete {SelectedTransactionsToProcess.Count} transactions?")</MudText>
+                }
+                else
+                {
+                    <div class="d-flex flex-column align-center">
+                        <MudText Typo="Typo.h4" Class="currency-font mb-2" Color="Color.Primary">@CurrentTransaction?.Symbol</MudText>
+                        <MudText Typo="Typo.body1" Class="mud-text-secondary">@CurrentTransaction?.Description</MudText>
+                    </div>
+                }
+            }
+            else
+            {
+                <MudText Typo="Typo.overline" Class="mb-4 d-block uppercase-label" Color="Color.Primary">
+                    @Lang.T($"Krok {_currentStep} z 3", $"Step {_currentStep} of 3")
+                </MudText>
+
+                @if (_currentStep == 1)
+                {
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="@_symbol" Label="@Lang.Symbol" Variant="Variant.Outlined"
+                                          Required="true" ReadOnly="@_isReadOnly" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudSelect T="Guid" Label="@Lang.Workplace" @bind-Value="_workplaceId" Variant="Variant.Outlined"
+                                       Required="true" ReadOnly="@_isReadOnly" AnchorOrigin="Origin.BottomCenter"
+                                       Style="font-family: 'Outfit', sans-serif;">
+                                @foreach (var wp in _workplaces)
+                                {
+                                    <MudSelectItem Value="@wp.WorkplaceId">@wp.City, @wp.StreetAndBuildingNumber</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <div class="d-flex align-end gap-2">
+                                <MudTextField T="string" Label="@Lang.Client" 
+                                              Value="@(GetClientDisplayName(_clientId))" 
+                                              ReadOnly="true" Variant="Variant.Outlined"
+                                              Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                                              Style="font-family: 'Outfit', sans-serif;" />
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenClientLookup"
+                                           Disabled="@_isReadOnly" Style="height: 56px;">
+                                    @Lang.T("Szukaj", "Search")
+                                </MudButton>
+                            </div>
+                        </MudItem>
+
+                        @if (_showClientLookup)
+                        {
+                            <DetailModalOverlay OnClickOutside="() => _showClientLookup = false">
+                                <MudCard Class="w-75 border-gold-glow" Style="max-height: 80vh; overflow: auto; border-radius: 20px;">
+                                    <MudCardHeader Class="pa-6" Style="border-bottom: 1px solid rgba(197, 160, 89, 0.1);">
+                                        <CardHeaderContent>
+                                            <div class="d-flex align-center justify-space-between w-100">
+                                                <MudText Typo="Typo.h6">@Lang.T("Wybierz Klienta", "Pick Client")</MudText>
+                                                <div @onclick:stopPropagation="true">
+                                                    <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success" OnClick="OpenAddClient">
+                                                        @Lang.Add
+                                                    </MudButton>
+                                                </div>
+                                            </div>
+                                        </CardHeaderContent>
+                                        <CardHeaderActions>
+                                            <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="() => _showClientLookup = false" />
+                                        </CardHeaderActions>
+                                    </MudCardHeader>
+                                    <MudCardContent Class="pa-6">
+                                        <UniversalGrid TItem="ClientDto" 
+                                                       Title="@Lang.ClientManagement"
+                                                       Items="_clients"
+                                                       IsLookupMode="true"
+                                                       OnItemPicked="HandleClientPicked">
+                                            <GridColumns>
+                                                <PropertyColumn T="ClientDto" TProperty="string" Property="x => x.Name" Title="@Lang.Name" />
+                                                <PropertyColumn T="ClientDto" TProperty="string" Property="x => x.Surname" Title="@Lang.Surname" />
+                                                <PropertyColumn T="ClientDto" TProperty="string" Property="x => x.Pesel" Title="@Lang.Pesel" />
+                                            </GridColumns>
+                                        </UniversalGrid>
+                                    </MudCardContent>
+                                </MudCard>
+                            </DetailModalOverlay>
+                        }
+                        
+                        @if (_showAddClient)
+                        {
+                            <ClientManagementDetail SelectedAction="UniversalCrudMenu.CrudAction.Add"
+                                                    OnDetailCancel="() => _showAddClient = false"
+                                                    OnCrudCompleted="RefreshClients" />
+                        }
+
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="@_description" Label="@Lang.Description" Variant="Variant.Outlined"
+                                          Required="true" Lines="2" ReadOnly="@_isReadOnly" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                    </MudGrid>
+                }
+                else if (_currentStep == 2 && (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy))
+                {
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <div class="d-flex align-end gap-2">
+                                <MudTextField T="string" Label="@Lang.Category" 
+                                              Value="@(GetCategoryDisplayName(ItemDetailsModel.ItemCategoryId))" 
+                                              ReadOnly="true" Variant="Variant.Outlined"
+                                              Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Category"
+                                              Style="font-family: 'Outfit', sans-serif;" />
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenCategoryLookup"
+                                           Style="height: 56px;">
+                                    @Lang.T("Szukaj", "Search")
+                                </MudButton>
+                            </div>
+                        </MudItem>
+
+                        @if (_showCategoryLookup)
+                        {
+                            <DetailModalOverlay OnClickOutside="() => _showCategoryLookup = false">
+                                <MudCard Class="w-75 border-gold-glow" Style="max-height: 80vh; overflow: auto; border-radius: 20px;">
+                                    <MudCardHeader Class="pa-6" Style="border-bottom: 1px solid rgba(197, 160, 89, 0.1);">
+                                        <CardHeaderContent>
+                                            <div class="d-flex align-center justify-space-between w-100">
+                                                <MudText Typo="Typo.h6">@Lang.T("Wybierz Kategorię", "Pick Category")</MudText>
+                                                <div @onclick:stopPropagation="true">
+                                                    <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Success" OnClick="OpenAddCategory">
+                                                        @Lang.Add
+                                                    </MudButton>
+                                                </div>
+                                            </div>
+                                        </CardHeaderContent>
+                                        <CardHeaderActions>
+                                            <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="() => _showCategoryLookup = false" />
+                                        </CardHeaderActions>
+                                    </MudCardHeader>
+                                    <MudCardContent Class="pa-6">
+                                        <UniversalGrid TItem="ItemCategoryDto" 
+                                                       Title="@Lang.Categories"
+                                                       Items="_categories"
+                                                       IsLookupMode="true"
+                                                       OnItemPicked="HandleCategoryPicked">
+                                            <GridColumns>
+                                                <PropertyColumn T="ItemCategoryDto" TProperty="string" Property="x => x.Name" Title="@Lang.Name" />
+                                                <PropertyColumn T="ItemCategoryDto" TProperty="string" Property="x => x.Description" Title="@Lang.Description" />
+                                            </GridColumns>
+                                        </UniversalGrid>
+                                    </MudCardContent>
+                                </MudCard>
+                            </DetailModalOverlay>
+                        }
+
+                        @if (_showAddCategory)
+                        {
+                            <ItemCategoryDetail SelectedAction="UniversalCrudMenu.CrudAction.Add"
+                                                OnDetailCancel="() => _showAddCategory = false"
+                                                OnCrudCompleted="RefreshCategories" />
+                        }
+
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="@(ItemDetailsModel.Name)" Label="@Lang.Name" Required="true"
+                                          Variant="Variant.Outlined" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="@(ItemDetailsModel.Brand)" Label="@Lang.Brand"
+                                          Variant="Variant.Outlined" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="@(ItemDetailsModel.Model)" Label="Model"
+                                          Variant="Variant.Outlined" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="@(ItemDetailsModel.SerialNumber)" Label="Nr Seryjny / SN"
+                                          Variant="Variant.Outlined" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="@(ItemDetailsModel.Comments)" Label="@Lang.Comments"
+                                          Variant="Variant.Outlined" Lines="3" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                    </MudGrid>
+                }
+                else if (_currentStep == 3 && (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy))
+                {
+                    <div class="d-flex flex-column align-center py-8">
+                        <MudIcon Icon="@Icons.Material.Filled.Payments" Color="Color.Primary" Size="Size.Large" Class="mb-4" />
+                        <MudText Typo="Typo.h6" Class="mb-6">@Lang.T("Wycena Przedmiotu", "Item Valuation")</MudText>
+                        <MudNumericField @bind-Value="@(ItemPricingModel.ItemPrice)" Label="@Lang.Price"
+                                         Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentText="PLN"
+                                         FullWidth="false" Style="width: 300px; font-size: 2rem;" Class="currency-font" />
+                    </div>
+                }
+                else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
+                {
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="@_symbol" Label="@Lang.Symbol" Variant="Variant.Outlined"
+                                          Required="true" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="@_description" Label="@Lang.Description" Variant="Variant.Outlined"
+                                          Required="true" Lines="2" Style="font-family: 'Outfit', sans-serif;" />
+                        </MudItem>
+                    </MudGrid>
+                }
+            }
+        </MudCardContent>
+
+        <MudCardActions Class="pa-6 d-flex justify-space-between" Style="background-color: rgba(0,0,0,0.05);">
+            <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="CancelAction" 
+                       Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+                @Lang.Cancel
+            </MudButton>
+            
+            <div class="d-flex gap-3">
+                @if (_currentStep > 1 && SelectedAction != UniversalCrudMenu.CrudAction.Update)
+                {
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="PreviousStep"
+                               Style="font-family: 'Outfit', sans-serif; font-weight: 500;">
+                        @Lang.Back
+                    </MudButton>
+                }
+                
+                @if (_currentStep < 3 && (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy))
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NextStep"
+                               Style="font-family: 'Outfit', sans-serif; font-weight: 600;" EndIcon="@Icons.Material.Filled.ArrowForward">
+                        @Lang.Next
+                    </MudButton>
+                }
+                else
+                {
+                    @if (SelectedAction != UniversalCrudMenu.CrudAction.View)
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   Color="@(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Color.Error : Color.Success)"
+                                   OnClick="HandleMainAction" Disabled="_isSaving"
+                                   Style="font-family: 'Outfit', sans-serif; font-weight: 600; min-width: 120px;">
+                            @if (_isSaving)
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                            }
+                            @(SelectedAction == UniversalCrudMenu.CrudAction.Delete ? Lang.Delete : Lang.Save)
+                        </MudButton>
+                    }
+                }
+            </div>
+        </MudCardActions>
+    </MudCard>
+</DetailModalOverlay>
+
+@code
+{
+    [Parameter] public SalesTransactionDto CurrentTransaction { get; set; }
+    [Parameter] public UniversalCrudMenu.CrudAction SelectedAction { get; set; }
+    [Parameter] public EventCallback OnDetailCancel { get; set; }
+    [Parameter] public EventCallback<Guid> OnCrudCompleted { get; set; }
+    [Parameter] public List<SalesTransactionDto> SelectedTransactionsToProcess { get; set; } = new();
+
+    private int _currentStep = 1;
+    private bool _isSaving = false;
+    private bool _isReadOnly => SelectedAction == UniversalCrudMenu.CrudAction.View || SelectedAction == UniversalCrudMenu.CrudAction.Delete;
+
+    private string _symbol = "";
+    private Guid _workplaceId;
+    private Guid? _clientId;
+    private string _description = "";
+    private bool _showClientLookup = false;
+    private bool _showCategoryLookup = false;
+    private bool _showAddClient = false;
+    private bool _showAddCategory = false;
+
+    private string GetClientDisplayName(Guid? clientId)
+    {
+        if (clientId == null) return Lang.T("Brak / Anonimowy", "None / Anonymous");
+        var client = _clients.FirstOrDefault(x => x.ClientId == clientId);
+        return client != null ? $"{client.Name} {client.Surname} ({client.Pesel})" : Lang.T("Nieznany", "Unknown");
+    }
+
+    private string GetCategoryDisplayName(Guid categoryId)
+    {
+        var category = _categories.FirstOrDefault(x => x.ItemCategoryId == categoryId);
+        return category != null ? category.Name : Lang.T("Wybierz kategorię...", "Pick category...");
+    }
+
+    private void OpenClientLookup() => _showClientLookup = true;
+    private void OpenCategoryLookup() => _showCategoryLookup = true;
+    private void OpenAddClient() => _showAddClient = true;
+    private void OpenAddCategory() => _showAddCategory = true;
+
+    private void HandleClientPicked(ClientDto client)
+    {
+        _clientId = client.ClientId;
+        _showClientLookup = false;
+        StateHasChanged();
+    }
+
+    private void HandleCategoryPicked(ItemCategoryDto category)
+    {
+        ItemDetailsModel.ItemCategoryId = category.ItemCategoryId;
+        _showCategoryLookup = false;
+        StateHasChanged();
+    }
+
+    private AddItemDetailsCommand ItemDetailsModel = new();
+    private AddItemInPurchaseSaleTransactionCommand ItemPricingModel = new();
+
+    private List<ItemCategoryDto> _categories = new();
+    private List<WorkplaceDto> _workplaces = new();
+    private List<ClientDto> _clients = new();
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInitialData();
+        if (CurrentTransaction != null)
+        {
+            _symbol = CurrentTransaction.Symbol;
+            _workplaceId = CurrentTransaction.Workplace.Id;
+            _clientId = CurrentTransaction.Client?.Id;
+            _description = CurrentTransaction.Description;
+        }
+        else if (SelectedAction == UniversalCrudMenu.CrudAction.Add)
+        {
+            _symbol = $"UM/{DateTime.Now:yyyy/MM}/{(new Random().Next(1000, 9999))}";
+            _description = Lang.T("Nowa transakcja", "New transaction");
+        }
+        else if (SelectedAction == UniversalCrudMenu.CrudAction.AddCopy && CurrentTransaction != null)
+        {
+            _symbol = $"UM/{DateTime.Now:yyyy/MM}/{(new Random().Next(1000, 9999))}";
+            _workplaceId = CurrentTransaction.Workplace.Id;
+            _clientId = CurrentTransaction.Client?.Id;
+            _description = CurrentTransaction.Description + " (Copy)";
+        }
+    }
+
+    private async Task LoadInitialData()
+    {
+        try
+        {
+            var wpRes = await apiService.GetAsync<GetAllWorkplacesResponse>("Workplaces/get", null);
+            _workplaces = wpRes?.AllWorkplacesList ?? new();
+            if (_workplaceId == Guid.Empty && _workplaces.Any())
+            {
+                _workplaceId = _workplaces.First().WorkplaceId;
+            }
+
+            var clRes = await apiService.GetAsync<GetAllClientsResponse>("Clients/get", new { PaginationParameters = new { PageNumber = 1, PageSize = 1000 } });
+            _clients = clRes?.AllClientsList?.Data ?? new();
+
+            var catRes = await apiService.GetAsync<GetAllItemCategoriesResponse>("ItemCategories/get", null);
+            _categories = catRes?.AllItemCategoriesList ?? new();
+        }
+        catch (Exception) { }
+    }
+
+    private async Task RefreshClients()
+    {
+        var clRes = await apiService.GetAsync<GetAllClientsResponse>("Clients/get", new { PaginationParameters = new { PageNumber = 1, PageSize = 1000 } });
+        _clients = clRes?.AllClientsList?.Data ?? new();
+        _showAddClient = false;
+        StateHasChanged();
+    }
+
+    private async Task RefreshCategories()
+    {
+        var catRes = await apiService.GetAsync<GetAllItemCategoriesResponse>("ItemCategories/get", null);
+        _categories = catRes?.AllItemCategoriesList ?? new();
+        _showAddCategory = false;
+        StateHasChanged();
+    }
+
+    private void NextStep() => _currentStep++;
+    private void PreviousStep() => _currentStep--;
+
+    private async Task CancelAction() => await OnDetailCancel.InvokeAsync();
+
+    private async Task HandleMainAction()
+    {
+        if (string.IsNullOrWhiteSpace(_description))
+        {
+            Snackbar.Add(Lang.T("Opis jest wymagany.", "Description is required."), Severity.Warning);
+            return;
+        }
+
+        if ((SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy) && _clientId == null)
+        {
+            Snackbar.Add(Lang.T("Musisz wybrać klienta dla tej transakcji.", "You must pick a client for this transaction."), Severity.Warning);
+            return;
+        }
+
+        _isSaving = true;
+        try
+        {
+            if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
+            {
+                await CreateTransaction();
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
+            {
+                await UpdateTransaction();
+            }
+            else if (SelectedAction == UniversalCrudMenu.CrudAction.Delete)
+            {
+                await DeleteTransactions();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"{Lang.ErrorGeneric}: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private async Task CreateTransaction()
+    {
+        var command = new AddPurchaseSaleTransactionDocumentCommand
+        {
+            Symbol = _symbol,
+            TypeOfTransaction = TypeOfTransactionEnum.Purchase,
+            TransactionDate = DateTime.Now,
+            Description = _description,
+            WorkplaceId = _workplaceId,
+            ClientId = _clientId
+        };
+
+        var tRes = await apiService.PostAsync<AddPurchaseSaleTransactionDocumentCommand, AddPurchaseSaleTransactionDocumentResponse>("PurchasesSaleTransaction/add", command);
+        
+        ItemDetailsModel.AddedOn = DateTime.Now;
+        ItemDetailsModel.IsAvailable = true;
+        
+        var dRes = await apiService.PostAsync<AddItemDetailsCommand, AddItemDetailsResponse>("ItemDetails/add", ItemDetailsModel);
+        
+        ItemPricingModel.PurchaseSaleTransactionId = tRes.Id;
+        ItemPricingModel.ItemDetailId = dRes.Id;
+        await apiService.PostAsync<AddItemInPurchaseSaleTransactionCommand, AddItemInPurchaseSaleTransactionResponse>("ItemInPurchaseSaleSaleTransaction/add", ItemPricingModel);
+
+        await OnCrudCompleted.InvokeAsync(tRes.Id);
+    }
+
+    private async Task UpdateTransaction()
+    {
+        var command = new UpdatePurchaseSaleTransactionDocumentCommand
+        {
+            Symbol = _symbol,
+            PurchaseSaleTransactionDocumentId = CurrentTransaction.Id,
+            PurchaseSaleTransactionId = CurrentTransaction.Id,
+            TypeOfTransaction = TypeOfTransactionEnum.Purchase,
+            TransactionDate = DateTime.Now,
+            Description = _description,
+            WorkplaceId = _workplaceId,
+            ClientId = _clientId
+        };
+        await apiService.PutAsync<UpdatePurchaseSaleTransactionDocumentCommand, UpdatePurchaseSaleTransactionDocumentResponse>("PurchasesSaleTransaction/update", command);
+        await OnCrudCompleted.InvokeAsync(CurrentTransaction.Id);
+    }
+
+    private async Task DeleteTransactions()
+    {
+        foreach (var t in SelectedTransactionsToProcess)
+        {
+            var command = new DeletePurchaseSaleTransactionDocumentCommand { PurchaseSaleTransactionDocumentId = t.Id };
+            await apiService.DeleteAsync<DeletePurchaseSaleTransactionDocumentCommand, DeletePurchaseSaleTransactionDocumentResponse>("PurchasesSaleTransaction/delete", command);
+        }
+        await OnCrudCompleted.InvokeAsync(Guid.Empty);
+    }
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
+}

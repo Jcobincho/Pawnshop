@@ -13,6 +13,9 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Commands.Upda
         [Required(ErrorMessage = "Transaction ID is required.")]
         public Guid PurchaseSaleTransactionDocumentId { get; set; }
 
+        [Required(ErrorMessage = "Purchase/Sale transaction ID is required.")]
+        public Guid PurchaseSaleTransactionId { get; set; }
+
         [Required(ErrorMessage = "Type of transaction is required.")]
         public TypeOfTransactionEnum TypeOfTransaction { get; set; }
 

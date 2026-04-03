@@ -4,7 +4,7 @@ namespace Pawnshop.Domain.Roles;
 
 public static class UserRoles
 {
-    // HeadAdmin has every priviliges 
+    // HeadAdmin has every priviliges
     public const string HeadAdmin = nameof(HeadAdmin);
 
     // Priviliges to Users account
@@ -22,6 +22,10 @@ public static class UserRoles
     // Priviliges to Workplaces
     public const string WorkplacesDisplay = nameof(WorkplacesDisplay);
     public const string WorkplacesDisplayAndModify = nameof(WorkplacesDisplayAndModify);
+
+    // Priviliges to Trading
+    public const string TradingDisplay = nameof(TradingDisplay);
+    public const string TradingAndModify = nameof(TradingAndModify);
 
     // Priviliges to ItemCategories
     public const string ItemCategoriesDisplay = nameof(ItemCategoriesDisplay);
@@ -50,6 +54,9 @@ public static class UserRoles
 
             new(WorkplacesDisplay),
             new(WorkplacesDisplayAndModify),
+
+            new(TradingDisplay),
+            new(TradingAndModify),
 
             new(ItemCategoriesDisplay),
             new(ItemCategoriesDisplayAndModify),

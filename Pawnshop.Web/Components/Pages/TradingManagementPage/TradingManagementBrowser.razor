@@ -1,0 +1,232 @@
+@page "/Trading-management-page"
+@using Pawnshop.Web.Components.Common
+@using Pawnshop.Application.ItemCategoriesApplication.Dto
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Dto
+@using Pawnshop.Application.PurchasesSaleTransactionApplication.Queries.GenerateAgreement
+@using Pawnshop.Application.ItemCategoriesApplication.Responses
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@using MudBlazor
+
+@inject IJSRuntime JS
+@inject LanguageService Lang
+@inject ApiService ApiService
+@implements IDisposable
+
+<div class="d-flex align-center mb-6">
+    <MudText Typo="Typo.h4" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase; letter-spacing: 1px;">
+        @Lang.TradingManagement
+    </MudText>
+</div>
+
+<MudPaper Elevation="0" Class="mb-6 d-flex gap-3 bg-transparent">
+    <MudButton Variant="@(_activeSection == 0 ? Variant.Filled : Variant.Outlined)" 
+               Color="Color.Primary"
+               Size="Size.Medium"
+               Class="@(_activeSection == 0 ? "elevation-4" : "")"
+               Style="font-family: 'Outfit', sans-serif; font-weight: 500; min-width: 160px;"
+               OnClick="@(() => _activeSection = 0)">
+        <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Class="mr-2" Size="Size.Small"/> @Lang.Transactions
+    </MudButton>
+    <MudButton Variant="@(_activeSection == 1 ? Variant.Filled : Variant.Outlined)" 
+               Color="Color.Primary"
+               Size="Size.Medium"
+               Class="@(_activeSection == 1 ? "elevation-4" : "")"
+               Style="font-family: 'Outfit', sans-serif; font-weight: 500; min-width: 160px;"
+               OnClick="@(() => _activeSection = 1)">
+        <MudIcon Icon="@Icons.Material.Filled.Category" Class="mr-2" Size="Size.Small"/> @Lang.Categories
+    </MudButton>
+</MudPaper>
+
+<MudPaper Elevation="4" Class="pa-3 mb-6 d-flex align-center border-gold-glow" Style="position: sticky; top: 16px; z-index: 100; border-radius: 16px;">
+    <UniversalCrudMenu SelectedItemsCount="@GetSelectedItemsCount()" OnActionSelected="HandleGlobalCrudAction" />
+</MudPaper>
+
+@if (_activeSection == 0)
+{
+    <MudGrid>
+        <MudItem xs="12" md="@(string.IsNullOrEmpty(_pdfUrl) ? 12 : 5)">
+            <MudPaper Class="pa-4" Elevation="4" Style="border-radius: 16px;">
+                <TradingManagementGrid @ref="_transactionGrid" OnSelectionChanged="HandleTransactionSelection" />
+            </MudPaper>
+        </MudItem>
+        
+        @if (!string.IsNullOrEmpty(_pdfUrl))
+        {
+            <MudItem xs="12" md="7">
+                <MudPaper Class="pa-4 d-flex flex-column"
+                          Style="height: 80vh; position: sticky; top: 80px;">
+                    <div class="d-flex align-center w-100 mb-2">
+                        <MudText Typo="Typo.h6">@Lang.Preview</MudText>
+                        <MudSpacer />
+                        <MudButton StartIcon="@Icons.Material.Filled.Download" 
+                                   Variant="Variant.Text" 
+                                   Color="Color.Primary"
+                                   OnClick="DownloadCurrentPdf">
+                            @Lang.T("Pobierz", "Download")
+                        </MudButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="@(() => _pdfUrl = null)" />
+                    </div>
+                    <iframe src="@_pdfUrl"
+                            style="width: 100%; height: 100%; border: none; border-radius: 8px; background: white;"></iframe>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+}
+else
+{
+    <MudPaper Class="pa-4" Elevation="4" Style="border-radius: 16px;">
+        <UniversalGrid TItem="ItemCategoryDto" 
+                       Title="@Lang.Categories"
+                       Items="_categories"
+                       OnItemSelected="HandleCategorySelected"
+                       OnActionTriggered="HandleGlobalCrudAction">
+            <GridColumns>
+                <PropertyColumn T="ItemCategoryDto" TProperty="string" Property="x => x.Name" Title="@Lang.Name" />
+                <PropertyColumn T="ItemCategoryDto" TProperty="string" Property="x => x.Description" Title="@Lang.Description" />
+            </GridColumns>
+        </UniversalGrid>    </MudPaper>
+}
+
+@if (_showTransactionDetail)
+{
+    <TradingManagementDetail
+    CurrentTransaction="@(_selectedAction == UniversalCrudMenu.CrudAction.Add ? null : _selectedTransactions.FirstOrDefault())"
+    SelectedTransactionsToProcess="_selectedTransactions" SelectedAction="_selectedAction"
+    OnDetailCancel="() => _showTransactionDetail = false" OnCrudCompleted="HandleTransactionCompleted" />
+}
+
+@if (_showCategoryDetail)
+{
+    <ItemCategoryDetail CurrentCategory="_currentCategory"
+                        SelectedAction="_selectedAction"
+                        OnDetailCancel="() => _showCategoryDetail = false"
+                        OnCrudCompleted="HandleCategoryCompleted" />
+}
+
+@code
+{
+    private int _activeSection = 0;
+    private string _pdfUrl = null;
+
+    private bool _showTransactionDetail = false;
+    private List<SalesTransactionDto> _selectedTransactions = new();
+    private TradingManagementGrid _transactionGrid;
+
+    private bool _showCategoryDetail = false;
+    private ItemCategoryDto _currentCategory = null;
+    private UniversalCrudMenu.CrudAction _selectedAction;
+    private List<ItemCategoryDto> _categories = new();
+
+    protected override void OnInitialized() => Lang.OnLanguageChanged += StateHasChanged;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        try
+        {
+            var response = await ApiService.GetAsync<GetAllItemCategoriesResponse>("ItemCategories/get", null);
+            _categories = response?.AllItemCategoriesList ?? new();
+        }
+        catch (Exception) { }
+    }
+
+    private int GetSelectedItemsCount()
+    {
+        return _activeSection == 0 ? _selectedTransactions.Count : (_currentCategory != null ? 1 : 0);
+    }
+
+    private async Task HandleGlobalCrudAction(UniversalCrudMenu.CrudAction action)
+    {
+        _selectedAction = action;
+
+        if (_activeSection == 0)
+        {
+            if (action == UniversalCrudMenu.CrudAction.View && _selectedTransactions.Count == 1)
+            {
+                await PreviewPdf(_selectedTransactions.First().Id);
+            }
+            else
+            {
+                _showTransactionDetail = true;
+            }
+        }
+        else
+        {
+            if (action == UniversalCrudMenu.CrudAction.Add)
+            {
+                _currentCategory = null;
+            }
+            _showCategoryDetail = true;
+        }
+    }
+
+    private void HandleTransactionSelection(IEnumerable<SalesTransactionDto> selected)
+    {
+        _selectedTransactions = selected.ToList();
+        StateHasChanged();
+    }
+
+    private async Task HandleTransactionCompleted(Guid transId)
+    {
+        _showTransactionDetail = false;
+        _selectedTransactions.Clear();
+        if (_transactionGrid != null) await _transactionGrid.ReloadDataAsync();
+        
+        if (transId != Guid.Empty)
+        {
+            await PreviewPdf(transId);
+        }
+        else
+        {
+            _pdfUrl = null;
+        }
+    }
+
+    private async Task PreviewPdf(Guid id)
+    {
+        try
+        {
+            var query = new { PurchasesSaleTransactionId = id };
+            var fileBytes = await ApiService.DownloadFileAsync("PurchasesSaleTransaction/generate-agreement", query);
+            if (fileBytes != null && fileBytes.Length > 0)
+            {
+                _lastPdfBytes = fileBytes;
+                using var streamRef = new DotNetStreamReference(stream: new MemoryStream(fileBytes));
+                _pdfUrl = await JS.InvokeAsync<string>("createBlobUrl", streamRef);
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex) { Console.WriteLine($"Preview error: {ex.Message}"); }
+    }
+
+    private byte[] _lastPdfBytes;
+    private async Task DownloadCurrentPdf()
+    {
+        if (_lastPdfBytes != null)
+        {
+            using var streamRef = new DotNetStreamReference(stream: new MemoryStream(_lastPdfBytes));
+            await JS.InvokeVoidAsync("downloadFileFromStream", $"Umowa_{DateTime.Now:yyyyMMdd}.pdf", streamRef);
+        }
+    }
+
+    private void HandleCategorySelected(ItemCategoryDto category)
+    {
+        _currentCategory = category;
+        StateHasChanged();
+    }
+
+    private async Task HandleCategoryCompleted()
+    {
+        _showCategoryDetail = false;
+        _currentCategory = null;
+        await LoadCategories();
+    }
+
+    public void Dispose() => Lang.OnLanguageChanged -= StateHasChanged;
+}

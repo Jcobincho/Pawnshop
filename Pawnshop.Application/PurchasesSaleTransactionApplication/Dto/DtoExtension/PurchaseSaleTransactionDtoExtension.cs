@@ -1,4 +1,4 @@
-﻿using Pawnshop.Application.ClientsApplication.Dto;
+using Pawnshop.Application.ClientsApplication.Dto;
 using Pawnshop.Application.ItemCategoriesApplication.Dto;
 using Pawnshop.Application.ItemInPurchaseSaleTransactionApplication.Dto;
 using Pawnshop.Application.WorkplacesApplication.Dto;
@@ -13,9 +13,23 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtens
         {
             return new SalesTransactionDto
             {
+                Id = purchaseSaleTransaction.Id,
                 Symbol = purchaseSaleTransaction.Symbol,
                 TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction,
                 TransactionDate = purchaseSaleTransaction.TransactionDate,
+                Client = purchaseSaleTransaction.Client != null ? new ClientDto
+                {
+                    ClientId = purchaseSaleTransaction.Client.Id,
+                    Name = purchaseSaleTransaction.Client.Name,
+                    SecondName = purchaseSaleTransaction.Client.SecondName,
+                    Surname = purchaseSaleTransaction.Client.Surname,
+                    BirthDate = purchaseSaleTransaction.Client.BirthDate,
+                    Pesel = purchaseSaleTransaction.Client.Pesel,
+                    IdCardNumber = purchaseSaleTransaction.Client.IdCardNumber,
+                    TelephoneNumber = purchaseSaleTransaction.Client.TelephoneNumber,
+                    Email = purchaseSaleTransaction.Client.Email,
+                    Description = purchaseSaleTransaction.Client.Description
+                } : null,
                 Description = purchaseSaleTransaction.Description,
                 Workplace = purchaseSaleTransaction.Workplace.WorkplaceParseToDto(),
                 CreatedAt = purchaseSaleTransaction.CreatedAt,
@@ -29,9 +43,23 @@ namespace Pawnshop.Application.PurchasesSaleTransactionApplication.Dto.DtoExtens
         {
             return new PurchasesTransactionDto
             {
+                Id = purchaseSaleTransaction.Id,
                 Symbol = purchaseSaleTransaction.Symbol,
                 TypeOfTransaction = purchaseSaleTransaction.TypeOfTransaction,
                 TransactionDate = purchaseSaleTransaction.TransactionDate,
+                Client = purchaseSaleTransaction.Client != null ? new ClientDto
+                {
+                    ClientId = purchaseSaleTransaction.Client.Id,
+                    Name = purchaseSaleTransaction.Client.Name,
+                    SecondName = purchaseSaleTransaction.Client.SecondName,
+                    Surname = purchaseSaleTransaction.Client.Surname,
+                    BirthDate = purchaseSaleTransaction.Client.BirthDate,
+                    Pesel = purchaseSaleTransaction.Client.Pesel,
+                    IdCardNumber = purchaseSaleTransaction.Client.IdCardNumber,
+                    TelephoneNumber = purchaseSaleTransaction.Client.TelephoneNumber,
+                    Email = purchaseSaleTransaction.Client.Email,
+                    Description = purchaseSaleTransaction.Client.Description
+                } : null,
                 Description = purchaseSaleTransaction.Description,
                 Workplace = purchaseSaleTransaction.Workplace.WorkplaceParseToDto(),
                 CreatedAt = purchaseSaleTransaction.CreatedAt,

@@ -1,164 +1,159 @@
 @page "/"
-
+@layout Layout.MainLayout
 @using Pawnshop.Application.UsersApplication.Commands.LoginUser
 @using Pawnshop.Domain.AuthTokens
 @using Pawnshop.Web.Exceptions
+@using Pawnshop.Web.Services
 @using Pawnshop.Web.Services.ApiService
 @using Pawnshop.Web.Services.AuthenticationService
-@using Microsoft.AspNetCore.Components.Authorization
+@using MudBlazor
 
-@inject HttpClient httpClient
 @inject ApiService ApiService
-@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ISnackbar Snackbar
+@inject LanguageService Lang
+@implements IDisposable
 
-<PageTitle>Pawnshop System - Login</PageTitle>
+<div class="d-flex align-center justify-center login-container" style="height: 100vh; background-color: var(--mud-palette-background);">
+    <MudPaper Elevation="25" Class="pa-10 login-card border-gold-glow" 
+              Style="width: 450px; border-radius: 24px; background-color: var(--mud-palette-surface); backdrop-filter: blur(10px);">
+        <div class="d-flex flex-column align-center mb-10">
+            <div class="logo-glow mb-4">
+                <MudIcon Icon="@Icons.Material.Filled.Store" Color="Color.Primary" Style="font-size: 5rem;" />
+            </div>
+            <MudText Typo="Typo.h3" Style="font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -1px; color: var(--mud-palette-primary); text-transform: uppercase;">
+                @Lang.AppTitle
+            </MudText>
+            <MudText Typo="Typo.subtitle1" Class="uppercase-label mt-1" Style="color: var(--mud-palette-text-secondary);">
+                @Lang.T("System Zarządzania Lombardem", "Pawnshop Management System")
+            </MudText>
+        </div>
+
+        <EditForm Model="@_loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            
+            <MudText Typo="Typo.caption" Class="uppercase-label mb-2 d-block" Color="Color.Primary">@Lang.Username</MudText>
+            <MudTextField @bind-Value="_loginModel.Username" 
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Person" 
+                          Class="mb-6"
+                          Style="font-family: 'Outfit', sans-serif;" />
+
+            <MudText Typo="Typo.caption" Class="uppercase-label mb-2 d-block" Color="Color.Primary">@Lang.Password</MudText>
+            <MudTextField @bind-Value="_loginModel.Password" 
+                          Variant="Variant.Outlined"
+                          InputType="@_passwordInput" 
+                          Adornment="Adornment.End" 
+                          AdornmentIcon="@_passwordInputIcon"
+                          OnAdornmentClick="TogglePasswordVisibility" 
+                          Class="mb-8"
+                          Style="font-family: 'Outfit', sans-serif;" />
+
+            <MudButton ButtonType="ButtonType.Submit" 
+                       Variant="Variant.Filled" 
+                       Color="Color.Primary" 
+                       FullWidth="true"
+                       Size="Size.Large" 
+                       Disabled="_isLoading"
+                       Style="height: 60px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 8px 16px rgba(197, 160, 89, 0.2);">
+                @if (_isLoading)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2" Style="font-family: 'Outfit', sans-serif;">@Lang.T("AUTORYZACJA...", "AUTHORIZING...")</MudText>
+                }
+                else
+                {
+                    <MudText Style="font-family: 'Outfit', sans-serif;">@Lang.Login.ToUpper()</MudText>
+                }
+            </MudButton>
+        </EditForm>
+
+        <div class="mt-8 d-flex justify-center">
+            <MudText Typo="Typo.caption" Style="color: var(--mud-palette-text-disabled); font-family: 'Outfit', sans-serif;">
+                &copy; 2026 @Lang.AppTitle. @Lang.T("WSZELKIE PRAWA ZASTRZEŻONE.", "ALL RIGHTS RESERVED.")
+            </MudText>
+        </div>
+    </MudPaper>
+</div>
 
 <style>
-    .login-wrapper {
-        min-height: 100vh;
-        background-color: var(--mud-palette-background);
-        transition: background-color 0.3s ease;
+    .login-container {
+        /* Subtelny gradient zależny od trybu */
+        background: radial-gradient(circle at center, var(--mud-palette-surface) 0%, var(--mud-palette-background) 100%);
     }
 
-    .pawnshop-auth-card {
-        border: 1px solid var(--mud-palette-primary-darken);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-        overflow: hidden;
-        border-radius: 12px;
+    .login-card {
+        border: 1px solid var(--mud-palette-lines-default) !important;
     }
 
-    .brand-section {
-        background: linear-gradient(135deg, var(--mud-palette-primary) 0%, var(--mud-palette-primary-darken) 100%);
-        color: var(--mud-palette-primary-text);
-        padding: 3rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
+    .logo-glow {
+        filter: drop-shadow(0 0 15px rgba(197, 160, 89, 0.3));
     }
 
-    .form-section {
-        background-color: var(--mud-palette-surface);
-        padding: 3rem;
-    }
-
-    .input-field {
-        margin-bottom: 1.5rem;
-    }
-
-    .pawn-logo-anim {
-        font-size: 5rem;
-        animation: pulse 2s infinite;
-    }
-
-    @@keyframes pulse {
-        0% { transform: scale(1); opacity: 0.9; }
-        50% { transform: scale(1.05); opacity: 1; }
-        100% { transform: scale(1); opacity: 0.9; }
+    .uppercase-label {
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+        font-size: 0.75rem;
     }
 </style>
 
-<div class="login-wrapper d-flex align-center justify-center">
-    <MudContainer MaxWidth="MaxWidth.Medium">
-        <MudCard Class="pawnshop-auth-card d-flex flex-column flex-md-row" Elevation="0">
-            <!-- Branding Area -->
-            <div class="brand-section col-12 col-md-5">
-                <MudIcon Icon="@Icons.Material.Filled.AccountBalance" Class="pawn-logo-anim mb-4" />
-                <MudText Typo="Typo.h3" Class="font-weight-bold">PAWNSHOP</MudText>
-                <MudText Typo="Typo.h6" Style="letter-spacing: 2px; text-transform: uppercase; opacity: 0.8;">Management System</MudText>
-                <div class="mt-8 mb-4" style="width: 50px; height: 3px; background-color: currentColor; border-radius: 2px;"></div>
-                <MudText Typo="Typo.body2" Align="Align.Center">Secure vault access for authorized personnel only.</MudText>
-            </div>
+@code
+{
+    private LoginUserCommand _loginModel = new();
+    private bool _isLoading = false;
+    private InputType _passwordInput = InputType.Password;
+    private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
 
-            <!-- Login Area -->
-            <div class="form-section col-12 col-md-7">
-                <div class="d-flex flex-column h-100 justify-center">
-                    <MudText Typo="Typo.h4" Color="Color.Primary" Class="font-weight-bold mb-2">Sign In</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-8">Access your workplace terminal.</MudText>
-
-                    <MudForm @bind-IsValid="@success" @bind-Errors="errors">
-                        <MudTextField @bind-Value="@loginData.Username"
-                                      Label="Operator ID"
-                                      Variant="Variant.Outlined"
-                                      Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Person"
-                                      Required="true"
-                                      RequiredError="Username is required"
-                                      Class="input-field" />
-
-                        <MudTextField @bind-Value="@loginData.Password"
-                                      Label="Security Password"
-                                      Variant="Variant.Outlined"
-                                      InputType="InputType.Password"
-                                      Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Lock"
-                                      Required="true"
-                                      RequiredError="Password is required"
-                                      Class="input-field" />
-
-                        @if (apiExceptions != null)
-                        {
-                            foreach (var exception in apiExceptions)
-                            {
-                                <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-4" Dense="true">@exception</MudAlert>
-                            }
-                        }
-
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   Size="Size.Large"
-                                   FullWidth="true"
-                                   Class="mt-4 py-3 font-weight-bold"
-                                   Style="letter-spacing: 1px;"
-                                   OnClick="@LoginHandle">
-                            AUTHENTICATE
-                        </MudButton>
-                    </MudForm>
-                </div>
-            </div>
-        </MudCard>
-    </MudContainer>
-</div>
-
-@code {
-    bool success;
-    string[] errors = { };
-
-    LoginUserCommand loginData = new LoginUserCommand();
-    List<string> apiExceptions = null;
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        Lang.OnLanguageChanged += StateHasChanged;
+    }
 
-        if (user.Identity is not null && user.Identity.IsAuthenticated)
+    private void TogglePasswordVisibility()
+    {
+        if (_passwordInput == InputType.Password)
         {
-            NavigationManager.NavigateTo("/Home");
+            _passwordInput = InputType.Text;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+        }
+        else
+        {
+            _passwordInput = InputType.Password;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
         }
     }
 
-    private async Task LoginHandle()
+    private async Task HandleLogin()
     {
+        _isLoading = true;
         try
         {
-            var result = await ApiService.PostAsync<LoginUserCommand, JsonWebToken>("/Users/login", loginData, requireAuth: false);
-            if (result != null && result.AccessToken != null)
+            var response = await ApiService.PostAsync<LoginUserCommand, JsonWebToken>("Users/login", _loginModel, false);
+            if (response != null)
             {
-                await ((AuthStateProviderService)AuthStateProvider).MarkUserAsAuthenticated(result);
+                await ((AuthStateProviderService)AuthStateProvider).MarkUserAsAuthenticated(response);
                 NavigationManager.NavigateTo("/Home");
             }
-            apiExceptions = null;
         }
         catch (ApiException ex)
         {
-            apiExceptions = ex.ErrorMessages;
+            Snackbar.Add(string.Join(", ", ex.ErrorMessages), Severity.Error);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            apiExceptions = new List<string> { "Connection to secure server failed." };
+            Snackbar.Add(Lang.T("Błąd logowania. Spróbuj ponownie.", "Login failed. Please try again."), Severity.Error);
         }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        Lang.OnLanguageChanged -= StateHasChanged;
     }
 }
