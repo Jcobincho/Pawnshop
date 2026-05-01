@@ -105,7 +105,7 @@
         {
             Country = CurrentWorkplace.Country;
             Region = CurrentWorkplace.Region;
-            City = SelectedAction == UniversalCrudMenu.CrudAction.AddCopy ? CurrentWorkplace.City + " (Copy)" : CurrentWorkplace.City;
+            City = CurrentWorkplace.City;
             Street = CurrentWorkplace.StreetAndBuildingNumber;
             ZipCode = CurrentWorkplace.ZipCode;
         }
@@ -117,7 +117,7 @@
         {
             if (SelectedAction == UniversalCrudMenu.CrudAction.Add || SelectedAction == UniversalCrudMenu.CrudAction.AddCopy)
             {
-                await ApiService.PostAsync<AddWorkplaceCommand, AddWorkplaceResponse>("Workplaces/add", new AddWorkplaceCommand { Country = Country, Region = Region, City = City, StreetAndBuildingNumber = Street, ZipCode = ZipCode });
+                await ApiService.PostAsync<AddWorkplaceCommand, AddWorkplaceResponse>("Workplaces/add", new AddWorkplaceCommand { Country = Country, Region = Region, City = City, StreetAndBuildingNumber = Street, ZipCode = ZipCode, Latitude = CurrentWorkplace?.Latitude, Longitude = CurrentWorkplace?.Longitude });
             }
             else if (SelectedAction == UniversalCrudMenu.CrudAction.Update)
             {

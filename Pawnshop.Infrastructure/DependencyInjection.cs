@@ -9,6 +9,7 @@ using Pawnshop.Application.CryptographyApplication.Interface;
 using Pawnshop.Application.EmployeesApplication.Interfaces;
 using Pawnshop.Application.FileStorageApplication.FileStorage.Interfaces;
 using Pawnshop.Application.FileStorageApplication.PurchaseSaleTransactionAgreementStorage.Interfaces;
+using Pawnshop.Application.GeocodingApplication.Interfaces;
 using Pawnshop.Application.ItemCategoriesApplication.Interfaces;
 using Pawnshop.Application.ItemDetailsApplication.Interfaces;
 using Pawnshop.Application.ItemHistoriesApplication.Interfaces;
@@ -30,6 +31,7 @@ using Pawnshop.Infrastructure.Services.CryptographyInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.EmployeesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.FileStorage.Services;
 using Pawnshop.Infrastructure.Services.FileStorageInfrastructure.PurchaseSaleTransactionAgreementStorage.Services;
+using Pawnshop.Infrastructure.Services.GeocodingInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.ItemCategoriesInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.ItemDetailsInfrastructure.Services;
 using Pawnshop.Infrastructure.Services.ItemHistoriesInfrastructure.Producers;
@@ -86,6 +88,9 @@ public static class DependencyInjection
 
         // Notification services
         services.AddScoped<INotificationService, NotificationService>();
+
+        // Geocoding service
+        services.AddSingleton<IGeocodingService, NominatimGeocodingService>();
 
         // MassTransit create item history with valuation
         services.AddScoped<IItemHistoryEventPublisher, ItemHistoryEventPublisher>();
