@@ -1,0 +1,499 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{url}
+
+\geometry{margin=2.5cm}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue
+}
+\sloppy
+
+\newcommand{\library}[4]{
+    \noindent
+    \textbf{\path{#1}} \hfill \textbf{wersja #2}\\
+    \textit{Deklaracja w projekcie/projektach: #3}
+
+    #4
+
+    \vspace{0.35cm}
+}
+
+\title{Dokumentacja projektu Pawnshop}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Zakres dokumentacji}
+
+Ten plik jest pierwszym etapem dokumentacji projektu \textit{Pawnshop}. Na tym etapie opis obejmuje bezpośrednie biblioteki NuGet zadeklarowane w plikach \path{.csproj}; nie obejmuje zależności przechodnich pobieranych automatycznie przez NuGet.
+
+Wersje pochodzą z wyniku poleceń \texttt{dotnet restore} oraz \texttt{dotnet list package}. Jeżeli wersja rozpoznana przez NuGet różni się od wersji zadeklarowanej w pliku projektu, zostało to zaznaczone przy danej bibliotece.
+
+Wszystkie projekty aplikacji są budowane dla platformy \path{net8.0}. Rozwiązanie składa się z warstw \path{Pawnshop.Api}, \path{Pawnshop.Application}, \path{Pawnshop.Domain}, \path{Pawnshop.Infrastructure} oraz \path{Pawnshop.Web}.
+
+Kolejne rozdzialy dokumentacji beda prowadzone w ujeciu OWASP Top 10:2025. Oznacza to, ze biblioteki, konfiguracja, kontrola dostepu, obsluga bledow i architektura aplikacji sa oceniane przede wszystkim pod katem ryzyk bezpieczenstwa, takich jak Broken Access Control, Security Misconfiguration, Software Supply Chain Failures, Cryptographic Failures, Injection oraz Authentication Failures.
+
+\section{Biblioteki zewnętrzne}
+
+Lista w tym rozdziale obejmuje 30 najwazniejszych bibliotek dla projektu. Uwzgledniono zarowno pakiety zadeklarowane bezposrednio w plikach \path{.csproj}, jak i zaleznosci przechodnie, jezeli sa istotne dla dzialania aplikacji albo ich typy sa uzywane w kodzie. Dobor potwierdzono przez \texttt{dotnet list package --include-transitive} oraz wyszukanie uzyc w plikach \path{.cs} i \path{.razor}. Z listy celowo pominieto pakiety zadeklarowane, ale niewykorzystywane w aktywnej implementacji, np. \path{MailKit} oraz \path{PuppeteerSharp}.
+
+\library
+{Microsoft.AspNetCore.OpenApi}
+{8.0.10}
+{\path{Pawnshop.Api}}
+{Biblioteka dostarcza integrację ASP.NET Core z opisem API w standardzie OpenAPI. W projekcie jest częścią warstwy API i wspiera generowanie dokumentacji endpointów, która jest dalej prezentowana przez Swagger UI.}
+
+\library
+{Microsoft.EntityFrameworkCore.Tools}
+{8.0.11}
+{\path{Pawnshop.Api}, \path{Pawnshop.Infrastructure}}
+{Pakiet zawiera narzędzia Entity Framework Core używane przy pracy z migracjami i modelem bazy danych. W tym projekcie jest potrzebny do obsługi migracji oraz operacji developerskich związanych ze schematem bazy PostgreSQL.}
+
+\library
+{Swashbuckle.AspNetCore}
+{6.6.2}
+{\path{Pawnshop.Api}}
+{Swashbuckle generuje dokument OpenAPI oraz interfejs Swagger UI dla aplikacji ASP.NET Core. W projekcie konfiguruje dokumentację API, w tym schemat autoryzacji Bearer dla tokenów JWT.}
+
+\library
+{FluentValidation}
+{11.11.0}
+{\path{Pawnshop.Application}}
+{FluentValidation służy do deklaratywnego opisywania reguł walidacji obiektów i komend. W warstwie aplikacyjnej projektu waliduje m.in. dane klientów, użytkowników, miejsc pracy oraz transakcji przed wykonaniem logiki biznesowej.}
+
+\library
+{FluentValidation.AspNetCore}
+{11.3.0}
+{\path{Pawnshop.Application}}
+{Pakiet łączy FluentValidation z mechanizmem walidacji ASP.NET Core. W projekcie włącza automatyczną walidację zarejestrowanych validatorów, dzięki czemu błędne dane wejściowe są przechwytywane zanim trafią do handlerów.}
+
+\library
+{FluentValidation.DependencyInjectionExtensions}
+{11.11.0}
+{\path{Pawnshop.Application}}
+{Ten pakiet upraszcza rejestrowanie validatorów FluentValidation w kontenerze dependency injection. W projekcie jest używany do automatycznego wyszukania i dodania validatorów z assembly warstwy aplikacyjnej.}
+
+\library
+{MassTransit.RabbitMQ}
+{8.4.1}
+{\path{Pawnshop.Application}}
+{MassTransit jest biblioteką do komunikacji asynchronicznej i obsługi kolejek, a wariant RabbitMQ zapewnia integrację z brokerem RabbitMQ. W projekcie obsługuje kolejki związane m.in. z historią przedmiotów, wycenami oraz generowaniem dokumentów umów.}
+
+\library
+{MediatR}
+{12.4.1}
+{\path{Pawnshop.Application}}
+{MediatR implementuje wzorzec mediator dla komend i zapytań. W projekcie porządkuje przepływ logiki aplikacyjnej: kontrolery wysyłają komendy lub zapytania, a odpowiednie handlery wykonują operacje biznesowe.}
+
+\library
+{Microsoft.AspNetCore.Identity.EntityFrameworkCore}
+{8.0.11}
+{\path{Pawnshop.Domain}, \path{Pawnshop.Infrastructure}}
+{Pakiet łączy ASP.NET Core Identity z Entity Framework Core. W projekcie odpowiada za przechowywanie użytkowników, ról i tokenów w bazie danych oraz za integrację klas domenowych użytkownika z mechanizmami Identity.}
+
+\library
+{Microsoft.EntityFrameworkCore}
+{8.0.11}
+{\path{Pawnshop.Domain}}
+{Entity Framework Core jest ORM-em dla platformy .NET, który mapuje obiekty C\# na tabele w relacyjnej bazie danych. W projekcie stanowi podstawę dostępu do danych, definicji \path{DbContext}, zbiorów encji i migracji.}
+
+\library
+{AWSSDK.S3}
+{4.0.6}
+{\path{Pawnshop.Infrastructure}}
+{AWSSDK.S3 to klient .NET do usług zgodnych z Amazon S3. W projekcie jest używany przez serwisy przechowywania plików do zapisu, odczytu i usuwania plików w magazynie S3 lub kompatybilnym z S3, takim jak MinIO.}
+
+\library
+{Handlebars.Net}
+{2.1.6}
+{\path{Pawnshop.Infrastructure}}
+{Handlebars.Net pozwala renderować szablony tekstowe i HTML na podstawie danych aplikacji. W projekcie zarejestrowane są helpery formatowania dat, walut, liczb oraz prostych obliczeń, które mogą być używane w szablonach dokumentów.}
+
+\library
+{Microsoft.AspNetCore.Authentication.JwtBearer}
+{8.0.11}
+{\path{Pawnshop.Infrastructure}}
+{Pakiet dodaje do ASP.NET Core obsługę uwierzytelniania Bearer Token dla JWT. W projekcie konfiguruje walidację tokenów, issuer, audience oraz klucz podpisu używany do zabezpieczania endpointów API.}
+
+\library
+{Npgsql.EntityFrameworkCore.PostgreSQL}
+{8.0.11}
+{\path{Pawnshop.Infrastructure}}
+{Npgsql.EntityFrameworkCore.PostgreSQL jest providerem Entity Framework Core dla bazy PostgreSQL. W projekcie jest wykorzystywany w konfiguracji \path{UseNpgsql}, aby \path{DbContext} mógł łączyć się z bazą PostgreSQL i wykonywać migracje w tej bazie.}
+
+\library
+{QuestPDF}
+{2025.1.0}
+{\path{Pawnshop.Infrastructure}}
+{QuestPDF służy do programowego tworzenia dokumentów PDF w .NET. W projekcie generuje dokument umowy transakcji, składając nagłówek, dane stron, specyfikację przedmiotów, podsumowanie wartości oraz stopkę.}
+
+\library
+{MudBlazor}
+{8.3.0}
+{\path{Pawnshop.Web}}
+{MudBlazor to biblioteka komponentów UI dla Blazora oparta o Material Design. W projekcie tworzy warstwę interfejsu webowego, dostarcza usługi komponentów, lokalizację elementów UI oraz motyw aplikacji.}
+
+\library
+{System.IdentityModel.Tokens.Jwt}
+{8.1.0 w \path{Pawnshop.Web}; 7.1.2 przechodnio w API/Infrastructure}
+{\path{Pawnshop.Web}; przechodnio takze \path{Pawnshop.Api} i \path{Pawnshop.Infrastructure}}
+{Pakiet zawiera narzędzia do tworzenia, odczytu i obsługi tokenów JWT. W projekcie jest używany przy generowaniu tokenów po stronie infrastruktury oraz przy odczycie tokenu w aplikacji webowej, aby zbudować stan uwierzytelnienia użytkownika.}
+
+\library
+{Microsoft.OpenApi}
+{1.6.14}
+{\path{Pawnshop.Api} jako zaleznosc OpenAPI/Swagger}
+{Microsoft.OpenApi dostarcza modele standardu OpenAPI, m.in. \path{OpenApiInfo}, \path{OpenApiSecurityScheme} i \path{OpenApiReference}. W projekcie typy z tej biblioteki sa uzywane bezposrednio w \path{AddSwaggerExtension.cs} do opisania dokumentu API oraz konfiguracji schematu autoryzacji Bearer.}
+
+\library
+{Swashbuckle.AspNetCore.SwaggerGen}
+{6.6.2}
+{\path{Pawnshop.Api} jako zaleznosc \path{Swashbuckle.AspNetCore}}
+{Pakiet odpowiada za generowanie dokumentu Swagger/OpenAPI na podstawie konfiguracji aplikacji ASP.NET Core. W projekcie jest uzywany przez \path{AddSwaggerGen}, gdzie definiowany jest dokument \path{v1} oraz wymagania bezpieczenstwa dla tokenow JWT.}
+
+\library
+{Swashbuckle.AspNetCore.SwaggerUI}
+{6.6.2}
+{\path{Pawnshop.Api} jako zaleznosc \path{Swashbuckle.AspNetCore}}
+{SwaggerUI udostepnia webowy interfejs do przegladania i testowania endpointow API. W projekcie jest uruchamiany przez \path{app.UseSwaggerUI()} w srodowisku developerskim, co pomaga weryfikowac kontrakt API i autoryzacje Bearer.}
+
+\library
+{MassTransit}
+{8.4.1}
+{\path{Pawnshop.Application}, \path{Pawnshop.Infrastructure}, zaleznosc \path{MassTransit.RabbitMQ}}
+{MassTransit jest glownym silnikiem abstrakcji komunikacji asynchronicznej. W projekcie obsluguje rejestracje consumerow, publikacje zdarzen i konfiguracje przeplywu komunikatow miedzy logika aplikacyjna a infrastruktura RabbitMQ.}
+
+\library
+{MassTransit.Abstractions}
+{8.4.1}
+{\path{Pawnshop.Application}, \path{Pawnshop.Infrastructure}, zaleznosc \path{MassTransit}}
+{Pakiet zawiera kontrakty i interfejsy MassTransit uzywane bez koniecznosci odwolywania sie do konkretnego transportu. W projekcie ma znaczenie dla separacji warstw, poniewaz aplikacja moze definiowac producentow i konsumentow zdarzen bez laczenia logiki biznesowej bezposrednio z implementacja brokera.}
+
+\library
+{RabbitMQ.Client}
+{7.1.2}
+{\path{Pawnshop.Application}, \path{Pawnshop.Infrastructure}, zaleznosc \path{MassTransit.RabbitMQ}}
+{RabbitMQ.Client jest niskopoziomowym klientem .NET dla brokera RabbitMQ. Projekt nie tworzy polaczen tym klientem recznie, ale korzysta z niego przez MassTransit.RabbitMQ, dlatego jest kluczowy dla dzialania kolejek item-history-and-item-valuation oraz generate-agreement.}
+
+\library
+{MediatR.Contracts}
+{2.0.1}
+{\path{Pawnshop.Application}, zaleznosc \path{MediatR}}
+{MediatR.Contracts zawiera podstawowe kontrakty dla zadan mediatora, takie jak \path{IRequest}. W projekcie komendy i zapytania dziedzicza po bazowych typach opartych o MediatR, dzieki czemu kontrolery i handlery komunikuja sie przez jawny kontrakt zamiast przez bezposrednie wywolania serwisow.}
+
+\library
+{Microsoft.IdentityModel.Tokens}
+{8.1.0 / 7.1.2}
+{\path{Pawnshop.Web}; przechodnio takze \path{Pawnshop.Api} i \path{Pawnshop.Infrastructure}}
+{Biblioteka dostarcza typy do podpisywania i walidacji tokenow, m.in. \path{TokenValidationParameters}, \path{SymmetricSecurityKey} oraz \path{SigningCredentials}. W projekcie jest uzywana przy konfiguracji JWT Bearer oraz przy generowaniu tokenow dostepowych podpisywanych kluczem symetrycznym.}
+
+\library
+{Microsoft.Extensions.Identity.Core}
+{8.0.11}
+{\path{Pawnshop.Domain}, \path{Pawnshop.Infrastructure}, zaleznosc Identity}
+{Pakiet zawiera podstawowa logike ASP.NET Core Identity, m.in. zarzadzanie uzytkownikami, haslami, rolami i walidacja danych konta. W projekcie jest wykorzystywany przez \path{UserManager}, \path{SignInManager} oraz konfiguracje wymagan hasel i unikalnosci adresu e-mail.}
+
+\library
+{Microsoft.EntityFrameworkCore.Relational}
+{8.0.11}
+{\path{Pawnshop.Domain}, \path{Pawnshop.Infrastructure}, zaleznosc EF Core}
+{Ten pakiet rozszerza Entity Framework Core o mechanizmy potrzebne dla relacyjnych baz danych. W projekcie jest istotny dla mapowania encji na tabele PostgreSQL, migracji, relacji miedzy encjami oraz zapytan wykonywanych przez provider Npgsql.}
+
+\library
+{Npgsql}
+{8.0.6}
+{\path{Pawnshop.Infrastructure}, zaleznosc \path{Npgsql.EntityFrameworkCore.PostgreSQL}}
+{Npgsql jest niskopoziomowym sterownikiem .NET do PostgreSQL. Projekt korzysta z niego przez provider Entity Framework Core, dzieki czemu operacje na \path{DbContext} sa tlumaczone na polaczenia i zapytania wykonywane w bazie PostgreSQL.}
+
+\library
+{AWSSDK.Core}
+{4.0.0.16}
+{\path{Pawnshop.Infrastructure}, zaleznosc \path{AWSSDK.S3}}
+{AWSSDK.Core zawiera wspolne mechanizmy AWS SDK, takie jak konfiguracja klientow, uwierzytelnianie, obsluga endpointow i podstawowe klasy wyjatkow. W projekcie jest niezbedny dla dzialania \path{AmazonS3Client}, ktory zapisuje, pobiera i usuwa pliki z MinIO/S3.}
+
+\library
+{Microsoft.AspNetCore.Components}
+{8.0.12}
+{\path{Pawnshop.Web}, zaleznosc warstwy Blazor}
+{Pakiet zawiera podstawowe typy Blazora, komponenty, routing i uslugi takie jak \path{NavigationManager}. W projekcie jest wykorzystywany przez pliki \path{.razor}, layout, strony zarzadzania oraz serwis API, ktory przekierowuje uzytkownika po zmianach stanu autoryzacji.}
+
+\clearpage
+\section{Publicznie opublikowane bledy wybranych bibliotek w ujeciu OWASP}
+
+Ten rozdzial opisuje trzy biblioteki obecne w aktualnym grafie zaleznosci projektu, dla ktorych publicznie opublikowano bledy bezpieczenstwa. Analiza jest prowadzona w oparciu o OWASP Top 10:2025, czyli aktualna liste najwazniejszych klas ryzyka dla aplikacji webowych. Dla zaleznosci szczegolnie istotna jest kategoria \path{A03:2025 - Software Supply Chain Failures}, ale konkretne skutki podatnosci moga dodatkowo wchodzic w obszar \path{A04:2025 - Cryptographic Failures}, \path{A05:2025 - Injection}, \path{A07:2025 - Authentication Failures} oraz \path{A02:2025 - Security Misconfiguration}.
+
+W przeciwienstwie do poprzedniego rozdzialu uwzgledniono tutaj takze zaleznosci przechodnie, poniewaz polecenie \texttt{dotnet list package --vulnerable --include-transitive} wskazalo je jako faktycznie rozwiazane i podatne pakiety uzywane przez aplikacje. Stan sprawdzono dnia 01.05.2026.
+
+\textbf{Podstawa klasyfikacji OWASP:} \url{https://owasp.org/Top10/2025/}
+
+\subsection{MailKit}
+
+\textbf{Wersja biblioteki:} \path{MailKit 4.8.0}\\
+\textbf{Rodzaj zaleznosci:} pakiet bezposredni w \path{Pawnshop.Infrastructure}.\\
+\textbf{Znalezione bledy:} \path{GHSA-9j88-vvj5-vhgr}, \path{CVE-2026-41319}, STARTTLS Response Injection.
+
+\textbf{Mapowanie OWASP Top 10:2025:} podstawowo \path{A03 - Software Supply Chain Failures}, poniewaz ryzyko pochodzi z podatnej biblioteki. Skutek techniczny dotyka rowniez \path{A04 - Cryptographic Failures}, bo problem wystepuje na granicy przejscia z tekstowego polaczenia do TLS, oraz \path{A07 - Authentication Failures}, poniewaz atak moze prowadzic do obnizenia mechanizmu uwierzytelniania SASL.
+
+MailKit w wersji \path{4.8.0} zostal wskazany przez NuGet jako pakiet podatny na publicznie opisany blad STARTTLS Response Injection. Publiczny advisory projektu MailKit opisuje problem jako blad przejscia z polaczenia jawnego na TLS: podczas wykonywania STARTTLS wewnetrzny bufor strumienia SMTP, IMAP albo POP3 nie byl czyszczony po podmianie zwyklego strumienia na \path{SslStream}. W efekcie dane wstrzykniete przez atakujacego przed ustanowieniem TLS mogly zostac pozniej potraktowane przez klienta jako zaufana odpowiedz juz po zestawieniu szyfrowanego kanalu. Blad jest szczegolnie istotny dla polaczen z opcjami \path{StartTls} oraz \path{StartTlsWhenAvailable}, czyli dla typowego scenariusza bezpiecznej komunikacji z serwerem pocztowym.
+
+Praktyczny skutek podatnosci polega na tym, ze atakujacy typu Man-in-the-Middle moze manipulowac odpowiedziami protokolu i wplynac na liste mechanizmow uwierzytelniania widzianych przez klienta. Advisory podaje jako przyklad degradacje SASL, czyli sytuacje, w ktorej serwer realnie oferuje silniejszy mechanizm, ale klient po ataku widzi i wybiera slabsze opcje, takie jak \path{PLAIN} albo \path{LOGIN}. W projekcie \textit{Pawnshop} pakiet jest obecnie zadeklarowany w warstwie infrastruktury, ale w aktualnym kodzie nie znaleziono aktywnego uzycia typow MailKit. To zmniejsza biezaca ekspozycje, ale nie usuwa problemu, poniewaz zaleznosc nadal znajduje sie w projekcie i moze zostac uzyta przy przyszlej implementacji wysylki wiadomosci e-mail.
+
+Dla systemu lombardowego ryzyko byloby najwieksze wtedy, gdyby aplikacja zaczela wysylac wiadomosci e-mail z potwierdzeniami, dokumentami, resetem hasla albo powiadomieniami operacyjnymi przez SMTP z STARTTLS. W takim scenariuszu atak moglby prowadzic do oslabienia sposobu logowania do serwera pocztowego, a posrednio do przechwycenia danych uwierzytelniajacych lub falszowania komunikacji. Zalecane dzialanie jest proste: albo usunac pakiet, jezeli nie jest potrzebny, albo zaktualizowac go co najmniej do wersji \path{4.16.0}, ktora advisory wskazuje jako wersje poprawiona. Dodatkowo konfiguracja poczty nie powinna dopuszczac akceptowania niepoprawnych certyfikatow TLS, a opcje polaczenia powinny wymuszac bezpieczny wariant szyfrowania.
+
+\textbf{Zrodla:} \url{https://github.com/jstedfast/MailKit/security/advisories/GHSA-9j88-vvj5-vhgr}, \url{https://www.nuget.org/packages/MailKit/4.8.0}
+
+\clearpage
+\subsection{MimeKit}
+
+\textbf{Wersja biblioteki:} \path{MimeKit 4.8.0}\\
+\textbf{Rodzaj zaleznosci:} pakiet przechodni rozwiazany przez NuGet, powiazany z obsluga poczty.\\
+\textbf{Znalezione bledy:} \path{GHSA-g7hc-96xr-gvvx}, \path{CVE-2026-30227}, CRLF Injection w lokalnej czesci adresu e-mail.
+
+\textbf{Mapowanie OWASP Top 10:2025:} podstawowo \path{A03 - Software Supply Chain Failures}, poniewaz podatna biblioteka jest elementem lancucha dostaw aplikacji. Bezposredni charakter bledu odpowiada tez \path{A05 - Injection}, poniewaz sekwencja CRLF moze zmienic skladnie komend SMTP i doprowadzic do wstrzykniecia dodatkowych polecen.
+
+MimeKit jest zaleznoscia przechodnia, dlatego nie pojawil sie w pierwszym rozdziale, ktory celowo opisywal tylko pakiety wpisane bezposrednio w plikach \path{.csproj}. Mimo to jest biblioteka obecna w aktualnym grafie zaleznosci projektu i zostala wskazana przez \texttt{dotnet list package --vulnerable --include-transitive}. Publiczny advisory GitHub opisuje podatnosc CRLF Injection w wersjach \path{MimeKit <= 4.15.0}, a wersja poprawiona jest \path{4.15.1}. Poniewaz projekt rozwiazuje \path{MimeKit 4.8.0}, pakiet miesci sie w zakresie podatnych wersji.
+
+Opisany blad dotyczy sytuacji, w ktorej atakujacy moze wplynac na wartosc adresu e-mail uzywanego pozniej jako adres koperty SMTP, na przyklad \path{MAIL FROM} albo \path{RCPT TO}. Problem polega na tym, ze znaki CR i LF mogly zostac umieszczone w cudzyslowionej lokalnej czesci adresu. Dla protokolu SMTP sekwencja CRLF konczy komende, dlatego jej niepoprawne przepuszczenie w argumencie polecenia moze skutkowac wstrzyknieciem kolejnych polecen SMTP. W praktyce oznacza to ryzyko command injection na poziomie sesji SMTP, falszowania adresatow albo manipulowania trescia i naglowkami wiadomosci, zaleznie od tego, jak aplikacja buduje i wysyla wiadomosci.
+
+W kontekscie \textit{Pawnshop} ta podatnosc ma podobny status jak problem w MailKit: aktualny kod nie pokazuje aktywnego modulu wysylki poczty, ale zaleznosc jest obecna i moze zostac wykorzystana w przyszlosci. Projekt przechowuje dane klientow, uzytkownikow oraz adresy e-mail firmowe, wiec naturalnym kierunkiem rozwoju systemu moglaby byc wysylka powiadomien, dokumentow transakcji albo wiadomosci administracyjnych. Jezeli adresy odbiorcow, nadawcow lub adresy odpowiedzi bylyby tworzone bezposrednio z danych wprowadzonych przez uzytkownika, podatnosc moglaby stac sie realna. Dlatego przy wdrazaniu poczty trzeba traktowac adres e-mail jako dane niezaufane, walidowac go przed zapisaniem oraz przed uzyciem w sesji SMTP, a takze unikac recznego skladania komend lub naglowkow wiadomosci.
+
+Najbardziej praktyczna rekomendacja to aktualizacja zaleznosci tak, aby rozwiazywana wersja MimeKit byla co najmniej \path{4.15.1}. Poniewaz MimeKit jest tutaj zaleznoscia przechodnia, zwykle najlepiej zrobic to przez aktualizacje pakietu MailKit do aktualnej bezpiecznej wersji. Jezeli z powodow kompatybilnosci nie da sie tego zrobic od razu, mozna tymczasowo przypiac bezpieczna wersje MimeKit jawnie w projekcie infrastruktury, ale docelowo lepsze jest utrzymanie zgodnego zestawu pakietow pocztowych. W dokumentacji projektu warto tez zostawic informacje, ze walidacja adresow e-mail jest wymaganiem bezpieczenstwa, a nie tylko walidacja formularza.
+
+\textbf{Zrodla:} \url{https://github.com/advisories/GHSA-g7hc-96xr-gvvx}, \url{https://www.nuget.org/packages/MimeKit/4.8.0}
+
+\clearpage
+\subsection{AWSSDK.Core}
+
+\textbf{Wersja biblioteki:} \path{AWSSDK.Core 4.0.0.16}\\
+\textbf{Rodzaj zaleznosci:} pakiet przechodni rozwiazany przez \path{AWSSDK.S3 4.0.6}.\\
+\textbf{Znalezione bledy:} \path{GHSA-9cvc-h2w8-phrp}, \path{CVE-2026-22611}, niewystarczajaca walidacja wartosci regionu przy budowaniu endpointu.
+
+\textbf{Mapowanie OWASP Top 10:2025:} podstawowo \path{A03 - Software Supply Chain Failures}, poniewaz problem dotyczy zaleznosci przechodniej SDK. Dodatkowo ryzyko laczy sie z \path{A02 - Security Misconfiguration}, bo podatnosc ujawnia sie przez bledna lub zlosliwie zmieniona konfiguracje regionu i endpointu.
+
+AWSSDK.Core jest podstawowym pakietem wspolnym dla bibliotek AWS SDK for .NET. W projekcie nie jest wpisany bezposrednio w pliku \path{Pawnshop.Infrastructure.csproj}, ale zostaje pobrany jako zaleznosc pakietu \path{AWSSDK.S3 4.0.6}. Polecenie \texttt{dotnet list package --vulnerable --include-transitive} wskazalo rozwiazana wersje \path{4.0.0.16} jako podatna. Publiczny advisory GitHub opisuje problem jako zabezpieczenie typu defense in depth dotyczace walidacji parametru regionu, a zakres podatnych wersji NuGet obejmuje \path{AWSSDK.Core >= 4.0.0, < 4.0.3.3}. Wersja \path{4.0.0.16} miesci sie w tym zakresie, natomiast wersja poprawiona wskazana przez advisory jest \path{4.0.3.3}.
+
+Blad polega na tym, ze wartosc regionu uzyta do skonstruowania adresu endpointu nie byla wystarczajaco ograniczona do poprawnej etykiety hosta. Jezeli osoba lub proces majacy wplyw na konfiguracje srodowiska podalby niepoprawna wartosc regionu, aplikacja moglaby kierowac wywolania API do nieoczekiwanych hostow. Advisory ocenia problem jako niskiej waznosci, poniewaz wymaga on kontroli nad konfiguracja i dotyczy przede wszystkim twardego wzmocnienia SDK, a nie typowego zdalnego ataku bez zadnych warunkow wstepnych. Mimo to jest to blad istotny w systemach, ktore pobieraja konfiguracje chmurowa ze zmiennych srodowiskowych, plikow konfiguracyjnych albo sekretow zarzadzanych poza repozytorium.
+
+W \textit{Pawnshop} pakiet S3 jest uzywany do obslugi magazynu plikow. Kod infrastruktury tworzy klienta \path{AmazonS3Client} na podstawie konfiguracji S3 i uzywa go do zapisu, odczytu oraz usuwania plikow. W konfiguracji Docker Compose znajduje sie MinIO, czyli magazyn kompatybilny z S3, a nie klasyczny publiczny endpoint AWS. To zmienia profil ryzyka: parametr regionu moze nie byc glownym elementem lokalnej konfiguracji, ale biblioteka bazowa nadal jest czescia uruchamianej aplikacji. Najbardziej niebezpieczny wariant pojawilby sie, gdyby adres uslugi, region lub inne elementy konfiguracji S3 mogly zostac zmienione przez nieuprawniona osobe albo przez blednie zarzadzane zmienne srodowiskowe. Wtedy aplikacja moglaby wysylac operacje na plikach do nieoczekiwanego miejsca.
+
+Rekomendacja dla projektu to aktualizacja pakietu \path{AWSSDK.S3} do wersji, ktora rozwiazuje bezpieczna wersje \path{AWSSDK.Core}, albo jawne przypiecie \path{AWSSDK.Core >= 4.0.3.3}, jezeli NuGet nadal wybiera podatna wersje przechodnia. Oprocz aktualizacji warto ograniczyc konfiguracje S3 do zaufanych zrodel, walidowac \path{ServiceURL}, nazwe bucketu oraz dane dostepowe i nie pozwalac, aby uzytkownik aplikacji mial jakikolwiek wplyw na endpoint magazynu plikow. Przy srodowiskach produkcyjnych nalezy tez preferowac HTTPS i oddzielne sekrety dla kazdego srodowiska.
+
+\textbf{Zrodla:} \url{https://github.com/advisories/GHSA-9cvc-h2w8-phrp}, \url{https://www.nuget.org/packages/AWSSDK.Core/4.0.0.16}
+
+\clearpage
+\section{Mocne i slabe strony aplikacji w ujeciu OWASP}
+
+Ocena ponizej nie jest pelnym audytem bezpieczenstwa, ale przegladem najwazniejszych obserwacji na podstawie kodu z repozytorium. Punkty zostaly opisane przez pryzmat OWASP Top 10:2025, poniewaz dokumentacja projektu ma koncentrowac sie na zalozeniach bezpieczenstwa aplikacji webowych.
+
+\subsection{Mocne strony}
+
+\textbf{Warstwowa architektura i rozdzielenie odpowiedzialnosci.} Projekt jest podzielony na \path{Domain}, \path{Application}, \path{Infrastructure}, \path{Api} oraz \path{Web}. Taki podzial ogranicza mieszanie logiki biznesowej, dostepu do danych i interfejsu API, co wspiera \path{A06 - Insecure Design}: latwiej wskazac, gdzie powinny znajdowac sie reguly biznesowe, walidacja i dostep do infrastruktury.
+
+\textbf{Uzycie ASP.NET Identity i ról.} Aplikacja korzysta z ASP.NET Identity, tabel uzytkownikow i rol oraz mechanizmu haszowania hasel dostarczanego przez framework. W konfiguracji widac wymagania dotyczace zlozonosci hasla, m.in. minimalna dlugosc, wielkie i male litery, cyfry oraz unikalnosc adresu e-mail. Jest to pozytywny element dla \path{A07 - Authentication Failures}, poniewaz aplikacja nie implementuje samodzielnie podstawowego przechowywania hasel.
+
+\textbf{Zabezpieczenie wielu kontrolerow atrybutem \path{[Authorize]}.} Kontrolery domenowe, takie jak klienci, pracownicy, kategorie, przedmioty i transakcje, sa oznaczone atrybutem wymagajacym zalogowanego uzytkownika. Rowniez hub SignalR dla powiadomien ma atrybut \path{[Authorize]}. To jest dobra baza pod \path{A01 - Broken Access Control}, bo domyslnie ogranicza dostep do operacji biznesowych.
+
+\textbf{Walidacja danych wejsciowych.} Warstwa aplikacyjna korzysta z FluentValidation oraz atrybutow \path{Required}. Walidatory obejmuja m.in. klientow, uzytkownikow, miejsca pracy, pozycje transakcji i generowanie dokumentow. Jest to istotne dla \path{A05 - Injection} oraz \path{A10 - Mishandling of Exceptional Conditions}, poniewaz czesc blednych danych zostaje zatrzymana przed wykonaniem logiki biznesowej.
+
+\textbf{Entity Framework Core zamiast recznego SQL.} W przejrzanym kodzie nie widac skladania zapytan SQL przez konkatenacje tekstu ani uzycia surowych zapytan SQL jako glownego mechanizmu dostepu do danych. Dostep do bazy jest realizowany przez EF Core i LINQ, co naturalnie ogranicza ryzyko klasycznych SQL Injection z \path{A05 - Injection}.
+
+\textbf{Losowe refresh tokeny generowane kryptograficznie.} Refresh token jest generowany przez \path{RandomNumberGenerator.GetBytes(64)}, a nie przez zwykly generator pseudolosowy. To dobry wybor w obszarze \path{A07 - Authentication Failures}, poniewaz token sesyjny powinien byc nieprzewidywalny.
+
+\textbf{Szyfrowanie hasel SMTP przez Data Protection.} Haslo SMTP zapisywane w encji \path{CompanyEmail} jest przed zapisem szyfrowane przez serwis oparty o \path{IDataProtectionProvider}. To wspiera \path{A04 - Cryptographic Failures}, bo sekret aplikacyjny nie jest przechowywany w bazie jako zwykly tekst. Dodatkowo centralny serwis kryptograficzny ulatwia pozniejsza zmiane sposobu ochrony danych.
+
+\textbf{Centralna obsluga wyjatkow.} API ma filtr wyjatkow, ktory zamienia znane wyjatki domenowe na odpowiedzi JSON z odpowiednim statusem HTTP. To jest dobry kierunek dla \path{A10 - Mishandling of Exceptional Conditions}, bo unika rozproszonego lapenia bledow w kazdym kontrolerze i daje jedno miejsce do standaryzacji odpowiedzi.
+
+\textbf{Metadane audytowe w encjach.} \path{DbContext} aktualizuje encje bazowe informacja o uzytkowniku pobrana z claims. To jest wartosciowe dla \path{A09 - Security Logging and Alerting Failures}, poniewaz dane o tym, kto utworzyl lub zmienil rekord, sa podstawa pozniejszego audytu operacji biznesowych.
+
+\subsection{Slabe strony i ryzyka}
+
+\textbf{Niepelny pipeline uwierzytelniania w API.} W \path{Pawnshop.Api/Program.cs} widac \path{app.UseAuthorization()}, ale nie widac \path{app.UseAuthentication()} przed autoryzacja. W aplikacji ASP.NET Core z JWT standardowy pipeline powinien jawnie uruchamiac uwierzytelnianie przed autoryzacja. Ryzyko mapuje sie na \path{A01 - Broken Access Control} oraz \path{A07 - Authentication Failures}, bo konfiguracja zabezpieczen moze dzialac niespojnie albo inaczej niz zakladaja programisci.
+
+\textbf{Brak szczegolowych polityk dostepu dla rol.} Kontrolery maja ogolne \path{[Authorize]}, ale w przegladzie nie znaleziono konsekwentnego uzycia \path{[Authorize(Roles=...)]} albo polityk dla operacji administracyjnych. To oznacza, ze kazdy zalogowany uzytkownik moze potencjalnie miec dostep do endpointow, ktore powinny byc dostepne tylko dla wybranych rol. Jest to klasyczny obszar \path{A01 - Broken Access Control}.
+
+\textbf{Zbyt szeroka konfiguracja CORS.} Konfiguracja CORS pozwala na dowolne origin, metode i naglowek przez \path{AllowAnyOrigin()}, \path{AllowAnyMethod()} oraz \path{AllowAnyHeader()}. W srodowisku produkcyjnym taka konfiguracja jest slabym punktem \path{A02 - Security Misconfiguration}. API powinno dopuszczac tylko znane adresy frontendu i tylko potrzebne metody oraz naglowki.
+
+\textbf{Sekrety i domyslne hasla w plikach konfiguracyjnych.} W \path{appsettings.json}, \path{appsettings.Development.json} i \path{docker-compose.yml} znajduja sie hasla do PostgreSQL, RabbitMQ, MinIO oraz sekret JWT. Nawet jezeli sa to wartosci developerskie, dokumentacja powinna wskazac, ze w produkcji musza zostac przeniesione do bezpiecznego storage sekretow albo zmiennych srodowiskowych. To dotyczy \path{A02 - Security Misconfiguration}, \path{A04 - Cryptographic Failures} i czesciowo \path{A03 - Software Supply Chain Failures}, bo sekrety w repozytorium zwiekszaja ryzyko kompromitacji calego wdrozenia.
+
+\textbf{Podatne zaleznosci w grafie NuGet.} Aktualne sprawdzenie wykazalo \path{MailKit 4.8.0}, \path{MimeKit 4.8.0} oraz \path{AWSSDK.Core 4.0.0.16} jako pakiety z publicznie opisanymi podatnosciami. To bezposrednio odpowiada \path{A03 - Software Supply Chain Failures}. Szczegolnie wazne jest to, ze dwa z tych pakietow sa zaleznosciami przechodnimi, wiec nie wystarczy patrzec tylko na recznie wpisane \path{PackageReference}.
+
+\textbf{Potencjalne ujawnianie szczegolow bledow.} Filtr wyjatkow dla nieznanych bledow zwraca w odpowiedzi \path{context.Exception.ToString()}, czyli szczegoly techniczne i stack trace. Dodatkowo niektore serwisy przekazuja do \path{BadRequestException} surowe komunikaty wyjatkow z warstwy infrastruktury, np. z S3. To jest ryzyko \path{A10 - Mishandling of Exceptional Conditions} oraz \path{A02 - Security Misconfiguration}, poniewaz odpowiedzi API moga ujawniac informacje pomocne dla atakujacego.
+
+\textbf{Transport bez wymuszenia HTTPS w czesci integracji.} Konfiguracja JWT ma \path{RequireHttpsMetadata = false}, a klient S3 ustawia \path{UseHttp = true}. Dla lokalnego MinIO jest to wygodne, ale w produkcji powinno byc wyraznie oddzielone od konfiguracji produkcyjnej. W przeciwnym razie ryzyko mapuje sie na \path{A04 - Cryptographic Failures}, bo dane uwierzytelniajace i pliki moga byc przesylane bez odpowiedniej ochrony transportowej.
+
+\textbf{Bardzo krotki czas blokady konta.} Konfiguracja Identity ustawia \path{DefaultLockoutTimeSpan} na 5 milisekund. Przy atakach brute force taka blokada praktycznie nie spelnia swojej roli. To oslabia ochrone przed \path{A07 - Authentication Failures}; nalezy zastosowac realny czas blokady, limit prob logowania i ewentualnie rate limiting na endpoint logowania.
+
+\textbf{Domyslne konto administracyjne w seederze.} Seeder tworzy konto boss z haslem zapisanym w kodzie. Jest to wygodne na etapie developmentu, ale niebezpieczne w srodowisku produkcyjnym, jezeli nie zostanie zastapione mechanizmem inicjalizacji z sekretu lub recznym procesem onboardingu. Ryzyko odpowiada \path{A07 - Authentication Failures} oraz \path{A02 - Security Misconfiguration}.
+
+\textbf{Tokeny po stronie klienta wymagaja ostroznego modelu zagrozen.} Aplikacja webowa przechowuje stan sesji z tokenami w \path{ProtectedLocalStorage}. Mechanizm ochrony Blazora jest lepszy niz zwykle przechowywanie tekstu jawnego, ale token w storage przegladarki nadal nalezy traktowac jako wrażliwy zasob, szczegolnie przy ryzyku XSS. Dla \path{A07 - Authentication Failures} i \path{A04 - Cryptographic Failures} warto rozwazyc model z ciasteczkami \path{HttpOnly}, \path{Secure} i \path{SameSite}, jezeli architektura aplikacji na to pozwala.
+
+\textbf{Brak widocznego rate limitingu i naglowkow bezpieczenstwa API.} W przejrzanym kodzie nie widac mechanizmu ograniczania liczby zadan ani dodatkowych naglowkow bezpieczenstwa. Dla endpointow logowania, odswiezania tokenu, pobierania plikow i generowania PDF moze to oznaczac wieksza podatnosc na naduzycia oraz odmowe uslugi. Ten obszar laczy sie z \path{A07 - Authentication Failures}, \path{A02 - Security Misconfiguration} i \path{A06 - Insecure Design}.
+
+\subsection{Najwazniejsze rekomendacje}
+
+Najwyzszy priorytet powinny miec zmiany, ktore dotykaja kontroli dostepu i sekretow. Nalezy dodac \path{UseAuthentication()} przed \path{UseAuthorization()}, doprecyzowac polityki rol dla endpointow administracyjnych, ograniczyc CORS do zaufanych originow oraz usunac sekrety z plikow konfiguracyjnych wersjonowanych w repozytorium. Rownolegle trzeba zaktualizowac podatne pakiety NuGet i rozdzielic konfiguracje developerska od produkcyjnej, szczegolnie dla JWT, S3/MinIO, RabbitMQ i PostgreSQL.
+
+Drugi priorytet to twarde usprawnienia operacyjne: usuniecie stack trace z odpowiedzi API, realny lockout konta, rate limiting dla logowania i operacji kosztownych, centralne logowanie zdarzen bezpieczenstwa oraz regularne skanowanie zaleznosci w CI. Te prace bezposrednio wzmacniaja zgodnosc z OWASP Top 10:2025 i zmniejszaja ryzyko, ze pojedynczy blad konfiguracji lub zaleznosci przerodzi sie w incydent produkcyjny.
+
+\textbf{Zrodla OWASP:} \url{https://owasp.org/Top10/2025/}, \url{https://devguide.owasp.org/en/07-training-education/05-top-ten/}
+
+\clearpage
+\section{Proces wdrozenia aplikacji}
+
+Ten rozdzial opisuje praktyczny proces wdrozenia aplikacji \textit{Pawnshop}. Proces bazuje na aktualnych plikach projektu: \path{Dockerfile}, \path{docker-compose.yml}, \path{Taskfile.yml}, konfiguracji \path{appsettings.json} oraz strukturze rozwiazania .NET. Poniewaz dokumentacja ma obejmowac istotne tematy safety i security, kazdy etap wdrozenia zawiera kontrole zwiazane z ochrona danych, stabilnoscia systemu i zasadami OWASP.
+
+\subsection{Etap 1: przygotowanie kodu i zaleznosci}
+
+Przed wdrozeniem nalezy upewnic sie, ze repozytorium jest w stabilnym stanie, a projekt buduje sie bez bledow. Minimalny zestaw kontroli obejmuje przywrocenie pakietow NuGet, zbudowanie rozwiazania oraz sprawdzenie podatnosci zaleznosci:
+
+\begin{itemize}
+    \item \path{dotnet restore Pawnshop.sln},
+    \item \path{dotnet build Pawnshop.sln -c Release},
+    \item \path{dotnet list Pawnshop.sln package --vulnerable --include-transitive}.
+\end{itemize}
+
+Kontrola zaleznosci jest elementem security i mapuje sie na \path{A03 - Software Supply Chain Failures}. W aktualnym stanie projektu nalezy zwrocic szczegolna uwage na podatne pakiety opisane w poprzednim rozdziale: \path{MailKit}, \path{MimeKit} oraz \path{AWSSDK.Core}. Wdrozenie nie powinno byc promowane na produkcje, jezeli znane podatnosci pozostaja bez decyzji: aktualizacja, usuniecie zaleznosci albo formalna akceptacja ryzyka.
+
+\subsection{Etap 2: przygotowanie konfiguracji srodowiska}
+
+Przed uruchomieniem aplikacji nalezy przygotowac konfiguracje dla konkretnego srodowiska: development, test albo production. W projekcie API korzysta m.in. z konfiguracji bazy danych, JWT, RabbitMQ oraz S3/MinIO. Wersja developerska ma wartosci wpisane w \path{appsettings.json}, \path{appsettings.Development.json} i \path{docker-compose.yml}, ale dla produkcji nie nalezy uzywac tych sekretow.
+
+Wdrozenie produkcyjne powinno przekazywac sekrety przez zmienne srodowiskowe, system sekretow albo konfiguracje orkiestratora. Dotyczy to przede wszystkim:
+
+\begin{itemize}
+    \item \path{ConnectionStrings__Database},
+    \item \path{Securities__Secret},
+    \item \path{RabbitMq__Username} oraz \path{RabbitMq__Password},
+    \item \path{S3Service__AccessKey} oraz \path{S3Service__SecretKey},
+    \item hasel PostgreSQL, pgAdmin, RabbitMQ i MinIO.
+\end{itemize}
+
+Ten etap dotyczy \path{A02 - Security Misconfiguration} oraz \path{A04 - Cryptographic Failures}. Dla safety wazne jest takze rozdzielenie baz danych dla developmentu, testow i produkcji, aby testowe uruchomienie migracji albo demonstracji nie moglo uszkodzic danych produkcyjnych.
+
+\subsection{Etap 3: przygotowanie infrastruktury kontenerowej}
+
+Aktualny \path{docker-compose.yml} uruchamia nastepujace uslugi: PostgreSQL, pgAdmin, RabbitMQ, API oraz MinIO. Dla wdrozenia lokalnego mozna uzyc polecenia:
+
+\begin{itemize}
+    \item \path{docker-compose up --build -d}
+\end{itemize}
+
+albo zadania z \path{Taskfile.yml}:
+
+\begin{itemize}
+    \item \path{task run}.
+\end{itemize}
+
+W srodowisku produkcyjnym ten plik powinien zostac potraktowany jako punkt wyjscia, a nie gotowa konfiguracja produkcyjna. Przed produkcja nalezy zmienic domyslne hasla, ograniczyc wystawione porty, usunac publiczny dostep do paneli administracyjnych, przypiac obrazy do konkretnych wersji zamiast \path{latest} oraz wymusic bezpieczna komunikacje HTTPS. Szczegolnie wrazliwe sa porty pgAdmin, RabbitMQ Management i konsoli MinIO.
+
+\subsection{Etap 4: budowa obrazu API}
+
+Obraz API budowany jest przez \path{Dockerfile}. Proces sklada sie z kilku faz: przywrocenie zaleznosci, kompilacja projektu \path{Pawnshop.Api}, publikacja aplikacji oraz skopiowanie wyniku do obrazu runtime .NET 8. Wdrozenie lokalne wykonuje ten proces automatycznie przy \path{docker-compose up --build}.
+
+Z perspektywy security nalezy zwrocic uwage, ze Dockerfile generuje certyfikat self-signed wewnatrz kontenera. Jest to akceptowalne dla developmentu, ale nie powinno byc sposobem obslugi TLS w produkcji. W produkcji certyfikat powinien byc zarzadzany przez reverse proxy, load balancer, ingress albo inny kontrolowany mechanizm. Dodatkowo koncowy kontener nie powinien dzialac jako \path{root}, jezeli nie jest to konieczne.
+
+\subsection{Etap 5: uruchomienie zaleznosci infrastrukturalnych}
+
+Po zbudowaniu obrazu nalezy uruchomic zalezne uslugi i sprawdzic, czy kazda z nich jest dostepna:
+
+\begin{itemize}
+    \item PostgreSQL powinien przyjmowac polaczenia na skonfigurowanym porcie i miec trwaly wolumen \path{pgdata},
+    \item RabbitMQ powinien dzialac przed startem funkcji, ktore publikuja zdarzenia,
+    \item MinIO powinno miec dostepny bucket uzywany przez aplikacje albo mozliwosc jego utworzenia,
+    \item API powinno miec poprawne connection stringi i dane dostepowe do uslug.
+\end{itemize}
+
+Kontrola tych uslug jest elementem safety, poniewaz awaria bazy, kolejki albo storage moze przerwac kluczowe procesy aplikacji. Jest tez elementem security, poniewaz kazda z tych uslug przechowuje lub transportuje dane wrazliwe.
+
+\subsection{Etap 6: migracje bazy danych}
+
+Po uruchomieniu bazy danych nalezy wykonac migracje Entity Framework. W projekcie przewidziano do tego zadanie:
+
+\begin{itemize}
+    \item \path{task db-update}
+\end{itemize}
+
+ktore uruchamia:
+
+\begin{itemize}
+    \item \path{dotnet ef database update --project Pawnshop.Infrastructure --startup-project Pawnshop.Api}.
+\end{itemize}
+
+Przed migracja produkcyjna nalezy wykonac kopie zapasowa bazy danych i zweryfikowac migracje na srodowisku testowym. Jest to kluczowy element safety: bledna migracja moze uszkodzic schemat, zablokowac aplikacje albo utrudnic odtworzenie historii transakcji. Z perspektywy security migracje nie powinny dodawac danych testowych, domyslnych kont lub sekretow do produkcyjnej bazy.
+
+\subsection{Etap 7: start API i aplikacji webowej}
+
+API w kontenerze wystawia porty \path{5000} oraz \path{5001}. Dla lokalnego uruchomienia webowego \path{Taskfile.yml} zawiera zadanie:
+
+\begin{itemize}
+    \item \path{task watch}
+\end{itemize}
+
+ktore uruchamia \path{Pawnshop.Web} z hot reloadem. W srodowisku produkcyjnym frontend powinien wskazywac na produkcyjny adres backendu przez konfiguracje \path{BackendUrl}. Nalezy unikac mieszania adresow developerskich i produkcyjnych, poniewaz moze to prowadzic do wysylania tokenow lub danych uzytkownika do zlego srodowiska.
+
+Na tym etapie trzeba zweryfikowac pipeline uwierzytelniania API. W dokumentacji ryzyk wskazano, ze w \path{Program.cs} widoczne jest \path{UseAuthorization()}, ale nie widac \path{UseAuthentication()}. Przed wdrozeniem produkcyjnym nalezy to poprawic i sprawdzic, czy endpointy oznaczone \path{[Authorize]} faktycznie odrzucaja zadania bez poprawnego tokenu JWT.
+
+\subsection{Etap 8: testy powdrozeniowe}
+
+Po uruchomieniu aplikacji nalezy wykonac testy smoke test i testy bezpieczenstwa. Minimalna lista obejmuje:
+
+\begin{itemize}
+    \item sprawdzenie, czy API odpowiada na endpointach zdrowia lub podstawowych endpointach aplikacji,
+    \item probe logowania poprawnym i niepoprawnym haslem,
+    \item probe wejscia na endpoint \path{[Authorize]} bez tokenu JWT,
+    \item weryfikacje zapisu i odczytu danych z PostgreSQL,
+    \item weryfikacje zapisu oraz pobrania pliku przez MinIO/S3,
+    \item weryfikacje publikacji zdarzen do RabbitMQ,
+    \item probe wygenerowania dokumentu PDF,
+    \item sprawdzenie, czy odpowiedzi API nie ujawniaja stack trace ani sekretow,
+    \item sprawdzenie, czy CORS dopuszcza tylko zaufany frontend.
+\end{itemize}
+
+Te testy lacza safety i security. Safety potwierdza, ze system wykonuje podstawowe procesy biznesowe. Security potwierdza, ze aplikacja nie przyjmuje nieautoryzowanych zadan, nie ujawnia danych technicznych i nie ma oczywistych bledow konfiguracji.
+
+\subsection{Etap 9: monitoring, logi i backup}
+
+Po wdrozeniu nalezy wlaczyc obserwacje systemu. W praktyce oznacza to monitorowanie logow API, stanu bazy danych, kolejki RabbitMQ, MinIO oraz zasobow kontenerow. Logi powinny pozwalac wykryc bledy logowania, bledy autoryzacji, wyjatki aplikacyjne, problemy z kolejka i problemy ze storage.
+
+Wazne jest, aby logi nie ujawnialy sekretow, tokenow, hasel ani pelnych stack trace uzytkownikowi koncowemu. Ten obszar mapuje sie na \path{A09 - Security Logging and Alerting Failures} oraz \path{A10 - Mishandling of Exceptional Conditions}. Dla safety nalezy dodatkowo wdrozyc regularne backupy PostgreSQL oraz danych MinIO, a takze okresowo testowac odtworzenie danych.
+
+\subsection{Etap 10: rollback i odtworzenie po awarii}
+
+Proces wdrozenia musi miec plan cofniecia zmian. Przed aktualizacja produkcyjna nalezy zapisac wersje obrazu aplikacji, wykonac backup bazy danych i upewnic sie, ze poprzedni obraz moze zostac ponownie uruchomiony. Jezeli migracja bazy jest nieodwracalna, rollback aplikacji moze nie wystarczyc; wtedy potrzebna jest procedura odtworzenia bazy z backupu.
+
+Dla wdrozenia kontenerowego podstawowy rollback polega na zatrzymaniu aktualnej wersji, uruchomieniu poprzedniego obrazu oraz przywroceniu zgodnej konfiguracji. Dla danych krytycznych, takich jak transakcje, klienci i dokumenty, rollback musi byc wykonywany ostroznie, aby nie utracic danych utworzonych po wdrozeniu. Ten etap jest przede wszystkim wymaganiem safety, ale ma tez znaczenie security, bo chaotyczny rollback czesto prowadzi do przywracania starych sekretow albo podatnych wersji zaleznosci.
+
+\subsection{Minimalna checklista przed produkcja}
+
+Przed produkcyjnym wdrozeniem aplikacji \textit{Pawnshop} nalezy potwierdzic nastepujace punkty:
+
+\begin{itemize}
+    \item aplikacja buduje sie w konfiguracji \path{Release},
+    \item podatne zaleznosci zostaly zaktualizowane albo ryzyko zostalo formalnie zaakceptowane,
+    \item sekrety zostaly usuniete z plikow wersjonowanych i przekazane przez bezpieczny mechanizm,
+    \item \path{UseAuthentication()} znajduje sie przed \path{UseAuthorization()},
+    \item CORS dopuszcza tylko zaufane adresy frontendu,
+    \item konta domyslne i hasla developerskie zostaly usuniete albo zmienione,
+    \item panele administracyjne nie sa publicznie wystawione,
+    \item HTTPS jest wymuszone poprawnym certyfikatem,
+    \item baza danych i MinIO maja skonfigurowane backupy,
+    \item migracje zostaly przetestowane na srodowisku testowym,
+    \item testy powdrozeniowe przeszly poprawnie,
+    \item istnieje plan rollbacku i odtworzenia danych.
+\end{itemize}
+
+Taki proces wdrozenia ogranicza ryzyka opisane w OWASP Top 10:2025, a jednoczesnie zabezpiecza ciaglosc pracy aplikacji. W praktyce oznacza to, ze wdrozenie nie konczy sie na uruchomieniu kontenerow; konczy sie dopiero po sprawdzeniu konfiguracji, migracji, dostepu, logow, backupow i mozliwosci odtworzenia systemu.
+
+\end{document}
