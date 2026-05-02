@@ -1,70 +1,82 @@
-# Pawnshop
+# Pawnshop Management System
 
-Pawnshop is a modular application built with .NET, following clean architecture principles. The system is designed to support trading operations, item management, and extensible business logic, with a clear separation between application layers.
+A web application for managing pawnshop chains, built with .NET 8 (Blazor & Web API) following Clean Architecture principles.
 
-## Architecture
+This project was developed to streamline daily pawnshop operations, including client management, collateral valuation, automated PDF contract generation, and geographical tracking of workplaces.
 
-The solution is structured using a layered approach:
+---
 
-```
-Pawnshop.sln
-│
-├── Pawnshop.Domain         # Core domain models and business rules
-├── Pawnshop.Application    # Application logic and use cases
-├── Pawnshop.Infrastructure # External integrations (database, services)
-├── Pawnshop.Api            # Backend API
-└── Pawnshop.Web            # Frontend (UI layer)
-```
+## Key Features
 
-This separation ensures maintainability, scalability, and testability.
+* **Full i18n Localization:** Deep integration of both Polish and English languages (PL/EN) across the UI and data grid components.
+* **Geographical Tracking:** Integrated geocoding (OpenStreetMap/Nominatim) and Leaflet.js maps for pinning and validating real physical pawnshop locations.
+* **Automated Contracts:** System-generated PDF agreements (powered by QuestPDF) with real-time, timezone-aware timestamps.
+* **Security & Identity:** Token-based authentication (JWT) with Refresh Tokens and role-based access control.
+* **Business Dashboard:** Dynamic KPI tracking and live-feed of recent sales and loan operations.
+* **Universal CRUD Architecture:** Highly reusable, generic components (UniversalGrid, UniversalCrudMenu) reducing frontend boilerplate.
 
-## Features
+---
 
-* Modular and extensible architecture
-* Separation of concerns (Domain / Application / Infrastructure)
-* REST API for backend communication
-* Web interface for user interaction
-* Support for localization (PL / EN)
-* Trading and item management system
-* Docker support for containerized environments
+## Tech Stack
 
-## Technologies
+### Frontend
+* **Blazor Web App** - Interactive client-side web UI with C#.
+* **MudBlazor** - Material Design component framework.
+* **Leaflet.js** - Open-source interactive maps.
 
-* .NET
-* ASP.NET Core
-* Docker / Docker Compose
-* REST API
-* (optional) Entity Framework Core
+### Backend
+* **.NET 8 Web API** - High-performance backend routing and RESTful endpoints.
+* **Clean Architecture & CQRS** - Utilizing MediatR for decoupled request/handler logic.
+* **Entity Framework Core** - ORM framework.
+* **PostgreSQL** - Relational database.
+* **QuestPDF** - Open-source library for advanced, code-first PDF generation.
+* **MassTransit & RabbitMQ** - Message-based architecture for background processing (e.g., valuation queues, email notifications).
+
+---
+
+## Architecture Overview
+
+The solution is divided into distinct layers emphasizing the separation of concerns:
+
+* `Pawnshop.Domain` - Enterprise logic, entities, exceptions, and core enums.
+* `Pawnshop.Application` - Business rules, CQRS Commands/Queries, validations, and DTOs.
+* `Pawnshop.Infrastructure` - External concerns: EF Core DbContext, S3 configurations, RabbitMQ, PDF Engine, and Geocoding APIs.
+* `Pawnshop.Api` - Application entry point, Controllers, Exception Filters, and Dependency Injection bootstrapping.
+* `Pawnshop.Web` - The Blazor presentation layer with Themes, Localizers, and UI Components.
+
+---
 
 ## Getting Started
 
-### Requirements
+### Prerequisites
+* .NET 8 SDK
+* Docker Desktop (for PostgreSQL & RabbitMQ)
 
-* .NET SDK
-* Docker (optional, recommended)
+### Local Setup
 
-### Running with Docker
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/YourUsername/Pawnshop.git
+   cd Pawnshop
+   ```
 
-```bash
-docker-compose up --build
-```
+2. **Start the Infrastructure**
+   Ensure Docker is running, then spin up the required databases and message brokers:
+   ```bash
+   docker-compose up -d
+   ```
 
-## Configuration
+3. **Apply Database Migrations**
+   ```bash
+   dotnet ef database update --project Pawnshop.Infrastructure --startup-project Pawnshop.Api
+   ```
 
-Application configuration is managed via standard .NET configuration files:
-
-* `appsettings.json`
-* environment variables
-* Docker configuration (`docker-compose.yml`)
-
-## Development
-
-The project follows clean architecture principles:
-
-* Domain layer contains no external dependencies
-* Application layer defines use cases and business workflows
-* Infrastructure layer handles persistence and external services
-* API exposes endpoints
-* Web provides user interface
-
-This repository is actively evolving. The current focus includes UI improvements, localization, and enhancements to the trading system.
+4. **Run the Application**
+   You can run the API and Blazor frontend using the .NET CLI or your favorite IDE.
+   ```bash
+   # Run the Backend API
+   dotnet run --project Pawnshop.Api
+   
+   # Run the Blazor Web UI
+   dotnet watch run --project Pawnshop.Web
+   ```

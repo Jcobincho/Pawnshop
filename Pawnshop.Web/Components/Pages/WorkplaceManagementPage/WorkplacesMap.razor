@@ -1,0 +1,360 @@
+@page "/Workplaces-map"
+@using Microsoft.JSInterop
+@using Pawnshop.Application.WorkplacesApplication.Dto
+@using Pawnshop.Application.WorkplacesApplication.Responses
+@using Pawnshop.Web.Services
+@using Pawnshop.Web.Services.ApiService
+@inject ApiService ApiService
+@inject IJSRuntime JS
+@inject LanguageService Lang
+@implements IAsyncDisposable
+@implements IDisposable
+
+<div class="d-flex align-center justify-space-between mb-6">
+    <MudText Typo="Typo.h4" Style="font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--mud-palette-primary); text-transform: uppercase; letter-spacing: 1px;">
+        @Lang.WorkplaceMap
+    </MudText>
+    <div class="d-flex align-center gap-2 map-actions">
+        <MudButton Variant="@GetStyleButtonVariant(StandardStyleUrl)" Color="Color.Primary" OnClick="@(() => SetMapStyleAsync(StandardStyleUrl))">
+            @Lang.T("Standard", "Standard")
+        </MudButton>
+        <MudButton Variant="@GetStyleButtonVariant(LightStyleUrl)" Color="Color.Primary" OnClick="@(() => SetMapStyleAsync(LightStyleUrl))">
+            @Lang.T("Jasna", "Light")
+        </MudButton>
+        <MudButton Variant="@GetStyleButtonVariant(DarkStyleUrl)" Color="Color.Primary" OnClick="@(() => SetMapStyleAsync(DarkStyleUrl))">
+            @Lang.T("Ciemna", "Dark")
+        </MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="ReloadAsync">
+            @Lang.T("Odśwież", "Refresh")
+        </MudButton>
+    </div>
+</div>
+
+<MudGrid Spacing="3">
+    <MudItem xs="12" lg="8">
+        <MudPaper Elevation="4" Class="pa-2 workplace-map-shell">
+            @if (_loading)
+            {
+                <div class="map-loading">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2">@Lang.Loading</MudText>
+                </div>
+            }
+            <div id="workplaces-map" class="workplaces-map"></div>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" lg="4">
+        <MudPaper Elevation="4" Class="pa-4 workplace-map-side">
+            <MudText Typo="Typo.h6" Class="mb-3" Style="font-family: 'Outfit', sans-serif; font-weight: 700;">
+                @(_selectedWorkplace == null ? Lang.T("Lombardy", "Workplaces") : _selectedWorkplace.City)
+            </MudText>
+
+            @if (_selectedWorkplace != null)
+            {
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.subtitle2" Color="Color.Primary">@_selectedWorkplace.StreetAndBuildingNumber</MudText>
+                    <MudText Typo="Typo.body2">@_selectedWorkplace.ZipCode @_selectedWorkplace.City</MudText>
+                    <MudText Typo="Typo.body2">@_selectedWorkplace.Region, @_selectedWorkplace.Country</MudText>
+                    <MudDivider />
+                    <MudText Typo="Typo.caption">Lat: @_selectedWorkplace.Latitude?.ToString("F6")</MudText>
+                    <MudText Typo="Typo.caption">Lon: @_selectedWorkplace.Longitude?.ToString("F6")</MudText>
+                </MudStack>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+                    @Lang.T("Wybierz marker na mapie.", "Select a marker on the map.")
+                </MudAlert>
+            }
+
+            <MudDivider Class="my-4" />
+
+            <MudStack Spacing="1">
+                @foreach (var workplace in _mappedWorkplaces)
+                {
+                    <MudButton Variant="@GetWorkplaceButtonVariant(workplace)" Color="Color.Primary" Class="workplace-list-button" OnClick="@(() => SelectFromListAsync(workplace))">
+                        @workplace.City, @workplace.StreetAndBuildingNumber
+                    </MudButton>
+                }
+            </MudStack>
+
+            @if (!_mappedWorkplaces.Any())
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">
+                    @Lang.T("Brak lombardów z zapisanymi współrzędnymi.", "No workplaces with saved coordinates.")
+                </MudAlert>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private List<WorkplaceDto> _workplaces = new();
+    private List<WorkplaceDto> _mappedWorkplaces = new();
+    private WorkplaceDto? _selectedWorkplace;
+    private IJSObjectReference? _mapModule;
+    private DotNetObjectReference<WorkplacesMap>? _dotNetReference;
+    private bool _loading = true;
+    private bool _renderPending;
+    private string _mapStyleUrl = StandardStyleUrl;
+
+    private const string StandardStyleUrl = "https://tiles.openfreemap.org/styles/liberty";
+    private const string LightStyleUrl = "https://tiles.openfreemap.org/styles/bright";
+    private const string DarkStyleUrl = "https://tiles.openfreemap.org/styles/dark";
+
+    protected override void OnInitialized()
+    {
+        Lang.OnLanguageChanged += StateHasChanged;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _mapModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/workplacesMap.js");
+            _dotNetReference = DotNetObjectReference.Create(this);
+            await RenderMapAsync();
+        }
+        else if (_renderPending)
+        {
+            await RenderMapAsync();
+        }
+    }
+
+    private async Task ReloadAsync()
+    {
+        await LoadDataAsync();
+        await RenderMapAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _loading = true;
+        try
+        {
+            var response = await ApiService.GetAsync<GetAllWorkplacesResponse>("Workplaces/get", null);
+            _workplaces = response?.AllWorkplacesList ?? new();
+            _mappedWorkplaces = _workplaces
+                .Where(x => x.Latitude.HasValue && x.Longitude.HasValue)
+                .ToList();
+            _selectedWorkplace = _mappedWorkplaces.FirstOrDefault();
+        }
+        catch (Exception)
+        {
+            _workplaces = new();
+            _mappedWorkplaces = new();
+            _selectedWorkplace = null;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task RenderMapAsync()
+    {
+        if (_mapModule == null || _dotNetReference == null)
+        {
+            _renderPending = true;
+            return;
+        }
+
+        _renderPending = false;
+        var mapItems = _mappedWorkplaces.Select(x => new
+        {
+            WorkplaceId = x.WorkplaceId,
+            x.Country,
+            x.Region,
+            x.City,
+            x.StreetAndBuildingNumber,
+            x.ZipCode,
+            Latitude = x.Latitude!.Value,
+            Longitude = x.Longitude!.Value
+        });
+
+        await _mapModule.InvokeVoidAsync("renderWorkplacesMap", "workplaces-map", mapItems, _dotNetReference, _mapStyleUrl);
+    }
+
+    private async Task SetMapStyleAsync(string styleUrl)
+    {
+        _mapStyleUrl = styleUrl;
+        await RenderMapAsync();
+    }
+
+    private Variant GetStyleButtonVariant(string styleUrl)
+    {
+        return _mapStyleUrl == styleUrl ? Variant.Filled : Variant.Outlined;
+    }
+
+    private Variant GetWorkplaceButtonVariant(WorkplaceDto workplace)
+    {
+        return _selectedWorkplace?.WorkplaceId == workplace.WorkplaceId ? Variant.Filled : Variant.Text;
+    }
+
+    private async Task SelectFromListAsync(WorkplaceDto workplace)
+    {
+        _selectedWorkplace = workplace;
+        if (_mapModule != null)
+        {
+            await _mapModule.InvokeVoidAsync("focusWorkplace", workplace.WorkplaceId);
+        }
+    }
+
+    [JSInvokable]
+    public Task SelectWorkplace(string workplaceId)
+    {
+        if (Guid.TryParse(workplaceId, out var parsedId))
+        {
+            _selectedWorkplace = _mappedWorkplaces.FirstOrDefault(x => x.WorkplaceId == parsedId);
+            StateHasChanged();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        Lang.OnLanguageChanged -= StateHasChanged;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (_mapModule != null)
+            {
+                await _mapModule.InvokeVoidAsync("disposeWorkplacesMap");
+                await _mapModule.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+
+        _dotNetReference?.Dispose();
+    }
+}
+
+<style>
+    .map-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .workplace-map-shell {
+        position: relative;
+        min-height: 640px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .workplaces-map {
+        width: 100%;
+        height: 640px;
+        min-height: 60vh;
+        border-radius: 6px;
+    }
+
+    .workplaces-map .maplibregl-canvas {
+        border-radius: 6px;
+    }
+
+    .workplace-map-marker {
+        width: 30px;
+        height: 30px;
+        border: 2px solid #ffffff;
+        border-radius: 50% 50% 50% 6px;
+        background: #c5a059;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+        cursor: pointer;
+        transform: rotate(-45deg);
+        transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .workplace-map-marker::after {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        top: 8px;
+        left: 8px;
+        border-radius: 50%;
+        background: #ffffff;
+    }
+
+    .workplace-map-marker:hover {
+        background: #1f2937;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.36);
+        transform: rotate(-45deg) translateY(-3px);
+    }
+
+    .workplace-map-popup .maplibregl-popup-content {
+        border-radius: 8px;
+        padding: 12px 14px;
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .workplace-popup-content {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 180px;
+    }
+
+    .workplace-popup-content strong {
+        color: #1f2937;
+        font-size: 0.95rem;
+    }
+
+    .workplace-popup-content span {
+        color: #4b5563;
+        font-size: 0.82rem;
+    }
+
+    .workplace-map-side {
+        min-height: 640px;
+        border-radius: 8px;
+    }
+
+    .workplace-list-button {
+        justify-content: flex-start;
+        min-height: 40px;
+        text-align: left;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .map-loading {
+        position: absolute;
+        inset: 0;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.72);
+    }
+
+    @@media (max-width: 960px) {
+        .workplace-map-shell,
+        .workplace-map-side {
+            min-height: auto;
+        }
+
+        .workplaces-map {
+            height: 520px;
+            min-height: 520px;
+        }
+
+        .map-actions {
+            justify-content: flex-start;
+            margin-top: 12px;
+        }
+    }
+</style>

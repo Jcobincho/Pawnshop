@@ -362,7 +362,14 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadInitialData();
-        if (CurrentTransaction != null)
+        if (SelectedAction == UniversalCrudMenu.CrudAction.AddCopy && CurrentTransaction != null)
+        {
+            _symbol = $"UM/{DateTime.Now:yyyy/MM}/{(new Random().Next(1000, 9999))}";
+            _workplaceId = CurrentTransaction.Workplace.Id;
+            _clientId = CurrentTransaction.Client?.Id;
+            _description = CurrentTransaction.Description + " (Copy)";
+        }
+        else if (CurrentTransaction != null)
         {
             _symbol = CurrentTransaction.Symbol;
             _workplaceId = CurrentTransaction.Workplace.Id;
@@ -373,13 +380,6 @@
         {
             _symbol = $"UM/{DateTime.Now:yyyy/MM}/{(new Random().Next(1000, 9999))}";
             _description = Lang.T("Nowa transakcja", "New transaction");
-        }
-        else if (SelectedAction == UniversalCrudMenu.CrudAction.AddCopy && CurrentTransaction != null)
-        {
-            _symbol = $"UM/{DateTime.Now:yyyy/MM}/{(new Random().Next(1000, 9999))}";
-            _workplaceId = CurrentTransaction.Workplace.Id;
-            _clientId = CurrentTransaction.Client?.Id;
-            _description = CurrentTransaction.Description + " (Copy)";
         }
     }
 

@@ -209,8 +209,10 @@ public class TransactionAgreementDocument : IDocument
             {
                 c.Item().Text(x =>
                 {
+                    var polishTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+                    var localDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, polishTimeZone);
                     x.Span("Dokument wygenerowany systemowo / System generated document: ").FontSize(7).FontColor(ColorSecondary);
-                    x.Span($"{DateTime.Now:dd.MM.yyyy HH:mm}").FontSize(7).Bold().FontColor(ColorSecondary);
+                    x.Span($"{localDate:dd.MM.yyyy HH:mm}").FontSize(7).Bold().FontColor(ColorSecondary);
                 });
                 c.Item().Text($"Transaction ID: {_data.PurchaseSaleTransactionId}").FontSize(6).FontColor(Colors.Grey.Lighten1);
             });

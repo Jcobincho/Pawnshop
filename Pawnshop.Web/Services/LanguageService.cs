@@ -29,6 +29,7 @@ namespace Pawnshop.Web.Services
         public string Home => T("Strona główna", "Home");
         public string TradingManagement => T("Zarządzanie Transakcjami", "Trading Management");
         public string WorkplaceManagement => T("Zarządzanie Lombardami", "Workplace Management");
+        public string WorkplaceMap => T("Mapa lombardów", "Workplace Map");
         public string ClientManagement => T("Zarządzanie Klientami", "Client Management");
         public string EmployeeManagement => T("Zarządzanie Pracownikami", "Employee Management");
         public string UserManagement => T("Zarządzanie Użytkownikami", "User Management");

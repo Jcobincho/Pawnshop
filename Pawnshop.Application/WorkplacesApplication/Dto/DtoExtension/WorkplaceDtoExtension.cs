@@ -14,6 +14,8 @@ namespace Pawnshop.Application.WorkplacesApplication.Dto.DtoExtension
                 StreetAndBuildingNumber = workplace.StreetAndBuildingNumber,
                 ZipCode = workplace.ZipCode,
                 City = workplace.City,
+                Latitude = workplace.Latitude,
+                Longitude = workplace.Longitude,
                 CreatedAt = workplace.CreatedAt,
                 CreatedBy = workplace.CreatedBy,
                 EditedAt = workplace.EditedAt,
